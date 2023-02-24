@@ -1,5 +1,4 @@
 import {
-  APIInteractionGuildMember,
   ChatInputCommandInteraction,
   Client,
   Guild,

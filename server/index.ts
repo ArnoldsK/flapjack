@@ -6,12 +6,16 @@ import { getUrl } from "./helpers/web"
 import { appConfig } from "./config"
 import { Client, Events, GatewayIntentBits, REST, Routes } from "discord.js"
 import { getSetupCommands } from "./helpers/commands"
+import { assert } from "./helpers/error"
 
 // Prepare next app
 const nextApp = next({ dev: appConfig.dev })
 const handle = nextApp.getRequestHandler()
 
 nextApp.prepare().then(async () => {
+  // Validate data
+  assert(!!appConfig.discord.token, "Discord token missing")
+
   // Get discord commands
   const commands = getSetupCommands()
 

@@ -1,14 +1,17 @@
-// TODO .env
+import { loadEnvConfig } from "@next/env"
+
+loadEnvConfig(process.cwd())
+
 export const appConfig = {
-  dev: true,
+  dev: Boolean(process.env.DEV),
 
   web: {
-    port: 3000,
-    baseUrl: "http://localhost:3000",
+    port: parseInt(process.env.WEB_PORT || "3000"),
+    baseUrl: process.env.WEB_BASE_URL || "http://localhost:3000",
   },
 
   discord: {
-    token: "MzgxOTUyMjM0NDY1Nzg3OTI0.WhIWvQ.d71dERJyd7t9Xy_aQ2nOuo_q7_8",
+    token: process.env.DISCORD_TOKEN || "",
 
     ids: {
       client: "381952234465787924",
