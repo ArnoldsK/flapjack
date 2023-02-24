@@ -48,7 +48,7 @@ export class Magik extends BaseCommand {
 
     try {
       // Attempt to send the image as an attachment
-      await this.reply({
+      this.reply({
         files: [
           {
             name: "magik.png",
@@ -56,8 +56,6 @@ export class Magik extends BaseCommand {
           },
         ],
       })
-
-      this.success()
     } catch (err) {
       this.fail((err as Error).message)
     }
