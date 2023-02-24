@@ -15,6 +15,7 @@ const handle = nextApp.getRequestHandler()
 nextApp.prepare().then(async () => {
   // Validate data
   assert(!!appConfig.discord.token, "Discord token missing")
+  assert(!!appConfig.discord.client, "Discord client missing")
 
   // Get discord commands
   const commands = getSetupCommands()
@@ -24,7 +25,7 @@ nextApp.prepare().then(async () => {
 
   await rest.put(
     Routes.applicationGuildCommands(
-      appConfig.discord.ids.client,
+      appConfig.discord.client,
       appConfig.discord.ids.guild,
     ),
     {

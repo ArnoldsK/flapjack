@@ -12,9 +12,9 @@ export const appConfig = {
 
   discord: {
     token: process.env.DISCORD_TOKEN || "",
+    client: process.env.DISCORD_TOKEN || "",
 
     ids: {
-      client: "381952234465787924",
       guild: "411593263615836172",
       roles: {
         nitroBooster: "611953929835643024",
