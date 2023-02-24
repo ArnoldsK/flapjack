@@ -12,7 +12,7 @@ export const appConfig = {
 
   discord: {
     token: process.env.DISCORD_TOKEN || "",
-    client: process.env.DISCORD_TOKEN || "",
+    client: process.env.DISCORD_CLIENT || "",
 
     ids: {
       guild: "411593263615836172",
