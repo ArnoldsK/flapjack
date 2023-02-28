@@ -12,7 +12,7 @@ import {
   User,
 } from "discord.js"
 
-import { Permission, permission } from "../helpers/permission"
+import { Permission, permission } from "../utils/permission"
 
 class BaseCommand {
   constructor(protected interaction: ChatInputCommandInteraction) {}

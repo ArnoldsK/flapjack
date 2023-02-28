@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "discord.js"
-import { isUrl } from "../helpers/web"
+import { isUrl } from "../utils/web"
 import { BaseCommand } from "../base/Command"
 
 const API_URL = "https://arnoldsk.lv/liquify-api/?url="

@@ -2,11 +2,11 @@ import next from "next"
 import express from "express"
 import http from "http"
 
-import { getUrl } from "./helpers/web"
+import { getUrl } from "./utils/web"
 import { appConfig } from "./config"
 import { Client, Events, GatewayIntentBits, REST, Routes } from "discord.js"
-import { getSetupCommands } from "./helpers/commands"
-import { assert } from "./helpers/error"
+import { getSetupCommands } from "./utils/commands"
+import { assert } from "./utils/error"
 
 // Prepare next app
 const nextApp = next({ dev: appConfig.dev })
