@@ -14,6 +14,7 @@ export default class Recap extends BaseCommand {
     const url = `https://pepsidog.lv/year-recap/${this.user.username}`
 
     this.reply({
+      ephemeral: true,
       embeds: [
         {
           color: this.member.displayColor,
