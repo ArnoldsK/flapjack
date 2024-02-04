@@ -119,7 +119,10 @@ export const getSetupCommands = (): SetupCommand[] => {
   })
 }
 
-export const handleApiCommands = async (commands: SetupCommand[]) => {
+export const handleApiCommands = async (
+  commands: SetupCommand[],
+  silent = false,
+) => {
   const rest = new REST({ version: "10" }).setToken(appConfig.discord.token)
   const route = Routes.applicationGuildCommands(
     appConfig.discord.client,
@@ -142,7 +145,7 @@ export const handleApiCommands = async (commands: SetupCommand[]) => {
 
   if (!mustUpdate) return
 
-  console.log("> Updating API commands")
+  !silent && console.log("> Updating API commands")
 
   await rest.put(route, {
     body: commands,
