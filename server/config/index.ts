@@ -5,7 +5,7 @@ loadEnvConfig(process.cwd())
 const port = parseInt(process.env.WEB_PORT || "3000")
 
 export const appConfig = {
-  dev: Boolean(process.env.DEV),
+  dev: process.env.DEV === "true",
 
   web: {
     port,

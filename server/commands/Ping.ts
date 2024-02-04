@@ -3,7 +3,7 @@ import { BaseCommand } from "../base/Command"
 import { permission, PermissionFlags } from "../utils/permission"
 
 export default class Ping extends BaseCommand {
-  static version = 1
+  static version = 2
 
   static command = new SlashCommandBuilder()
     .setName("ping")
