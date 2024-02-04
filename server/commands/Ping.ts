@@ -2,7 +2,9 @@ import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { permission, PermissionFlags } from "../utils/permission"
 
-export class Ping extends BaseCommand {
+export default class Ping extends BaseCommand {
+  static version = 1
+
   static command = new SlashCommandBuilder()
     .setName("ping")
     .setDescription("Get latency information")

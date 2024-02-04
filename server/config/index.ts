@@ -2,12 +2,14 @@ import { loadEnvConfig } from "@next/env"
 
 loadEnvConfig(process.cwd())
 
+const port = parseInt(process.env.WEB_PORT || "3000")
+
 export const appConfig = {
   dev: Boolean(process.env.DEV),
 
   web: {
-    port: parseInt(process.env.WEB_PORT || "3000"),
-    baseUrl: process.env.WEB_BASE_URL || "http://localhost:3000",
+    port,
+    baseUrl: process.env.WEB_BASE_URL || `http://localhost:${port}`,
   },
 
   discord: {
@@ -21,6 +23,9 @@ export const appConfig = {
       },
       users: {
         owner: "221755442513051649",
+      },
+      categories: {
+        archive: "525995353821151242",
       },
     },
   },

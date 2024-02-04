@@ -3,12 +3,12 @@ import {
   Client,
   Guild,
   GuildMember,
+  GuildTextBasedChannel,
   InteractionReplyOptions,
   Message,
   MessagePayload,
   SlashCommandBuilder,
   SlashCommandSubcommandsOnlyBuilder,
-  TextBasedChannel,
   User,
 } from "discord.js"
 
@@ -16,6 +16,12 @@ import { Permission, permission } from "../utils/permission"
 
 class BaseCommand {
   constructor(protected interaction: ChatInputCommandInteraction) {}
+
+  /**
+   * Version allows to check whether remote commands must be updated
+   * Will throw if the version is not set to at least 1 on the command
+   */
+  static version = 0
 
   /**
    * Command builder
@@ -40,14 +46,14 @@ class BaseCommand {
   /**
    * Execute the command
    */
-  async execute() {}
+  async execute(): Promise<void> {}
 
   get client(): Client {
     return this.interaction.client
   }
 
-  get channel(): TextBasedChannel | null {
-    return this.interaction.channel
+  get channel(): GuildTextBasedChannel {
+    return this.interaction.channel as GuildTextBasedChannel
   }
 
   get user(): User {
@@ -59,7 +65,7 @@ class BaseCommand {
   }
 
   get member(): GuildMember {
-    return this.interaction.member! as GuildMember
+    return this.interaction.member as GuildMember
   }
 
   reply(options: string | MessagePayload | InteractionReplyOptions) {
@@ -89,6 +95,10 @@ class BaseCommand {
       content: "No permission to use this command",
       ephemeral: true,
     })
+  }
+
+  getSubcommand<T>(): T {
+    return this.interaction.options.getSubcommand(true) as T
   }
 }
 

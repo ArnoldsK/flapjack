@@ -1,11 +1,12 @@
+import "reflect-metadata"
 import next from "next"
 import express from "express"
 import http from "http"
 
 import { getUrl } from "./utils/web"
 import { appConfig } from "./config"
-import { Client, Events, GatewayIntentBits, REST, Routes } from "discord.js"
-import { getSetupCommands } from "./utils/commands"
+import { Client, Events, GatewayIntentBits } from "discord.js"
+import { getSetupCommands, handleApiCommands } from "./utils/commands"
 import { assert } from "./utils/error"
 
 // Prepare next app
@@ -13,27 +14,19 @@ const nextApp = next({ dev: appConfig.dev })
 const handle = nextApp.getRequestHandler()
 
 nextApp.prepare().then(async () => {
-  // Validate data
   assert(!!appConfig.discord.token, "Discord token missing")
   assert(!!appConfig.discord.client, "Discord client missing")
 
-  // Get discord commands
+  // #############################################################################
+  // Commands
+  // #############################################################################
   const commands = getSetupCommands()
 
-  // Update discord commands
-  const rest = new REST({ version: "10" }).setToken(appConfig.discord.token)
+  await handleApiCommands(commands)
 
-  await rest.put(
-    Routes.applicationGuildCommands(
-      appConfig.discord.client,
-      appConfig.discord.ids.guild,
-    ),
-    {
-      body: commands.map(({ execute, ...command }) => command),
-    },
-  )
-
-  // Initiate discord client
+  // #############################################################################
+  // Client
+  // #############################################################################
   const client = new Client({
     intents: [
       GatewayIntentBits.Guilds,
@@ -41,17 +34,18 @@ nextApp.prepare().then(async () => {
       GatewayIntentBits.MessageContent,
       GatewayIntentBits.GuildMembers,
     ],
+    allowedMentions: {
+      parse: ["users"],
+    },
   })
 
   client.login(appConfig.discord.token)
 
-  // Handle discord events
   client.on(Events.ClientReady, () => {
     console.log(`> Discord client ready as ${client.user?.tag}`)
   })
 
   client.on(Events.InteractionCreate, async (interaction) => {
-    // Handle commands
     if (interaction.isChatInputCommand()) {
       const command = commands.find((el) => el.name === interaction.commandName)
 
@@ -66,14 +60,14 @@ nextApp.prepare().then(async () => {
     }
   })
 
+  // #############################################################################
   // Web server
+  // #############################################################################
   const server = express()
   const httpServer = http.createServer(server)
 
-  // Fallback to next handler
   server.all("*", (req, res) => handle(req, res))
 
-  // Listen
   httpServer.listen(appConfig.web.port, () => {
     console.log(`> Web server ready on ${getUrl()}`)
   })

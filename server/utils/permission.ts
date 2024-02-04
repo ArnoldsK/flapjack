@@ -26,7 +26,7 @@ export const getPermissionFlagName = (permission: bigint): string | null => {
     case PermissionFlags.NitroBooster:
       return "Booster"
     default:
-      return null
+      return "Moderator"
   }
 }
 

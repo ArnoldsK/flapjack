@@ -1,20 +1,24 @@
 import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 
-const OPTION_USER = "user"
+enum OptionName {
+  User = "user",
+}
 
-export class Avatar extends BaseCommand {
+export default class Avatar extends BaseCommand {
+  static version = 1
+
   static command = new SlashCommandBuilder()
     .setName("avatar")
     .setDescription("See those pixels up close")
     .addUserOption((option) =>
       option
-        .setName(OPTION_USER)
+        .setName(OptionName.User)
         .setDescription("Ignore this to get your own avatar"),
     )
 
   async execute() {
-    const user = this.interaction.options.getUser(OPTION_USER) ?? this.user
+    const user = this.interaction.options.getUser(OptionName.User) ?? this.user
 
     const avatarUrl = user.avatarURL({
       size: 2048,

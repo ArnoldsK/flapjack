@@ -1,37 +1,44 @@
 import { SlashCommandBuilder } from "discord.js"
 import { isUrl } from "../utils/web"
 import { BaseCommand } from "../base/Command"
+import { checkUnreachable } from "../utils/error"
 
 const API_URL = "https://arnoldsk.lv/liquify-api/?url="
 
-const SUBCOMMAND_USER = "user"
-const SUBCOMMAND_URL = "url"
+enum SubcommandName {
+  User = "user",
+  Url = "url",
+}
 
-const OPTION_USER = "user"
-const OPTION_URL = "url"
+enum OptionName {
+  User = "user",
+  Url = "url",
+}
 
-export class Magik extends BaseCommand {
+export default class Magik extends BaseCommand {
+  static version = 1
+
   static command = new SlashCommandBuilder()
     .setName("magik")
     .setDescription("Liquify an image")
     .addSubcommand((subcommand) =>
       subcommand
-        .setName(SUBCOMMAND_USER)
+        .setName(SubcommandName.User)
         .setDescription("Liquify user avatar")
         .addUserOption((option) =>
           option
-            .setName(OPTION_USER)
+            .setName(OptionName.User)
             .setDescription("Which user avatar to liquify?")
             .setRequired(true),
         ),
     )
     .addSubcommand((subcommand) =>
       subcommand
-        .setName(SUBCOMMAND_URL)
+        .setName(SubcommandName.Url)
         .setDescription("Liquify an image by URL")
         .addStringOption((option) =>
           option
-            .setName(OPTION_URL)
+            .setName(OptionName.Url)
             .setDescription("Image URL for liquify")
             .setRequired(true),
         ),
@@ -62,20 +69,26 @@ export class Magik extends BaseCommand {
   }
 
   getImageUrl(): string | null {
-    const subcommand = this.interaction.options.getSubcommand(true)
+    const subcommand = this.getSubcommand<SubcommandName>()
 
-    if (subcommand === SUBCOMMAND_USER) {
-      const user = this.interaction.options.getUser(OPTION_USER) ?? this.user
+    switch (subcommand) {
+      case SubcommandName.User: {
+        const user =
+          this.interaction.options.getUser(OptionName.User) ?? this.user
 
-      return user.avatarURL({
-        forceStatic: true,
-        extension: "png",
-        size: 1024,
-      })
-    } else if (subcommand === SUBCOMMAND_URL) {
-      return this.interaction.options.getString(OPTION_URL)
-    } else {
-      return null
+        return user.avatarURL({
+          forceStatic: true,
+          extension: "png",
+          size: 1024,
+        })
+      }
+
+      case SubcommandName.Url:
+        return this.interaction.options.getString(OptionName.Url)
+
+      default:
+        checkUnreachable(subcommand)
+        return null
     }
   }
 }
