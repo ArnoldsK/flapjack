@@ -248,10 +248,11 @@ export default class CreditsCommand extends BaseCommand {
               amount: wallet.credits + wallet.banked,
             }))
             .sort((a, b) => sortBigInt(b.amount, a.amount))
-            .slice(0, 6)
+            .slice(0, 9)
             .map(({ member, amount }, i) => ({
               name: `#${i + 1} ${member.displayName}`,
               value: formatCredits(amount),
+              inline: true,
             })),
         },
       ],

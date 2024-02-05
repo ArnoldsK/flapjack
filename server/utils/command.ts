@@ -13,7 +13,6 @@ import { assert } from "./error"
 import { getPermissionFlagName, memberHasPermission } from "./permission"
 import { dedupe } from "./array"
 import { appConfig } from "../config"
-import { createHash } from "crypto"
 
 export type SetupCommand = RESTPostAPIChatInputApplicationCommandsJSONBody & {
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>
@@ -31,17 +30,6 @@ const getCommandVersion = (command: {
   assert(!Number.isNaN(version), `${command.name} has no valid version`)
 
   return version
-}
-
-const parseName = (Command: typeof BaseCommand): string => {
-  const name = Command.command.name
-
-  // Encrypt the names on the dev bot so it doesn't clash
-  if (appConfig.dev) {
-    return createHash("md5").update(name).digest("hex")
-  }
-
-  return name
 }
 
 const parseDescription = (Command: typeof BaseCommand): string => {
@@ -68,7 +56,7 @@ export const getSetupCommands = (): SetupCommand[] => {
   return commands.map((Command) => {
     return {
       ...Command.command.toJSON(),
-      name: parseName(Command),
+
       description: parseDescription(Command),
 
       execute: async (interaction) => {
