@@ -106,10 +106,6 @@ export default class ColorCommand extends BaseCommand {
 
     await this.member.roles.remove(role)
 
-    if (!role.members.size) {
-      await role.delete()
-    }
-
     this.reply({
       ephemeral: true,
       content: "Color removed.",
