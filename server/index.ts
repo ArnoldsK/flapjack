@@ -48,8 +48,12 @@ nextApp.prepare().then(async () => {
 
   client.login(appConfig.discord.token)
 
-  client.once(Events.ClientReady, () => {
+  client.once(Events.ClientReady, async () => {
     console.log(`> Discord client ready as ${client.user?.tag}`)
+
+    // Pre-fetch data for cache
+    const guild = client.guilds.cache.get(appConfig.discord.ids.guild)!
+    await guild.members.fetch()
   })
 
   client.on(Events.InteractionCreate, async (interaction) => {

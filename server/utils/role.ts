@@ -31,6 +31,14 @@ export const getOrCreateRole = async (
 export const getMemberColorRole = (member: GuildMember): Role | undefined =>
   member.roles.cache.find(({ name }) => name.startsWith(COLOR_ROLE_PREFIX))
 
+/**
+ * Delete the role if it has no members
+ */
+export const purgeRole = async (role: Role) => {
+  if (role.members.size) return
+  await role.delete()
+}
+
 export const setMemberColorRole = async (
   member: GuildMember,
   color: HexColorString,
@@ -38,6 +46,7 @@ export const setMemberColorRole = async (
   const oldRole = getMemberColorRole(member)
   if (oldRole) {
     await member.roles.remove(oldRole)
+    await purgeRole(oldRole)
   }
 
   const role = await getOrCreateRole(member.guild, {

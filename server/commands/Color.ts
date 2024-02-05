@@ -1,7 +1,11 @@
 import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { checkUnreachable } from "../utils/error"
-import { getMemberColorRole, setMemberColorRole } from "../utils/role"
+import {
+  getMemberColorRole,
+  purgeRole,
+  setMemberColorRole,
+} from "../utils/role"
 import { getImageBestColorData, parseHexColor } from "../utils/color"
 
 enum SubcommandName {
@@ -105,6 +109,7 @@ export default class ColorCommand extends BaseCommand {
     if (!role) return
 
     await this.member.roles.remove(role)
+    await purgeRole(role)
 
     this.reply({
       ephemeral: true,

@@ -4,6 +4,7 @@ import { db } from "../database"
 import CreditsEntity from "../entity/Credits"
 
 export interface Wallet {
+  member: GuildMember
   credits: bigint
   banked: bigint
   updatedAt: Date
@@ -26,6 +27,7 @@ export default class CreditsModel {
     })
 
     return {
+      member: this.#member,
       credits: entity?.credits ?? BigInt(0),
       banked: entity?.banked ?? BigInt(0),
       updatedAt: entity?.updatedAt ?? new Date(),
@@ -45,5 +47,19 @@ export default class CreditsModel {
       ],
       ["userId"],
     )
+  }
+
+  async getAllWallets(): Promise<Wallet[]> {
+    const entities = await this.#repository.find()
+    const members = this.#member.guild.members.cache
+
+    return entities
+      .filter((entity) => members.has(entity.userId))
+      .map((entity) => ({
+        member: members.get(entity.userId)!,
+        credits: entity.credits,
+        banked: entity.banked,
+        updatedAt: entity.updatedAt,
+      }))
   }
 }

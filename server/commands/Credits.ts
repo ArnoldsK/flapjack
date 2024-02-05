@@ -7,12 +7,14 @@ import { checkUnreachable } from "../utils/error"
 import { joinAsLines } from "../utils/string"
 import { formatCredits } from "../utils/credits"
 import CreditsModel from "../models/Credits"
+import { sortBigInt } from "../utils/array"
 
 enum SubcommandName {
   View = "view",
   Give = "give",
   Deposit = "deposit",
   Withdraw = "withdraw",
+  Top = "top",
 }
 
 enum OptionName {
@@ -21,7 +23,7 @@ enum OptionName {
 }
 
 export default class CreditsCommand extends BaseCommand {
-  static version = 1
+  static version = 2
 
   static command = new SlashCommandBuilder()
     .setName("credits")
@@ -78,6 +80,11 @@ export default class CreditsCommand extends BaseCommand {
             .setRequired(true),
         ),
     )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName(SubcommandName.Top)
+        .setDescription("Get credits top list"),
+    )
 
   async execute() {
     const subcommand = this.getSubcommand<SubcommandName>()
@@ -97,6 +104,10 @@ export default class CreditsCommand extends BaseCommand {
 
       case SubcommandName.Withdraw:
         this.#handleBank(SubcommandName.Withdraw)
+        break
+
+      case SubcommandName.Top:
+        this.#handleTop()
         break
 
       default:
@@ -218,6 +229,30 @@ export default class CreditsCommand extends BaseCommand {
             action === SubcommandName.Deposit
               ? `Put ${formatCredits(finalAmount)} in the bank`
               : `Took ${formatCredits(finalAmount)} from the bank`,
+        },
+      ],
+    })
+  }
+
+  async #handleTop() {
+    const creditsModel = new CreditsModel(this.member)
+    const wallets = await creditsModel.getAllWallets()
+
+    this.reply({
+      ephemeral: !this.#isInCasino,
+      embeds: [
+        {
+          fields: wallets
+            .map((wallet) => ({
+              member: wallet.member,
+              amount: wallet.credits + wallet.banked,
+            }))
+            .sort((a, b) => sortBigInt(b.amount, a.amount))
+            .slice(0, 6)
+            .map(({ member, amount }, i) => ({
+              name: `#${i + 1} ${member.displayName}`,
+              value: formatCredits(amount),
+            })),
         },
       ],
     })
