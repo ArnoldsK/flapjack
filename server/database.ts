@@ -1,13 +1,15 @@
 import { join } from "path"
 import { DataSource } from "typeorm"
+import { appConfig } from "./config"
 
 export const db = new DataSource({
-  type: "mysql",
-  host: "localhost",
-  port: 3306,
-  username: "root",
-  password: "root",
-  database: "flapjack",
+  // @ts-expect-error yolo
+  type: appConfig.db.type,
+  host: appConfig.db.host,
+  port: appConfig.db.port,
+  username: appConfig.db.username,
+  password: appConfig.db.password,
+  database: appConfig.db.database,
   logging: false,
   entities: [join(__dirname, "entity", "*.{ts,js}")],
   subscribers: [],
