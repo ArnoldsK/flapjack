@@ -6,8 +6,10 @@ import http from "http"
 import { getUrl } from "./utils/web"
 import { appConfig } from "./config"
 import { Client, Events, GatewayIntentBits } from "discord.js"
-import { getSetupCommands, handleApiCommands } from "./utils/commands"
+import { getSetupCommands, handleApiCommands } from "./utils/command"
 import { assert } from "./utils/error"
+import { db } from "./database"
+import { getGroupedEvents } from "./utils/event"
 
 // Prepare next app
 const nextApp = next({ dev: appConfig.dev })
@@ -16,6 +18,11 @@ const handle = nextApp.getRequestHandler()
 nextApp.prepare().then(async () => {
   assert(!!appConfig.discord.token, "Discord token missing")
   assert(!!appConfig.discord.client, "Discord client missing")
+
+  // #############################################################################
+  // Database
+  // #############################################################################
+  await db.initialize()
 
   // #############################################################################
   // Commands
@@ -41,7 +48,7 @@ nextApp.prepare().then(async () => {
 
   client.login(appConfig.discord.token)
 
-  client.on(Events.ClientReady, () => {
+  client.once(Events.ClientReady, () => {
     console.log(`> Discord client ready as ${client.user?.tag}`)
   })
 
@@ -59,6 +66,21 @@ nextApp.prepare().then(async () => {
       }
     }
   })
+
+  // #############################################################################
+  // Custom events
+  // #############################################################################
+  const groupedEvents = getGroupedEvents()
+
+  for (const event of groupedEvents) {
+    client.on(event.name, async (...args) => {
+      await Promise.all(
+        event.callbacks.map((callback) => {
+          return callback.apply(null, args)
+        }),
+      )
+    })
+  }
 
   // #############################################################################
   // Web server

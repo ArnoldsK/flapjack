@@ -1,25 +1,27 @@
 import { BaseCommand } from "../base/Command"
 
-import Avatar from "./Avatar"
-import Magik from "./Magik"
-import Ping from "./Ping"
-import Archive from "./Archive"
-import Clear from "./Clear"
-import Color from "./Color"
-import EightBall from "./EightBall"
-import Mock from "./Mock"
-import Recap from "./Recap"
-import UserInfo from "./UserInfo"
+import AvatarCommand from "./Avatar"
+import MagikCommand from "./Magik"
+import PingCommand from "./Ping"
+import ArchiveCommand from "./Archive"
+import ClearCommand from "./Clear"
+import ColorCommand from "./Color"
+import EightBallCommand from "./EightBall"
+import MockCommand from "./Mock"
+import RecapCommand from "./Recap"
+import UserInfoCommand from "./UserInfo"
+import CreditsCommand from "./Credits"
 
 export const commands: Array<typeof BaseCommand> = [
-  Avatar,
-  Ping,
-  Magik,
-  Archive,
-  Clear,
-  Color,
-  EightBall,
-  Mock,
-  Recap,
-  UserInfo,
+  AvatarCommand,
+  PingCommand,
+  MagikCommand,
+  ArchiveCommand,
+  ClearCommand,
+  ColorCommand,
+  EightBallCommand,
+  MockCommand,
+  RecapCommand,
+  UserInfoCommand,
+  CreditsCommand,
 ]

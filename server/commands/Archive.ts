@@ -4,7 +4,7 @@ import { PermissionFlags, permission } from "../utils/permission"
 import { Color } from "../constants"
 import { appConfig } from "../config"
 
-export default class Archive extends BaseCommand {
+export default class ArchiveCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()

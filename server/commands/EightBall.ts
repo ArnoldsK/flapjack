@@ -8,7 +8,7 @@ enum OptionName {
   Question = "question",
 }
 
-export default class EightBall extends BaseCommand {
+export default class EightBallCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()

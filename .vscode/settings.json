@@ -1,5 +1,5 @@
 {
   "editor.formatOnSave": true,
   "typescript.preferences.importModuleSpecifier": "relative",
-  "cSpell.words": ["magik", "middot"]
+  "cSpell.words": ["magik", "middot", "typeorm"]
 }

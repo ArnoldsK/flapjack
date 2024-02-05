@@ -16,3 +16,5 @@ export enum Color {
 }
 
 export const COLOR_ROLE_PREFIX = "Color-"
+
+export const CREDITS_PER_MESSAGE = 10

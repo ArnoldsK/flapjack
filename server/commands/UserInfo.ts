@@ -15,7 +15,7 @@ enum OptionName {
   Position = "position",
 }
 
-export default class UserInfo extends BaseCommand {
+export default class UserInfoCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()
@@ -41,10 +41,11 @@ export default class UserInfo extends BaseCommand {
       subcommand
         .setName(SubcommandName.Position)
         .setDescription("Find user by join position")
-        .addNumberOption((option) =>
+        .addIntegerOption((option) =>
           option
             .setName(OptionName.Position)
             .setDescription("The position of user joining the server")
+            .setMinValue(1)
             .setRequired(true),
         ),
     )
@@ -75,7 +76,7 @@ export default class UserInfo extends BaseCommand {
         )
 
       case SubcommandName.Position: {
-        const position = this.interaction.options.getNumber(
+        const position = this.interaction.options.getInteger(
           OptionName.Position,
           true,
         )

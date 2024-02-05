@@ -5,7 +5,7 @@ enum OptionName {
   User = "user",
 }
 
-export default class Avatar extends BaseCommand {
+export default class AvatarCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()

@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { PermissionFlags, permission } from "../utils/permission"
 
-export default class Clear extends BaseCommand {
+export default class ClearCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()
