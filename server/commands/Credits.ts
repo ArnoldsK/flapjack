@@ -1,7 +1,5 @@
-import { ChannelType, SlashCommandBuilder } from "discord.js"
+import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
-import { PermissionFlags, permission } from "../utils/permission"
-import { Color } from "../constants"
 import { appConfig } from "../config"
 import { checkUnreachable } from "../utils/error"
 import { joinAsLines } from "../utils/string"

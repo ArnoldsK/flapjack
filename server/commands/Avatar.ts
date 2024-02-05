@@ -3,10 +3,11 @@ import { BaseCommand } from "../base/Command"
 
 enum OptionName {
   User = "user",
+  Spying = "spying",
 }
 
 export default class AvatarCommand extends BaseCommand {
-  static version = 1
+  static version = 2
 
   static command = new SlashCommandBuilder()
     .setName("avatar")
@@ -16,9 +17,15 @@ export default class AvatarCommand extends BaseCommand {
         .setName(OptionName.User)
         .setDescription("Ignore this to get your own avatar"),
     )
+    .addBooleanOption((option) =>
+      option
+        .setName(OptionName.Spying)
+        .setDescription("Only you will see the avatar, no one will know"),
+    )
 
   async execute() {
     const user = this.interaction.options.getUser(OptionName.User) ?? this.user
+    const spying = this.interaction.options.getBoolean(OptionName.Spying)
 
     const avatarUrl = user.avatarURL({
       size: 2048,
@@ -30,8 +37,8 @@ export default class AvatarCommand extends BaseCommand {
       }
 
       this.reply({
+        ephemeral: !!spying,
         files: [avatarUrl],
-        ephemeral: true,
       })
     } catch (err) {
       this.fail((err as Error).message)
