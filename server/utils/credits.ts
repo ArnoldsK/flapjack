@@ -75,6 +75,10 @@ export const formatCredits = (value: bigint | number): string => {
     Number(BigInt(value) / (item?.multiplier ?? BigInt(1))),
   )
 
+  if (!amount) {
+    return "no credits"
+  }
+
   return [
     formatThousands(amount),
     item?.suffix,
