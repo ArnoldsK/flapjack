@@ -74,15 +74,13 @@ export const formatCredits = (value: bigint | number): string => {
   const amount = Math.floor(
     Number(BigInt(value) / (item?.multiplier ?? BigInt(1))),
   )
-  const suffix = item?.suffix ?? null
-  const spacer = amount >= 30 ? Unicode.thinSpace : null
 
   return [
     formatThousands(amount),
     Unicode.thinSpace,
-    suffix,
-    spacer,
-    getCreditsEmoji(value),
+    item?.suffix || null,
+    amount >= 30 ? Unicode.thinSpace : null,
+    getCreditsEmoji(value) || null,
   ].join("")
 }
 
