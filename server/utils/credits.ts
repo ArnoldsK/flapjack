@@ -55,7 +55,7 @@ export const formatCredits = (value: bigint | number): string => {
     },
     {
       from: BigInt("10000000000000000"),
-      to: BigInt("2147483649147483647"),
+      to: Infinity,
       suffix: "Q",
       multiplier: BigInt("1000000000000000"),
     },
