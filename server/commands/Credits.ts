@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { appConfig } from "../config"
 import { checkUnreachable } from "../utils/error"
-import { joinAsLines } from "../utils/string"
+import { joinAsLines, ucFirst } from "../utils/string"
 import { formatCredits, parseCreditsAmount } from "../utils/credits"
 import CreditsModel from "../models/Credits"
 import { sortBigInt } from "../utils/array"
@@ -134,7 +134,7 @@ export default class CreditsCommand extends BaseCommand {
           color: member.displayColor,
           description: joinAsLines(
             `**${intro} ${formatCredits(wallet.credits)}**`,
-            `${formatCredits(wallet.banked)} in the bank`,
+            ucFirst(`${formatCredits(wallet.banked)} in the bank`),
           ),
         },
       ],
