@@ -69,12 +69,10 @@ export default class RouletteCommand extends BaseCommand {
       ephemeral: !isCasinoChannel(this.channel),
       embeds: [
         {
-          description: `You rolled ${rolledColor} and ${
+          title: `You rolled ${rolledColor} and ${
             isWin ? "won" : "lost"
           } ${formatCredits(isWin ? winAmount : amount)}`,
-          footer: {
-            text: `You have ${formatCredits(newWallet.credits)} now`,
-          },
+          description: `You have ${formatCredits(newWallet.credits)} now`,
           color: Color[rolledColor],
         },
       ],
