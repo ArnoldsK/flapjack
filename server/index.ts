@@ -97,16 +97,16 @@ nextApp.prepare().then(async () => {
   httpServer.listen(appConfig.web.port, () => {
     console.log(`> Web server ready on ${getUrl()}`)
   })
-})
 
-// #############################################################################
-// On Ctrl+C remove local commands
-// #############################################################################
-process.on("SIGINT", async () => {
-  if (!appConfig.dev) return
+  // #############################################################################
+  // On Ctrl+C remove local commands
+  // #############################################################################
+  process.on("SIGINT", async () => {
+    if (!appConfig.dev) return
 
-  console.log("> Remove commands")
-  await handleApiCommands([], true)
+    console.log("> Remove commands")
+    await handleApiCommands([], true)
 
-  process.exit(2)
+    process.exit(2)
+  })
 })

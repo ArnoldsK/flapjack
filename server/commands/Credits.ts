@@ -3,9 +3,11 @@ import { BaseCommand } from "../base/Command"
 import { appConfig } from "../config"
 import { checkUnreachable } from "../utils/error"
 import { joinAsLines } from "../utils/string"
-import { formatCredits } from "../utils/credits"
+import { formatCredits, parseCreditsAmount } from "../utils/credits"
 import CreditsModel from "../models/Credits"
 import { sortBigInt } from "../utils/array"
+import { OPTION_DESCRIPTION_AMOUNT } from "../constants"
+import { isCasinoChannel } from "../utils/channel"
 
 enum SubcommandName {
   View = "view",
@@ -46,11 +48,10 @@ export default class CreditsCommand extends BaseCommand {
             .setDescription("User to give credits to")
             .setRequired(true),
         )
-        .addIntegerOption((option) =>
+        .addStringOption((option) =>
           option
             .setName(OptionName.Amount)
-            .setDescription("Amount of credits to give")
-            .setMinValue(1)
+            .setDescription(OPTION_DESCRIPTION_AMOUNT)
             .setRequired(true),
         ),
     )
@@ -58,11 +59,10 @@ export default class CreditsCommand extends BaseCommand {
       subcommand
         .setName(SubcommandName.Deposit)
         .setDescription("Place credits in the bank")
-        .addIntegerOption((option) =>
+        .addStringOption((option) =>
           option
             .setName(OptionName.Amount)
-            .setDescription("Amount of credits to put in the bank")
-            .setMinValue(1)
+            .setDescription(OPTION_DESCRIPTION_AMOUNT)
             .setRequired(true),
         ),
     )
@@ -70,11 +70,10 @@ export default class CreditsCommand extends BaseCommand {
       subcommand
         .setName(SubcommandName.Withdraw)
         .setDescription("Remove credits from the bank")
-        .addIntegerOption((option) =>
+        .addStringOption((option) =>
           option
             .setName(OptionName.Amount)
-            .setDescription("Amount of credits to remove from the bank")
-            .setMinValue(1)
+            .setDescription(OPTION_DESCRIPTION_AMOUNT)
             .setRequired(true),
         ),
     )
@@ -113,10 +112,6 @@ export default class CreditsCommand extends BaseCommand {
     }
   }
 
-  get #isInCasino() {
-    return this.channel.id === appConfig.discord.ids.channels.casino
-  }
-
   async #handleView() {
     const user = this.interaction.options.getUser(OptionName.User) ?? this.user
 
@@ -133,7 +128,7 @@ export default class CreditsCommand extends BaseCommand {
     const wallet = await creditsModel.getWallet()
 
     this.reply({
-      ephemeral: !this.#isInCasino,
+      ephemeral: !isCasinoChannel(this.channel),
       embeds: [
         {
           color: member.displayColor,
@@ -148,8 +143,6 @@ export default class CreditsCommand extends BaseCommand {
 
   async #handleGive() {
     const targetUser = this.interaction.options.getUser(OptionName.User, true)
-    const amount = this.interaction.options.getInteger(OptionName.Amount, true)
-
     const targetMember = this.guild.members.cache.get(targetUser.id)
     if (!targetMember) {
       this.fail("User not found")
@@ -165,26 +158,21 @@ export default class CreditsCommand extends BaseCommand {
     const creditsModel = new CreditsModel(this.member)
     const wallet = await creditsModel.getWallet()
 
-    let finalAmount = Math.abs(amount)
-    if (finalAmount > wallet.credits) {
-      // ! bigint to number conversion
-      finalAmount = Number(wallet.credits)
-    }
-
-    if (finalAmount <= 0) {
-      this.fail("Nothing to give")
-      return
-    }
+    const rawAmount = this.interaction.options.getString(
+      OptionName.Amount,
+      true,
+    )
+    const amount = parseCreditsAmount(rawAmount, wallet.credits)
 
     const targetCreditsModel = new CreditsModel(targetMember)
-    await targetCreditsModel.addCredits(finalAmount)
-    await creditsModel.addCredits(-finalAmount)
+    await targetCreditsModel.addCredits(amount)
+    await creditsModel.addCredits(-amount)
 
     this.reply({
       embeds: [
         {
           color: this.member.displayColor,
-          description: `Gave ${formatCredits(finalAmount)} to ${
+          description: `Gave ${formatCredits(amount)} to ${
             targetMember.displayName
           }`,
         },
@@ -193,40 +181,33 @@ export default class CreditsCommand extends BaseCommand {
   }
 
   async #handleBank(action: SubcommandName.Deposit | SubcommandName.Withdraw) {
-    const amount = this.interaction.options.getInteger(OptionName.Amount, true)
-
     const creditsModel = new CreditsModel(this.member)
     const wallet = await creditsModel.getWallet()
 
     const sourceAmount =
       action === SubcommandName.Deposit ? wallet.credits : wallet.banked
 
-    let finalAmount = Math.abs(amount)
-    if (finalAmount > sourceAmount) {
-      // ! bigint to number conversion
-      finalAmount = Number(sourceAmount)
-    }
-
-    if (finalAmount <= 0) {
-      this.fail(`Nothing to ${action}`)
-      return
-    }
+    const rawAmount = this.interaction.options.getString(
+      OptionName.Amount,
+      true,
+    )
+    const amount = parseCreditsAmount(rawAmount, sourceAmount)
 
     if (action === SubcommandName.Deposit) {
-      await creditsModel.addCredits(-finalAmount, finalAmount)
+      await creditsModel.addCredits(-amount, amount)
     } else {
-      await creditsModel.addCredits(finalAmount, -finalAmount)
+      await creditsModel.addCredits(amount, -amount)
     }
 
     this.reply({
-      ephemeral: !this.#isInCasino,
+      ephemeral: !isCasinoChannel(this.channel),
       embeds: [
         {
           color: this.member.displayColor,
           description:
             action === SubcommandName.Deposit
-              ? `Put ${formatCredits(finalAmount)} in the bank`
-              : `Took ${formatCredits(finalAmount)} from the bank`,
+              ? `Put ${formatCredits(amount)} in the bank`
+              : `Took ${formatCredits(amount)} from the bank`,
         },
       ],
     })
@@ -237,7 +218,7 @@ export default class CreditsCommand extends BaseCommand {
     const wallets = await creditsModel.getAllWallets()
 
     this.reply({
-      ephemeral: !this.#isInCasino,
+      ephemeral: !isCasinoChannel(this.channel),
       embeds: [
         {
           fields: wallets

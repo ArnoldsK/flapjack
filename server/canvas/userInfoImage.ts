@@ -84,7 +84,7 @@ export const getUserInfoImage = async (
   ctx.font = "13px sans-serif"
   ctx.fillText(info.createdDate, createdX, createdY + 14)
 
-  // Joined
+  // Joined since
   const joinedX = createdX
   const joinedY = createdY + 27 + margin
 
@@ -96,7 +96,7 @@ export const getUserInfoImage = async (
   ctx.font = "13px sans-serif"
   ctx.fillText(info.joinedDate, joinedX, joinedY + 14)
 
-  // Ago
+  // Joined ago
   const agoX = createdX
   const agoY = joinedY + 27 + margin
 

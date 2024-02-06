@@ -34,19 +34,30 @@ export default class CreditsModel {
     }
   }
 
-  async addCredits(amount: number, bankedAmount = 0) {
-    const { credits, banked } = await this.getWallet()
+  async addCredits(amount: number, bankedAmount = 0): Promise<Wallet> {
+    const { member, credits, banked } = await this.getWallet()
+    const newCredits = credits + BigInt(amount)
+    const newBanked = banked + BigInt(bankedAmount)
+    const newUpdatedAt = new Date()
 
     await this.#repository.upsert(
       [
         {
           userId: this.#member.id,
-          credits: credits + BigInt(amount),
-          banked: banked + BigInt(bankedAmount),
+          credits: newCredits,
+          banked: newBanked,
+          updatedAt: newUpdatedAt,
         },
       ],
       ["userId"],
     )
+
+    return {
+      member,
+      credits: newCredits,
+      banked: newBanked,
+      updatedAt: newUpdatedAt,
+    }
   }
 
   async getAllWallets(): Promise<Wallet[]> {

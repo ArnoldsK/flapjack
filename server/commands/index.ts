@@ -11,6 +11,7 @@ import MockCommand from "./Mock"
 import RecapCommand from "./Recap"
 import UserInfoCommand from "./UserInfo"
 import CreditsCommand from "./Credits"
+import RouletteCommand from "./Roulette"
 
 export const commands: Array<typeof BaseCommand> = [
   AvatarCommand,
@@ -24,4 +25,5 @@ export const commands: Array<typeof BaseCommand> = [
   RecapCommand,
   UserInfoCommand,
   CreditsCommand,
+  RouletteCommand,
 ]

@@ -18,3 +18,6 @@ export enum Color {
 export const COLOR_ROLE_PREFIX = "Color-"
 
 export const MIN_CREDITS_PER_MESSAGE = 10
+
+export const OPTION_DESCRIPTION_AMOUNT =
+  "Amount of credits. Examples: 100; 1.1k; 1.1m; all."

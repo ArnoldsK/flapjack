@@ -3,7 +3,6 @@ import { appConfig } from "../config"
 export const getUrl = (path: string = ""): string => {
   let baseUrl = appConfig.web.baseUrl
 
-  // Add ending slash
   if (!baseUrl.endsWith("/")) {
     baseUrl += "/"
   }
