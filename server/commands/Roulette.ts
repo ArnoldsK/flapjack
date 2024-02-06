@@ -5,6 +5,7 @@ import { formatCredits, parseCreditsAmount } from "../utils/credits"
 import { Color, OPTION_DESCRIPTION_AMOUNT } from "../constants"
 import { randomValue } from "../utils/random"
 import { isCasinoChannel } from "../utils/channel"
+import { joinAsLines } from "../utils/string"
 
 enum OptionName {
   Color = "color",
@@ -69,10 +70,12 @@ export default class RouletteCommand extends BaseCommand {
       ephemeral: !isCasinoChannel(this.channel),
       embeds: [
         {
-          title: `You rolled ${rolledColor} and ${
-            isWin ? "won" : "lost"
-          } ${formatCredits(isWin ? winAmount : amount)}`,
-          description: `You have ${formatCredits(newWallet.credits)} now`,
+          description: joinAsLines(
+            `**You rolled ${rolledColor} and ${
+              isWin ? "won" : "lost"
+            } ${formatCredits(isWin ? winAmount : amount)}**`,
+            `You have ${formatCredits(newWallet.credits)} now`,
+          ),
           color: Color[rolledColor],
         },
       ],

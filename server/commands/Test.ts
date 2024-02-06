@@ -1,5 +1,15 @@
-import { SlashCommandBuilder } from "discord.js"
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ComponentType,
+  SlashCommandBuilder,
+} from "discord.js"
 import { BaseCommand } from "../base/Command"
+import { formatCredits } from "../utils/credits"
+import assert from "assert"
+import CreditsModel from "../models/Credits"
+import { randomValue } from "../utils/random"
 
 export default class TestCommand extends BaseCommand {
   static version = 1
@@ -10,16 +20,8 @@ export default class TestCommand extends BaseCommand {
 
   async execute() {
     this.reply({
-      // ephemeral:true,
-      embeds: [
-        {
-          title: "test <:Coins10000:1204533924559065099> test",
-          description: "test <:Coins10000:1204533924559065099> test",
-          footer: {
-            text: "test <:Coins10000:1204533924559065099> test",
-          },
-        },
-      ],
+      ephemeral: true,
+      content: "test",
     })
   }
 }

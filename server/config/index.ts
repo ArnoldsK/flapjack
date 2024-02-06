@@ -37,6 +37,7 @@ export const appConfig = {
         archive: "525995353821151242",
       },
       channels: {
+        general: "411593264211296258",
         casino: "621834853696143360",
       },
     },

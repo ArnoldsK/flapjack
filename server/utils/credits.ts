@@ -21,12 +21,6 @@ export const getCreditsEmoji = (value: bigint | number): string => {
   )
 }
 
-export const formatThousands = (value: number): string => {
-  return value
-    .toString()
-    .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, Unicode.thinSpace)
-}
-
 export const formatCredits = (value: bigint | number): string => {
   const items = [
     {
@@ -80,7 +74,7 @@ export const formatCredits = (value: bigint | number): string => {
   }
 
   return [
-    formatThousands(amount),
+    amount,
     item?.suffix,
     value >= 30 ? Unicode.thinSpace : null,
     getCreditsEmoji(value) || null,

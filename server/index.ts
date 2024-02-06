@@ -10,6 +10,7 @@ import { getSetupCommands, handleApiCommands } from "./utils/command"
 import { assert } from "./utils/error"
 import { db } from "./database"
 import { getGroupedEvents } from "./utils/event"
+import { handleCron } from "./utils/cron"
 
 // Prepare next app
 const nextApp = next({ dev: appConfig.dev })
@@ -85,6 +86,11 @@ nextApp.prepare().then(async () => {
       )
     })
   }
+
+  // #############################################################################
+  // Cron
+  // #############################################################################
+  handleCron(client)
 
   // #############################################################################
   // Web server
