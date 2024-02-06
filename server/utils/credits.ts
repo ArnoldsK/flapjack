@@ -77,9 +77,8 @@ export const formatCredits = (value: bigint | number): string => {
 
   return [
     formatThousands(amount),
-    Unicode.thinSpace,
-    item?.suffix || null,
-    amount >= 30 ? Unicode.thinSpace : null,
+    item?.suffix,
+    value >= 30 ? Unicode.thinSpace : null,
     getCreditsEmoji(value) || null,
   ].join("")
 }
