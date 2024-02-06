@@ -1,7 +1,9 @@
 export enum Unicode {
+  /** @deprecated */
   credits = "❈",
   middot = "·",
   zeroWidthSpace = "​",
+  thinSpace = " ",
 }
 
 export enum Color {

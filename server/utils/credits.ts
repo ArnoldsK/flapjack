@@ -1,13 +1,77 @@
 import { Unicode } from "../constants"
 
-export const formatCredits = (value: bigint | number): string => {
-  const formatter = Intl.NumberFormat("en-US", {
-    notation: "compact",
-    maximumFractionDigits: 1,
-  })
-  const amount = formatter.format(value)
+export const getCreditsEmoji = (value: bigint | number): string => {
+  const minValueMap = {
+    "<:Coins10000:1204533924559065099>": 100_000,
+    "<:Coins1000:1204533922923548753>": 10_000,
+    "<:Coins250:1204533921652412487>": 2_500,
+    "<:Coins100:1204533919073042432>": 1_00,
+    "<:Coins25:1204533917361643630>": 250,
+    "<:Coins5:1204533915113496717>": 50,
+    "<:Coins4:1204533896092450856>": 40,
+    "<:Coins3:1204533887649194074>": 30,
+    "<:Coins2:1204533886361673788>": 20,
+    "<:Coins1:1204533883702612018>": 1,
+  }
 
-  return `${Unicode.credits}${amount}`
+  return (
+    Object.entries(minValueMap).find(
+      ([, minValue]) => value >= minValue,
+    )?.[0] ?? ""
+  )
+}
+
+export const formatCredits = (value: bigint | number): string => {
+  const items = [
+    {
+      from: BigInt("1"),
+      to: BigInt("99999"),
+      suffix: "",
+      multiplier: BigInt("1"),
+    },
+    {
+      from: BigInt("100000"),
+      to: BigInt("9999999"),
+      suffix: "K",
+      multiplier: BigInt("1000"),
+    },
+    {
+      from: BigInt("10000000"),
+      to: BigInt("9999999999"),
+      suffix: "M",
+      multiplier: BigInt("1000000"),
+    },
+    {
+      from: BigInt("10000000000"),
+      to: BigInt("9999999999999"),
+      suffix: "B",
+      multiplier: BigInt("1000000000"),
+    },
+    {
+      from: BigInt("10000000000000"),
+      to: BigInt("9999999999999999"),
+      suffix: "T",
+      multiplier: BigInt("1000000000000"),
+    },
+    {
+      from: BigInt("10000000000000000"),
+      to: BigInt("2147483649147483647"),
+      suffix: "Q",
+      multiplier: BigInt("1000000000000000"),
+    },
+  ]
+
+  const item = items.find(({ from, to }) => {
+    return value >= from && value < to
+  })
+
+  const amount = Math.floor(
+    Number(BigInt(value) / (item?.multiplier ?? BigInt(1))),
+  )
+  const suffix = item?.suffix ?? ""
+  const spacer = amount >= 30 ? Unicode.thinSpace : ""
+
+  return `${amount}${suffix}${spacer}${getCreditsEmoji(value)}`
 }
 
 export const parseCreditsAmount = (
