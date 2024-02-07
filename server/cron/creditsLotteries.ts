@@ -59,8 +59,8 @@ export default {
     })
 
     collector.on("end", async (collected) => {
-      // Delete the original (not async!)
-      message.delete()
+      // Delete the original
+      await message.delete()
 
       // Get at least 2 members
       const members = collected
