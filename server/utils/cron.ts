@@ -39,7 +39,7 @@ export const handleCron = (client: Client) => {
     if (task.productionOnly && appConfig.dev) continue
 
     cron.schedule(expression, () => {
-      console.log(">", task.description)
+      // console.log(">", task.description)
       task.execute(client)
     })
   }

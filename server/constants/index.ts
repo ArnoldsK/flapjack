@@ -23,3 +23,8 @@ export const MIN_CREDITS_PER_MESSAGE = 10
 
 export const OPTION_DESCRIPTION_AMOUNT =
   "Amount of credits. Examples: 100; 1.1k; 1.1m; all."
+
+export const CREDITS_BANK_HOURLY_RATE = {
+  rate: 5,
+  divider: 1000,
+}
