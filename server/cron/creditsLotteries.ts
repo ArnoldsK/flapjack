@@ -34,7 +34,7 @@ export default {
     ) as GuildTextBasedChannel
 
     // One in x minutes chance
-    if (!randomBool(10)) return
+    if (!randomBool(20)) return
 
     const amount = getAmount()
 
