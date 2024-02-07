@@ -20,7 +20,6 @@ const getAmount = (): number => {
   return (randomInt(2, 20) / 2) * randomValue([1_000, 10_000])!
 }
 
-// TODO make crons a class?
 export default {
   description: "Credits lotteries chance",
 
@@ -34,8 +33,8 @@ export default {
       appConfig.discord.ids.channels.general,
     ) as GuildTextBasedChannel
 
-    // One in 30th minute chance
-    if (!randomBool(30)) return
+    // One in x minutes chance
+    if (!randomBool(10)) return
 
     const amount = getAmount()
 
