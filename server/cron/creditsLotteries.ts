@@ -59,17 +59,15 @@ export default {
     })
 
     collector.on("end", async (collected) => {
-      // Delete the original
-      await message.delete()
+      // Delete the original (not async!)
+      message.delete()
 
       // Get at least 2 members
       const members = collected
         .map((el) => guild.members.cache.get(el.user.id))
         .filter(Boolean)
 
-      if (members.length < 2) {
-        return
-      }
+      if (members.length < 2) return
 
       // Get random member
       const member = randomValue(members)!
