@@ -142,7 +142,7 @@ export default class SlotsCommand extends BaseCommand {
       {
         name: "seven",
         distribution: 1,
-        emoji: "<:slotsseven:641269114974765062>",
+        emoji: "<:slotsseven:1205175066170626098>",
       },
       {
         name: "dream",

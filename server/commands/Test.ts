@@ -21,7 +21,14 @@ export default class TestCommand extends BaseCommand {
   async execute() {
     this.reply({
       ephemeral: true,
-      content: "test",
+      embeds: [
+        {
+          title:
+            "<:slotsseven:641269114974765062> <:Dreaming:712788218319339581>",
+          description:
+            "<:slotsseven:641269114974765062> <:Dreaming:712788218319339581>",
+        },
+      ],
     })
   }
 }
