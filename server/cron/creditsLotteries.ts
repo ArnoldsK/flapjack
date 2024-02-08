@@ -38,16 +38,18 @@ export default {
 
     const amount = getAmount()
 
+    const customId = `claim-${Math.random()}`
     const row = new ActionRowBuilder<ButtonBuilder>()
     row.addComponents(
       new ButtonBuilder()
-        .setCustomId("random-credits-button")
+        .setCustomId(customId)
         .setLabel(" ")
         .setStyle(ButtonStyle.Secondary)
         .setEmoji("1204533924559065099"),
     )
 
     const message = await channel.send({ components: [row] })
+    const ts = message.createdTimestamp
 
     const collector = message.createMessageComponentCollector({
       componentType: ComponentType.Button,
@@ -67,7 +69,10 @@ export default {
         .map((el) => guild.members.cache.get(el.user.id))
         .filter(Boolean)
 
-      console.log(`> Credits lottery > ${members.length} joined`)
+      const s = Math.floor((Date.now() - ts) / 1000)
+      console.log(
+        `> Credits lottery > ${members.length} joined > Was up for ${s}sec`,
+      )
 
       if (members.length < 2) return
 
