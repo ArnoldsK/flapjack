@@ -67,6 +67,8 @@ export default {
         .map((el) => guild.members.cache.get(el.user.id))
         .filter(Boolean)
 
+      console.log(`> Credits lottery > ${members.length} joined`)
+
       if (members.length < 2) return
 
       // Get random member
