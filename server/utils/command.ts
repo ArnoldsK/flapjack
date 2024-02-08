@@ -157,7 +157,9 @@ export const handleApiCommands = async (commands: SetupCommand[]) => {
     const apiVersion = getCommandVersion(apiCommand)
     const version = getCommandVersion(command)
 
-    if (version > apiVersion) {
+    if (version === apiVersion) {
+      // Do nothing
+    } else if (version > apiVersion || appConfig.dev) {
       console.log("> Commands > Update >", command.name)
       updateCommands[apiCommandIndex] = command
     } else if (version < apiVersion) {
