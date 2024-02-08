@@ -113,11 +113,14 @@ export const removeApiCommands = async () => {
   const rest = new REST({ version: "10" }).setToken(appConfig.discord.token)
 
   console.log("> Commands > Delete all")
-  await rest.delete(
+  await rest.put(
     Routes.applicationGuildCommands(
       appConfig.discord.client,
       appConfig.discord.ids.guild,
     ),
+    {
+      body: [],
+    },
   )
 }
 
