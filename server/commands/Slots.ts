@@ -120,19 +120,19 @@ export default class SlotsCommand extends BaseCommand {
   get #items(): SlotsItem[] {
     return [
       {
-        name: "tangerine",
+        name: "filler1",
         distribution: 6,
-        emoji: "🍊",
+        emoji: "💩",
       },
       {
-        name: "banana",
+        name: "filler2",
         distribution: 6,
-        emoji: "🍌",
+        emoji: "🕸️",
       },
       {
-        name: "lemon",
+        name: "filler3",
         distribution: 6,
-        emoji: "🍋",
+        emoji: "💀",
       },
       {
         name: "cherries",
