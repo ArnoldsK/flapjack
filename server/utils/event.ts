@@ -2,6 +2,7 @@ import { ClientEvents } from "discord.js"
 import fs from "fs"
 import { join } from "path"
 import { appConfig } from "../config"
+import { BaseContext } from "../types"
 
 export interface EventOptions {
   productionOnly: boolean

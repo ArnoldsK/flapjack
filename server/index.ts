@@ -6,11 +6,17 @@ import http from "http"
 import { getUrl } from "./utils/web"
 import { appConfig } from "./config"
 import { Client, Events, GatewayIntentBits } from "discord.js"
-import { getSetupCommands, handleApiCommands } from "./utils/command"
+import {
+  getSetupCommands,
+  handleApiCommands,
+  removeApiCommands,
+} from "./utils/command"
 import { assert } from "./utils/error"
 import { db } from "./database"
 import { getGroupedEvents } from "./utils/event"
 import { handleCron } from "./utils/cron"
+import { BaseContext } from "./types"
+import CacheManager from "./cache"
 
 // Prepare next app
 const nextApp = next({ dev: appConfig.dev })
@@ -24,13 +30,6 @@ nextApp.prepare().then(async () => {
   // Database
   // #############################################################################
   await db.initialize()
-
-  // #############################################################################
-  // Commands
-  // #############################################################################
-  const commands = getSetupCommands()
-
-  await handleApiCommands(commands)
 
   // #############################################################################
   // Client
@@ -47,8 +46,26 @@ nextApp.prepare().then(async () => {
     },
   })
 
-  client.login(appConfig.discord.token)
+  await client.login(appConfig.discord.token)
 
+  // #############################################################################
+  // Context
+  // #############################################################################
+  const context: BaseContext = {
+    client,
+    cache: new CacheManager(),
+  }
+
+  // #############################################################################
+  // Commands
+  // #############################################################################
+  const commands = getSetupCommands(context)
+
+  await handleApiCommands(commands)
+
+  // #############################################################################
+  // Client events
+  // #############################################################################
   client.once(Events.ClientReady, async () => {
     console.log(`> Discord client ready as ${client.user?.tag}`)
 
@@ -110,8 +127,7 @@ nextApp.prepare().then(async () => {
   process.on("SIGINT", async () => {
     if (!appConfig.dev) return
 
-    console.log("> Remove commands")
-    await handleApiCommands([], true)
+    await removeApiCommands()
 
     process.exit(2)
   })

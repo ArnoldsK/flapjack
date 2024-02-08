@@ -69,11 +69,6 @@ export default {
         .map((el) => guild.members.cache.get(el.user.id))
         .filter(Boolean)
 
-      const s = Math.floor((Date.now() - ts) / 1000)
-      console.log(
-        `> Credits lottery > ${members.length} joined > Was up for ${s}sec`,
-      )
-
       if (members.length < 2) return
 
       // Get random member

@@ -39,6 +39,7 @@ export const appConfig = {
       channels: {
         general: "411593264211296258",
         casino: "621834853696143360",
+        nsfw: "632985833414066176",
       },
     },
   },

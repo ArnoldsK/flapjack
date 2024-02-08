@@ -1,5 +1,6 @@
 import {
   APIApplicationCommand,
+  ApplicationCommandType,
   ChatInputCommandInteraction,
   GuildMember,
   REST,
@@ -13,6 +14,7 @@ import { assert } from "./error"
 import { getPermissionFlagName, memberHasPermission } from "./permission"
 import { dedupe } from "./array"
 import { appConfig } from "../config"
+import { BaseContext } from "../types"
 
 export type SetupCommand = RESTPostAPIChatInputApplicationCommandsJSONBody & {
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>
@@ -52,7 +54,7 @@ const parseDescription = (Command: typeof BaseCommand): string => {
   return dedupe(elements).join(` ${Unicode.middot} `)
 }
 
-export const getSetupCommands = (): SetupCommand[] => {
+export const getSetupCommands = (context: BaseContext): SetupCommand[] => {
   return commands.map((Command) => {
     return {
       ...Command.command.toJSON(),
@@ -77,7 +79,7 @@ export const getSetupCommands = (): SetupCommand[] => {
         // #############################################################################
         // Initialize
         // #############################################################################
-        const command = new Command(interaction)
+        const command = new Command(context, interaction)
 
         // #############################################################################
         // Permissions
@@ -107,35 +109,67 @@ export const getSetupCommands = (): SetupCommand[] => {
   })
 }
 
-export const handleApiCommands = async (
-  commands: SetupCommand[],
-  silent = false,
-) => {
+export const removeApiCommands = async () => {
   const rest = new REST({ version: "10" }).setToken(appConfig.discord.token)
-  const route = Routes.applicationGuildCommands(
-    appConfig.discord.client,
-    appConfig.discord.ids.guild,
+
+  console.log("> Commands > Delete all")
+  await rest.delete(
+    Routes.applicationGuildCommands(
+      appConfig.discord.client,
+      appConfig.discord.ids.guild,
+    ),
+  )
+}
+
+export const handleApiCommands = async (commands: SetupCommand[]) => {
+  const rest = new REST({ version: "10" }).setToken(appConfig.discord.token)
+  const apiCommands = (await rest.get(
+    Routes.applicationGuildCommands(
+      appConfig.discord.client,
+      appConfig.discord.ids.guild,
+    ),
+  )) as APIApplicationCommand[]
+
+  // Due to how updating works, create a single update body based on current API commands
+  const updateCommands: Omit<SetupCommand, "execute">[] = apiCommands.map(
+    (el) => ({
+      ...el,
+      type: el.type === ApplicationCommandType.ChatInput ? el.type : undefined,
+    }),
   )
 
-  const apiCommands = (await rest.get(route)) as APIApplicationCommand[]
-  const mustUpdate =
-    commands.length !== apiCommands.length ||
-    commands.some((command) => {
-      const apiCommand = apiCommands.find(
-        (apiCommand) => apiCommand.name === command.name,
-      )
+  // Add new commands
+  for (const command of commands) {
+    const apiCommandIndex = apiCommands.findIndex(
+      (el) => el.name === command.name,
+    )
+    const apiCommand = apiCommands[apiCommandIndex]
 
-      return (
-        !apiCommand ||
-        getCommandVersion(apiCommand) !== getCommandVersion(command)
-      )
-    })
+    if (!apiCommand) {
+      console.log("> Commands > Create >", command.name)
+      updateCommands.push(command)
+      continue
+    }
 
-  if (!mustUpdate) return
+    const apiVersion = getCommandVersion(apiCommand)
+    const version = getCommandVersion(command)
 
-  !silent && console.log("> Updating API commands")
+    if (version > apiVersion) {
+      console.log("> Commands > Update >", command.name)
+      updateCommands[apiCommandIndex] = command
+    } else if (version < apiVersion) {
+      console.log("> Commands > Outdated local version >", command.name)
+      console.log(`             API version: ${apiVersion}`)
+    }
+  }
 
-  await rest.put(route, {
-    body: commands,
-  })
+  await rest.put(
+    Routes.applicationGuildCommands(
+      appConfig.discord.client,
+      appConfig.discord.ids.guild,
+    ),
+    {
+      body: updateCommands,
+    },
+  )
 }

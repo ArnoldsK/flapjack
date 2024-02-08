@@ -13,9 +13,13 @@ import {
 } from "discord.js"
 
 import { Permission, permission } from "../utils/permission"
+import { BaseContext } from "../types"
 
 class BaseCommand {
-  constructor(protected interaction: ChatInputCommandInteraction) {}
+  constructor(
+    protected context: BaseContext,
+    protected interaction: ChatInputCommandInteraction,
+  ) {}
 
   /**
    * Version allows to check whether remote commands must be updated
