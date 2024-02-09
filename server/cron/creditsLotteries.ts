@@ -10,6 +10,7 @@ import CreditsModel from "../models/Credits"
 import { formatCredits } from "../utils/credits"
 import { CronTask } from "../utils/cron"
 import { randomBool, randomInt, randomValue } from "../utils/random"
+import { dedupe } from "../utils/array"
 
 const getAmount = (): number => {
   // One in 50 to get a mil
@@ -49,7 +50,6 @@ export default {
     )
 
     const message = await channel.send({ components: [row] })
-    const ts = message.createdTimestamp
 
     const collector = message.createMessageComponentCollector({
       componentType: ComponentType.Button,
@@ -64,9 +64,12 @@ export default {
       // Delete the original
       await message.delete()
 
+      // Map to user ids and dedupe
+      const userIds = dedupe(collected.map((el) => el.user.id))
+
       // Get at least 2 members
-      const members = collected
-        .map((el) => guild.members.cache.get(el.user.id))
+      const members = userIds
+        .map((id) => guild.members.cache.get(id))
         .filter(Boolean)
 
       if (members.length < 2) return

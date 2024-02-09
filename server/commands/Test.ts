@@ -19,16 +19,6 @@ export default class TestCommand extends BaseCommand {
     .setDescription("test")
 
   async execute() {
-    this.reply({
-      ephemeral: true,
-      embeds: [
-        {
-          title:
-            "<:slotsseven:641269114974765062> <:Dreaming:712788218319339581>",
-          description:
-            "<:slotsseven:641269114974765062> <:Dreaming:712788218319339581>",
-        },
-      ],
-    })
+    // nothing
   }
 }
