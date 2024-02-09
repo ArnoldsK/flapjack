@@ -7,8 +7,16 @@ import { randomValue } from "../utils/random"
 import { isCasinoChannel } from "../utils/channel"
 import { joinAsLines } from "../utils/string"
 
+type ItemName =
+  | "filler1"
+  | "filler2"
+  | "filler3"
+  | "cherries"
+  | "seven"
+  | "dream"
+
 interface SlotsItem {
-  name: string
+  name: ItemName
   distribution: number
   emoji: string
 }
@@ -16,7 +24,7 @@ interface SlotsItem {
 interface SlotsReward {
   label: string
   multiplier: number
-  name: string
+  name: ItemName
   count: number
 }
 
@@ -67,7 +75,7 @@ export default class SlotsCommand extends BaseCommand {
           description: joinAsLines(
             reward
               ? `**Won ${formatCredits(winAmount)} (${reward.label})**`
-              : "**You got nothing**",
+              : `**You got nothing and lost ${formatCredits(amount)}**`,
             `You have ${formatCredits(newWallet.credits)} now`,
           ),
         },

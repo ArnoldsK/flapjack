@@ -62,7 +62,7 @@ export default class CreditsModel {
 
   async getAllWallets(): Promise<Wallet[]> {
     const entities = await this.#repository.find()
-    const members = this.#member.guild.members.cache
+    const members = await this.#member.guild.members.fetch()
 
     return entities
       .filter((entity) => members.has(entity.userId))
