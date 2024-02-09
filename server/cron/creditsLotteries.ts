@@ -75,7 +75,7 @@ export default {
       const member = randomValue(members)!
 
       const creditsModel = new CreditsModel(member)
-      await creditsModel.addCredits(amount)
+      await creditsModel.addCredits(0, amount)
 
       // Send a new message
       await channel.send({

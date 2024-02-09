@@ -27,6 +27,7 @@ export default createEvent(
     const timeBasedAmount = Math.floor(secondsSinceUpdate * 0.2)
 
     await creditsModel.addCredits(
+      0,
       Math.max(MIN_CREDITS_PER_MESSAGE, timeBasedAmount),
     )
   },
