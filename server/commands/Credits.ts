@@ -88,23 +88,23 @@ export default class CreditsCommand extends BaseCommand {
 
     switch (subcommand) {
       case SubcommandName.View:
-        this.#handleView()
+        await this.#handleView()
         break
 
       case SubcommandName.Give:
-        this.#handleGive()
+        await this.#handleGive()
         break
 
       case SubcommandName.Deposit:
-        this.#handleBank(SubcommandName.Deposit)
+        await this.#handleBank(SubcommandName.Deposit)
         break
 
       case SubcommandName.Withdraw:
-        this.#handleBank(SubcommandName.Withdraw)
+        await this.#handleBank(SubcommandName.Withdraw)
         break
 
       case SubcommandName.Top:
-        this.#handleTop()
+        await this.#handleTop()
         break
 
       default:

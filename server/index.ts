@@ -79,8 +79,8 @@ nextApp.prepare().then(async () => {
       try {
         await command?.execute(interaction)
       } catch (err) {
-        console.error(err)
-        await interaction.reply({
+        // console.error("> Command error >", interaction.commandName, err)
+        interaction.reply({
           content: (err as Error).message,
           ephemeral: true,
         })

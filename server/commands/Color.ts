@@ -53,16 +53,15 @@ export default class ColorCommand extends BaseCommand {
 
     switch (subcommand) {
       case SubcommandName.Auto:
-        console.log("auto")
-        this.#handleAuto()
+        await this.#handleAuto()
         return
 
       case SubcommandName.Custom:
-        this.#handleCustom()
+        await this.#handleCustom()
         return
 
       case SubcommandName.None:
-        this.#handleNone()
+        await this.#handleNone()
         return
 
       default:

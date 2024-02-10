@@ -99,6 +99,7 @@ export const parseCreditsAmount = (
   }
 
   amount = Math.floor(amount)
+  amount = Math.max(0, Math.min(Math.floor(amount), Number(max)))
 
   if (Number.isNaN(amount)) {
     throw new Error("Invalid amount format")
@@ -108,5 +109,5 @@ export const parseCreditsAmount = (
     throw new Error("The amount is not positive")
   }
 
-  return Math.max(0, Math.min(Math.floor(amount), Number(max)))
+  return amount
 }
