@@ -100,9 +100,15 @@ export default class CreditsModel {
     if (appConfig.dev) return
 
     const role = this.#member.guild.roles.cache.get(discordIds.roles.upperClass)
+    console.log(this.#member.displayName, role?.name ?? "ROLE NOT FOUND")
     if (!role) return
 
     const total = wallet.credits + wallet.banked
+    console.log(
+      total,
+      UPPER_CLASS_MESSAGE_CREDITS,
+      total >= UPPER_CLASS_MESSAGE_CREDITS,
+    )
     if (total >= UPPER_CLASS_MESSAGE_CREDITS) {
       await this.#member.roles.add(role)
     } else {
