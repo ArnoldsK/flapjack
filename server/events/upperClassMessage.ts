@@ -37,6 +37,12 @@ export default createEvent(
       removeFromBanked = wallet.banked
     }
 
+    console.log(message.member.displayName, {
+      total,
+      removeFromCredits,
+      removeFromBanked,
+    })
+
     await creditsModel.addCredits(-removeFromCredits, -removeFromBanked)
   },
 )
