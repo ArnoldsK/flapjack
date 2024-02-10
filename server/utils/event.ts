@@ -50,7 +50,7 @@ export const getGroupedEvents = () => {
   const events = getEventTasks()
 
   for (const { event, callback, options } of events) {
-    if (options.productionOnly && !appConfig.dev) continue
+    if (options.productionOnly && appConfig.dev) continue
 
     if (!group[event]) {
       group[event] = []

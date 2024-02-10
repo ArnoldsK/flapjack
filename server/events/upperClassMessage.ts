@@ -8,8 +8,6 @@ export default createEvent(
   Events.MessageCreate,
   { productionOnly: true },
   async (message) => {
-    console.log("UPPER CLASS EVENT")
-
     if (message.channel.id !== discordIds.channels.upperClass) return
     if (message.author.bot) return
     if (!message.member) return
