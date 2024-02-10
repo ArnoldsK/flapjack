@@ -200,7 +200,7 @@ export default class CreditsCommand extends BaseCommand {
     }
 
     this.reply({
-      ephemeral: !isCasinoChannel(this.channel),
+      ephemeral: true,
       embeds: [
         {
           color: this.member.displayColor,
