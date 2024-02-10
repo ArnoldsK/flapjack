@@ -420,10 +420,10 @@ export default class BlackjackCommand extends BaseCommand {
 
   #formatCards(cards: Card[], dealerHasHole = false): string {
     const suiteEmoji: Record<Card["suite"], string> = {
-      clubs: "\\♣️",
-      diamonds: "\\♦️",
-      hearts: "\\♥️",
-      spades: "\\♠",
+      clubs: "♧",
+      diamonds: "♢",
+      hearts: "♡",
+      spades: "♤",
     }
 
     const result = cards.map((card) => `${card.text}${suiteEmoji[card.suite]}`)
