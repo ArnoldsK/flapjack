@@ -8,6 +8,8 @@ export default createEvent(
   Events.MessageCreate,
   { productionOnly: false },
   async (message) => {
+    console.log("CREDITS EVENT")
+
     if (message.author.bot) return
     if (!message.member) return
 

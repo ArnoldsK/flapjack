@@ -6,32 +6,13 @@ import { UPPER_CLASS_MESSAGE_CREDITS } from "../constants"
 
 export default createEvent(
   Events.MessageCreate,
-  {
-    productionOnly: true,
-  },
+  { productionOnly: true },
   async (message) => {
-    // if (message.channel.id !== discordIds.channels.upperClass) return
-    // if (message.author.bot) return
-    // if (!message.member) return
+    console.log("UPPER CLASS EVENT")
 
-    if (message.channel.id !== discordIds.channels.upperClass) {
-      console.log(
-        "message.channel.id !== discordIds.channels.upperClass",
-        message.channel.id,
-        discordIds.channels.upperClass,
-        // @ts-ignore
-        message.channel.name,
-      )
-      return
-    }
-    if (message.author.bot) {
-      console.log("message.author.bot", message.author.bot)
-      return
-    }
-    if (!message.member) {
-      console.log("!message.member")
-      return
-    }
+    if (message.channel.id !== discordIds.channels.upperClass) return
+    if (message.author.bot) return
+    if (!message.member) return
 
     if (!message.member.roles.cache.has(discordIds.roles.upperClass)) {
       await message.delete()
