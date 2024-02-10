@@ -138,11 +138,12 @@ export default class BlackjackCommand extends BaseCommand {
         {
           ...embed,
           description,
-          footer: ephemeral
-            ? {
-                text: "Dismissing message counts as a loss",
-              }
-            : undefined,
+          footer:
+            ephemeral && !gameOver
+              ? {
+                  text: "Dismissing message counts as a loss",
+                }
+              : undefined,
         },
       ],
       components,
