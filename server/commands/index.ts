@@ -16,6 +16,7 @@ import RouletteCommand from "./Roulette"
 import TestCommand from "./Test"
 import NsfwCommand from "./Nsfw"
 import SlotsCommand from "./Slots"
+import BlackjackCommand from "./Blackjack"
 
 export const commands: Array<typeof BaseCommand> = [
   ...(appConfig.dev ? [TestCommand] : []),
@@ -33,4 +34,5 @@ export const commands: Array<typeof BaseCommand> = [
   RouletteCommand,
   NsfwCommand,
   SlotsCommand,
+  BlackjackCommand,
 ].filter(Boolean)

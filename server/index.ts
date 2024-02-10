@@ -46,8 +46,6 @@ nextApp.prepare().then(async () => {
     },
   })
 
-  await client.login(appConfig.discord.token)
-
   // #############################################################################
   // Context
   // #############################################################################
@@ -81,7 +79,8 @@ nextApp.prepare().then(async () => {
       try {
         await command?.execute(interaction)
       } catch (err) {
-        interaction.reply({
+        console.error(err)
+        await interaction.reply({
           content: (err as Error).message,
           ephemeral: true,
         })
@@ -96,13 +95,23 @@ nextApp.prepare().then(async () => {
 
   for (const event of groupedEvents) {
     client.on(event.name, async (...args) => {
-      await Promise.all(
-        event.callbacks.map((callback) => {
-          return callback.apply(null, args)
-        }),
-      )
+      try {
+        await Promise.all(
+          event.callbacks.map((callback) => {
+            return callback.apply(null, args)
+          }),
+        )
+      } catch (err) {
+        console.error(err)
+      }
     })
   }
+
+  // #############################################################################
+  // Client login
+  // ! Must be below any events
+  // #############################################################################
+  await client.login(appConfig.discord.token)
 
   // #############################################################################
   // Cron

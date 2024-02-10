@@ -1,8 +1,10 @@
+import { Game } from "engine-blackjack-ts"
 import { AppCache, CacheKey } from "./types/cache"
 
 export default class CacheManager {
   #cache: AppCache = {
-    nsfwPosts: [],
+    [CacheKey.NsfwPosts]: [],
+    [CacheKey.Blackjack]: null,
   }
 
   constructor() {}
