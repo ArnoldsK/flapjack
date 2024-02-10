@@ -20,6 +20,6 @@ export default class ClearCommand extends BaseCommand {
     const postText = `This is the start of the #${this.channel.name} channel.`
     const spacer = `\n${nonBreakingSpace}`.repeat(100)
 
-    this.channel.send(`${preText}${spacer}${postText}`)
+    this.reply(`${preText}${spacer}${postText}`)
   }
 }

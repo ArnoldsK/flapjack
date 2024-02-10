@@ -20,8 +20,10 @@ export default class PingCommand extends BaseCommand {
       fetchReply: true,
       ephemeral: true,
     })
-    const latency = sent.createdTimestamp - this.interaction.createdTimestamp
 
-    this.editReply(`Roundtrip latency: ${latency}ms`)
+    if (sent) {
+      const latency = sent.createdTimestamp - this.interaction.createdTimestamp
+      this.editReply(`Roundtrip latency: ${latency}ms`)
+    }
   }
 }

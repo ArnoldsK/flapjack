@@ -1,4 +1,4 @@
-import { Game } from "engine-blackjack-ts"
+import { CacheObjectManager } from "../cache"
 
 export interface CacheNsfwPost {
   title: string
@@ -13,5 +13,5 @@ export enum CacheKey {
 
 export interface AppCache {
   [CacheKey.NsfwPosts]: CacheNsfwPost[]
-  [CacheKey.Blackjack]: Game | null
+  [CacheKey.Blackjack]: CacheObjectManager<string>
 }

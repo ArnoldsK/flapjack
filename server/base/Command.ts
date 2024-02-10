@@ -72,12 +72,20 @@ class BaseCommand {
     return this.interaction.member as GuildMember
   }
 
-  reply(options: string | MessagePayload | InteractionReplyOptions) {
-    return this.interaction.reply(options) as unknown as Promise<Message>
+  async reply(options: string | MessagePayload | InteractionReplyOptions) {
+    try {
+      return await this.interaction.reply(options)
+    } catch {
+      // Message is most likely deleted
+    }
   }
 
-  editReply(options: string | MessagePayload | InteractionReplyOptions) {
-    return this.interaction.editReply(options) as Promise<Message>
+  async editReply(options: string | MessagePayload | InteractionReplyOptions) {
+    try {
+      return await this.interaction.editReply(options)
+    } catch {
+      // Message is most likely deleted
+    }
   }
 
   fail(message?: string) {

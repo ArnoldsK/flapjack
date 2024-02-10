@@ -4,6 +4,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ComponentType,
+  InteractionResponse,
   Message,
   SlashCommandBuilder,
 } from "discord.js"
@@ -24,6 +25,7 @@ import { isCasinoChannel } from "../utils/channel"
 import { joinAsLines, ucFirst } from "../utils/string"
 import { isNonNullish } from "../utils/boolean"
 import assert from "assert"
+import { CacheKey } from "../types/cache"
 
 type Action = keyof typeof actions
 type HandSide = keyof HandInfo
@@ -72,7 +74,34 @@ export default class BlackjackCommand extends BaseCommand {
     return this.#_creditsModel
   }
 
+  #getRunningGameUrl(): string | undefined {
+    const manager = this.context.cache.get(CacheKey.Blackjack)
+
+    return manager.get(this.user.id)
+  }
+
+  #updateCache(
+    game: Game,
+    response: InteractionResponse | Message | undefined,
+  ) {
+    const manager = this.context.cache.get(CacheKey.Blackjack)
+
+    if (response && game.getState().stage !== "done") {
+      const url = new URL(this.channel.url)
+      url.pathname += `/${response.id}`
+      manager.set(this.user.id, url.toString())
+    } else {
+      manager.uns(this.user.id)
+    }
+  }
+
   async execute() {
+    const gameUrl = this.#getRunningGameUrl()
+    if (gameUrl) {
+      this.fail(`You already have a running game at ${gameUrl}`)
+      return
+    }
+
     // #############################################################################
     // Prepare credits
     // #############################################################################
@@ -103,7 +132,7 @@ export default class BlackjackCommand extends BaseCommand {
       : undefined
 
     const ephemeral = !isCasinoChannel(this.channel)
-    const message = await this.reply({
+    const response = await this.reply({
       ephemeral,
       embeds: [
         {
@@ -119,15 +148,22 @@ export default class BlackjackCommand extends BaseCommand {
       components,
     })
 
-    // Begin the rabbit hole...
-    await this.#handleAwaitResponse(message, game)
+    this.#updateCache(game, response)
+
+    if (response) {
+      // Begin the rabbit hole...
+      await this.#handleAwaitResponse(response, game)
+    }
   }
 
-  async #handleAwaitResponse(message: Message, game: Game) {
+  async #handleAwaitResponse(
+    response: InteractionResponse | Message,
+    game: Game,
+  ) {
     try {
-      const interaction = await message.awaitMessageComponent({
+      const interaction = await response.awaitMessageComponent({
         componentType: ComponentType.Button,
-        time: 60_000,
+        idle: 60_000,
         filter: (i) => i.user.id === this.user.id,
       })
 
@@ -181,7 +217,7 @@ export default class BlackjackCommand extends BaseCommand {
         ? await this.#handleGameOver(game, wonAmount)
         : undefined
 
-      const nextMessage = await interaction.editReply({
+      const nextResponse = await interaction.editReply({
         embeds: [
           {
             ...embed,
@@ -191,9 +227,11 @@ export default class BlackjackCommand extends BaseCommand {
         components,
       })
 
+      this.#updateCache(game, nextResponse)
+
       if (!gameOver) {
         // Continue the rabbit hole...
-        await this.#handleAwaitResponse(nextMessage, game)
+        await this.#handleAwaitResponse(nextResponse, game)
       }
     } catch (err) {
       const wallet = await this.#creditsModel.getWallet()
@@ -214,6 +252,8 @@ export default class BlackjackCommand extends BaseCommand {
         ],
         components: [],
       })
+
+      this.#updateCache(game, undefined)
     }
   }
 
