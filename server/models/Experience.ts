@@ -8,6 +8,10 @@ export default class ExperienceModel {
   #repository: Repository<ExperienceEntity>
 
   constructor(member: GuildMember) {
+    if (member.user.bot) {
+      throw new Error("Not allowed for bots")
+    }
+
     this.#member = member
     this.#repository = db.getRepository(ExperienceEntity)
   }
