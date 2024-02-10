@@ -2,7 +2,7 @@ import { GuildMember } from "discord.js"
 import { Repository } from "typeorm"
 import { db } from "../database"
 import CreditsEntity from "../entity/Credits"
-import { discordIds } from "../config"
+import { appConfig, discordIds } from "../config"
 import { getOrCreateRole } from "../utils/role"
 import { UPPER_CLASS_MESSAGE_CREDITS } from "../constants"
 
@@ -97,6 +97,8 @@ export default class CreditsModel {
   }
 
   async #handleUpperClassRole(wallet: Wallet) {
+    if (appConfig.dev) return
+
     const role = this.#member.guild.roles.cache.get(discordIds.roles.upperClass)
     if (!role) return
 
