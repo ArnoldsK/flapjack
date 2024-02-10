@@ -29,6 +29,7 @@ export const appConfig = {
       guild: "411593263615836172",
       roles: {
         nitroBooster: "611953929835643024",
+        upperClass: "1159244242074468503",
       },
       users: {
         owner: "221755442513051649",
@@ -41,7 +42,10 @@ export const appConfig = {
         casino: "621834853696143360",
         nsfw: "632985833414066176",
         logs: "546830997983854592",
+        upperClass: "868434446502723625",
       },
     },
   },
 }
+
+export const discordIds = appConfig.discord.ids

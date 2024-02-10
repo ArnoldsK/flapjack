@@ -2,7 +2,7 @@ import { ChannelType, SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { PermissionFlags, permission } from "../utils/permission"
 import { Color } from "../constants"
-import { appConfig } from "../config"
+import { discordIds } from "../config"
 
 export default class ArchiveCommand extends BaseCommand {
   static version = 1
@@ -22,7 +22,7 @@ export default class ArchiveCommand extends BaseCommand {
       return
     }
 
-    await this.channel.setParent(appConfig.discord.ids.categories.archive, {
+    await this.channel.setParent(discordIds.categories.archive, {
       // Sync permissions
       lockPermissions: true,
     })

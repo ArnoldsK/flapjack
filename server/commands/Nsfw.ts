@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
-import { appConfig } from "../config"
+import { discordIds } from "../config"
 import { CacheKey, CacheNsfwPost } from "../types/cache"
 
 export default class NsfwCommand extends BaseCommand {
@@ -12,8 +12,7 @@ export default class NsfwCommand extends BaseCommand {
     .setNSFW(true)
 
   async execute() {
-    const isNsfwChannel =
-      this.channel.id === appConfig.discord.ids.channels.nsfw
+    const isNsfwChannel = this.channel.id === discordIds.channels.nsfw
 
     const post = await this.#getPost()
 

@@ -1,6 +1,6 @@
 import { GuildTextBasedChannel } from "discord.js"
-import { appConfig } from "../config"
+import { discordIds } from "../config"
 
 export const isCasinoChannel = (channel: GuildTextBasedChannel): boolean => {
-  return channel.id === appConfig.discord.ids.channels.casino
+  return channel.id === discordIds.channels.casino
 }

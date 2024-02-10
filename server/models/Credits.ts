@@ -2,6 +2,9 @@ import { GuildMember } from "discord.js"
 import { Repository } from "typeorm"
 import { db } from "../database"
 import CreditsEntity from "../entity/Credits"
+import { discordIds } from "../config"
+import { getOrCreateRole } from "../utils/role"
+import { UPPER_CLASS_MESSAGE_CREDITS } from "../constants"
 
 export interface Wallet {
   member: GuildMember
@@ -38,10 +41,21 @@ export default class CreditsModel {
     }
   }
 
-  async addCredits(amount: number, bankedAmount = 0): Promise<Wallet> {
+  async addCredits(
+    amount: bigint | number,
+    bankedAmount: bigint | number = 0,
+  ): Promise<Wallet> {
     const { member, credits, banked } = await this.getWallet()
-    const newCredits = credits + BigInt(Math.floor(amount))
-    const newBanked = banked + BigInt(Math.floor(bankedAmount))
+
+    const bigAmount: bigint =
+      typeof amount === "bigint" ? amount : BigInt(Math.floor(amount))
+    const bigBankedAmount: bigint =
+      typeof bankedAmount === "bigint"
+        ? bankedAmount
+        : BigInt(Math.floor(bankedAmount))
+
+    const newCredits = credits + bigAmount
+    const newBanked = banked + bigBankedAmount
     const newUpdatedAt = new Date()
 
     await this.#repository.upsert(
@@ -56,12 +70,16 @@ export default class CreditsModel {
       ["userId"],
     )
 
-    return {
+    const newWallet: Wallet = {
       member,
       credits: newCredits,
       banked: newBanked,
       updatedAt: newUpdatedAt,
     }
+
+    await this.#handleUpperClassRole(newWallet)
+
+    return newWallet
   }
 
   async getAllWallets(): Promise<Wallet[]> {
@@ -76,5 +94,17 @@ export default class CreditsModel {
         banked: entity.banked,
         updatedAt: entity.updatedAt,
       }))
+  }
+
+  async #handleUpperClassRole(wallet: Wallet) {
+    const role = this.#member.guild.roles.cache.get(discordIds.roles.upperClass)
+    if (!role) return
+
+    const total = wallet.credits + wallet.banked
+    if (total >= UPPER_CLASS_MESSAGE_CREDITS) {
+      await this.#member.roles.add(role)
+    } else {
+      await this.#member.roles.remove(role)
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { appConfig } from "../config"
+import { discordIds } from "../config"
 import { Color } from "../constants"
 import CreditsEntity from "../entity/Credits"
 import { CronTask } from "../utils/cron"
@@ -23,10 +23,7 @@ export default {
       },
     ]
 
-    const channelIds = [
-      appConfig.discord.ids.channels.casino,
-      appConfig.discord.ids.channels.logs,
-    ]
+    const channelIds = [discordIds.channels.casino, discordIds.channels.logs]
 
     await Promise.all(
       channelIds.map(async (id) => {

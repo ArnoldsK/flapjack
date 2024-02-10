@@ -28,3 +28,5 @@ export const CREDITS_BANK_HOURLY_RATE = {
   rate: 5,
   divider: 1000,
 }
+
+export const UPPER_CLASS_MESSAGE_CREDITS = 100_000

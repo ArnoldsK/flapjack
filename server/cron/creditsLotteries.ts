@@ -5,7 +5,7 @@ import {
   ComponentType,
   GuildTextBasedChannel,
 } from "discord.js"
-import { appConfig } from "../config"
+import { discordIds } from "../config"
 import CreditsModel from "../models/Credits"
 import { formatCredits } from "../utils/credits"
 import { CronTask } from "../utils/cron"
@@ -29,9 +29,9 @@ export default {
   productionOnly: true,
 
   async execute(client) {
-    const guild = client.guilds.cache.get(appConfig.discord.ids.guild)!
+    const guild = client.guilds.cache.get(discordIds.guild)!
     const channel = guild.channels.cache.get(
-      appConfig.discord.ids.channels.general,
+      discordIds.channels.general,
     ) as GuildTextBasedChannel
 
     // One in x minutes chance
