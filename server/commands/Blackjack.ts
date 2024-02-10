@@ -150,7 +150,7 @@ export default class BlackjackCommand extends BaseCommand {
 
     this.#updateCache(game, response)
 
-    if (response) {
+    if (response && !gameOver) {
       // Begin the rabbit hole...
       await this.#handleAwaitResponse(response, game)
     }
