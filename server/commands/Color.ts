@@ -38,7 +38,7 @@ export default class ColorCommand extends BaseCommand {
             .setName(OptionName.Hex)
             .setDescription("Full length hex color, e.g. #B492D4")
             .setRequired(true)
-            .setMinLength(7)
+            .setMinLength(6)
             .setMaxLength(7),
         ),
     )
