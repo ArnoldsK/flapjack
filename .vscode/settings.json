@@ -1,6 +1,6 @@
 {
   "editor.formatOnSave": true,
   "typescript.preferences.importModuleSpecifier": "relative",
-  "cSpell.words": ["magik", "middot", "Trueish", "typeorm"],
+  "cSpell.words": ["magik", "middot", "runescape", "Trueish", "typeorm"],
   "jest.runMode": "on-demand"
 }
