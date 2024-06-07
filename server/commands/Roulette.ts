@@ -20,7 +20,7 @@ export default class RouletteCommand extends BaseCommand {
 
   static command = new SlashCommandBuilder()
     .setName("roulette")
-    .setDescription("Guess one of the three colors.")
+    .setDescription("Guess one of the three colors")
     .addStringOption((option) =>
       option
         .setName(OptionName.Color)

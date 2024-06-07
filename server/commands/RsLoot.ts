@@ -19,6 +19,7 @@ export default class RsLootCommand extends BaseCommand {
       return
     }
 
+    // TODO add cleanup to remove unused webhooks (e.g. username change)
     const webhooks = await this.channel.fetchWebhooks()
 
     let userWebhook = webhooks.find((el) => el.name === this.user.username)
