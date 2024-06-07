@@ -38,10 +38,7 @@ export default class RsLootCommand extends BaseCommand {
     }
 
     this.reply({
-      content: joinAsLines(
-        "Your webhook URL is:",
-        `${codeBlock(userWebhook.url)}`,
-      ),
+      content: joinAsLines("Your webhook URL is:", codeBlock(userWebhook.url)),
       ephemeral: true,
     })
   }
