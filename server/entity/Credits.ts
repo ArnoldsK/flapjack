@@ -27,20 +27,6 @@ export default class CreditsEntity extends BaseEntity {
   })
   credits: bigint
 
-  @Column({
-    type: "bigint",
-    unsigned: true,
-    transformer: {
-      from(value: string): bigint {
-        return BigInt(value)
-      },
-      to(value?: bigint): string {
-        return value?.toString() ?? "0"
-      },
-    },
-  })
-  banked: bigint
-
   @UpdateDateColumn()
   updatedAt: Date
 }

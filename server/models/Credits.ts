@@ -3,13 +3,11 @@ import { Repository } from "typeorm"
 import { db } from "../database"
 import CreditsEntity from "../entity/Credits"
 import { appConfig, discordIds } from "../config"
-import { getOrCreateRole } from "../utils/role"
 import { UPPER_CLASS_MESSAGE_CREDITS } from "../constants"
 
 export interface Wallet {
   member: GuildMember
   credits: bigint
-  banked: bigint
   updatedAt: Date
 }
 
@@ -36,26 +34,17 @@ export default class CreditsModel {
     return {
       member: this.#member,
       credits: entity?.credits ?? BigInt(0),
-      banked: entity?.banked ?? BigInt(0),
       updatedAt: entity?.updatedAt ?? new Date(),
     }
   }
 
-  async addCredits(
-    amount: bigint | number,
-    bankedAmount: bigint | number = 0,
-  ): Promise<Wallet> {
-    const { member, credits, banked } = await this.getWallet()
+  async addCredits(amount: bigint | number): Promise<Wallet> {
+    const { member, credits } = await this.getWallet()
 
     const bigAmount: bigint =
       typeof amount === "bigint" ? amount : BigInt(Math.floor(amount))
-    const bigBankedAmount: bigint =
-      typeof bankedAmount === "bigint"
-        ? bankedAmount
-        : BigInt(Math.floor(bankedAmount))
 
     const newCredits = credits + bigAmount
-    const newBanked = banked + bigBankedAmount
     const newUpdatedAt = new Date()
 
     await this.#repository.upsert(
@@ -63,7 +52,6 @@ export default class CreditsModel {
         {
           userId: this.#member.id,
           credits: newCredits,
-          banked: newBanked,
           updatedAt: newUpdatedAt,
         },
       ],
@@ -73,7 +61,6 @@ export default class CreditsModel {
     const newWallet: Wallet = {
       member,
       credits: newCredits,
-      banked: newBanked,
       updatedAt: newUpdatedAt,
     }
 
@@ -91,7 +78,6 @@ export default class CreditsModel {
       .map((entity) => ({
         member: members.get(entity.userId)!,
         credits: entity.credits,
-        banked: entity.banked,
         updatedAt: entity.updatedAt,
       }))
   }
@@ -102,8 +88,7 @@ export default class CreditsModel {
     const role = this.#member.guild.roles.cache.get(discordIds.roles.upperClass)
     if (!role) return
 
-    const total = wallet.credits + wallet.banked
-    if (total >= UPPER_CLASS_MESSAGE_CREDITS) {
+    if (wallet.credits >= UPPER_CLASS_MESSAGE_CREDITS) {
       await this.#member.roles.add(role)
     } else {
       await this.#member.roles.remove(role)

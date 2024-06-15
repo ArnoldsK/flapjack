@@ -1,8 +1,6 @@
 import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
-import { appConfig } from "../config"
 import { checkUnreachable } from "../utils/error"
-import { joinAsLines, ucFirst } from "../utils/string"
 import { formatCredits, parseCreditsAmount } from "../utils/credits"
 import CreditsModel from "../models/Credits"
 import { sortBigInt } from "../utils/array"
@@ -12,8 +10,6 @@ import { isCasinoChannel } from "../utils/channel"
 enum SubcommandName {
   View = "view",
   Give = "give",
-  Deposit = "deposit",
-  Withdraw = "withdraw",
   Top = "top",
 }
 
@@ -23,7 +19,7 @@ enum OptionName {
 }
 
 export default class CreditsCommand extends BaseCommand {
-  static version = 2
+  static version = 3
 
   static command = new SlashCommandBuilder()
     .setName("credits")
@@ -57,28 +53,6 @@ export default class CreditsCommand extends BaseCommand {
     )
     .addSubcommand((subcommand) =>
       subcommand
-        .setName(SubcommandName.Deposit)
-        .setDescription("Place credits in the bank")
-        .addStringOption((option) =>
-          option
-            .setName(OptionName.Amount)
-            .setDescription(OPTION_DESCRIPTION_AMOUNT)
-            .setRequired(true),
-        ),
-    )
-    .addSubcommand((subcommand) =>
-      subcommand
-        .setName(SubcommandName.Withdraw)
-        .setDescription("Remove credits from the bank")
-        .addStringOption((option) =>
-          option
-            .setName(OptionName.Amount)
-            .setDescription(OPTION_DESCRIPTION_AMOUNT)
-            .setRequired(true),
-        ),
-    )
-    .addSubcommand((subcommand) =>
-      subcommand
         .setName(SubcommandName.Top)
         .setDescription("Get credits top list"),
     )
@@ -93,14 +67,6 @@ export default class CreditsCommand extends BaseCommand {
 
       case SubcommandName.Give:
         await this.#handleGive()
-        break
-
-      case SubcommandName.Deposit:
-        await this.#handleBank(SubcommandName.Deposit)
-        break
-
-      case SubcommandName.Withdraw:
-        await this.#handleBank(SubcommandName.Withdraw)
         break
 
       case SubcommandName.Top:
@@ -132,10 +98,7 @@ export default class CreditsCommand extends BaseCommand {
       embeds: [
         {
           color: member.displayColor,
-          description: joinAsLines(
-            `**${intro} ${formatCredits(wallet.credits)}**`,
-            ucFirst(`${formatCredits(wallet.banked)} in the bank`),
-          ),
+          description: `**${intro} ${formatCredits(wallet.credits)}**`,
         },
       ],
     })
@@ -180,39 +143,6 @@ export default class CreditsCommand extends BaseCommand {
     })
   }
 
-  async #handleBank(action: SubcommandName.Deposit | SubcommandName.Withdraw) {
-    const creditsModel = new CreditsModel(this.member)
-    const wallet = await creditsModel.getWallet()
-
-    const sourceAmount =
-      action === SubcommandName.Deposit ? wallet.credits : wallet.banked
-
-    const rawAmount = this.interaction.options.getString(
-      OptionName.Amount,
-      true,
-    )
-    const amount = parseCreditsAmount(rawAmount, sourceAmount)
-
-    if (action === SubcommandName.Deposit) {
-      await creditsModel.addCredits(-amount, amount)
-    } else {
-      await creditsModel.addCredits(amount, -amount)
-    }
-
-    this.reply({
-      ephemeral: true,
-      embeds: [
-        {
-          color: this.member.displayColor,
-          description:
-            action === SubcommandName.Deposit
-              ? `Put ${formatCredits(amount)} in the bank`
-              : `Took ${formatCredits(amount)} from the bank`,
-        },
-      ],
-    })
-  }
-
   async #handleTop() {
     const creditsModel = new CreditsModel(this.member)
     const wallets = await creditsModel.getAllWallets()
@@ -224,7 +154,7 @@ export default class CreditsCommand extends BaseCommand {
           fields: wallets
             .map((wallet) => ({
               member: wallet.member,
-              amount: wallet.credits + wallet.banked,
+              amount: wallet.credits,
             }))
             .sort((a, b) => sortBigInt(b.amount, a.amount))
             .slice(0, 9)

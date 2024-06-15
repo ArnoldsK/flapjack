@@ -21,20 +21,12 @@ export default createEvent(
     const wallet = await creditsModel.getWallet()
 
     // Role should account for this but just in case...
-    const total = wallet.credits + wallet.banked
-    if (total < UPPER_CLASS_MESSAGE_CREDITS) {
+    if (wallet.credits < UPPER_CLASS_MESSAGE_CREDITS) {
       await message.delete()
       return
     }
 
-    // Allocate to take from banked first, then from credits
-    let removeFromCredits = BigInt(0)
-    let removeFromBanked = BigInt(UPPER_CLASS_MESSAGE_CREDITS)
-    if (wallet.banked < removeFromBanked) {
-      removeFromCredits = removeFromBanked - wallet.banked
-      removeFromBanked = wallet.banked
-    }
-
-    await creditsModel.addCredits(-removeFromCredits, -removeFromBanked)
+    const removeFromCredits = BigInt(UPPER_CLASS_MESSAGE_CREDITS)
+    await creditsModel.addCredits(-removeFromCredits)
   },
 )
