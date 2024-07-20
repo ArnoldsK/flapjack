@@ -33,7 +33,8 @@ export const getWheelImage = async (items: string[]): Promise<Buffer> => {
   let spinDeg = randomInt(0, 359)
   for (let spin = 0; spin < SPIN_COUNT; spin++) {
     drawWheel(ctx, {
-      items,
+      // Replace first frame items with empty text for Discord out of focus view
+      items: spin === 0 ? items.map(() => "") : items,
       radSpinOffset: deg2rad(spinDeg),
     })
     encoder.addFrame(ctx as any)
