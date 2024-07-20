@@ -4,10 +4,11 @@ import { getWheelImage } from "../canvas/wheel"
 
 enum OptionName {
   Choices = "choices",
+  Message = "message",
 }
 
 export default class WheelCommand extends BaseCommand {
-  static version = 1
+  static version = 2
 
   static command = new SlashCommandBuilder()
     .setName("wheel")
@@ -18,15 +19,21 @@ export default class WheelCommand extends BaseCommand {
         .setDescription('Choices for the wheel, separated by ";".')
         .setRequired(true),
     )
+    .addStringOption((option) =>
+      option
+        .setName(OptionName.Message)
+        .setDescription("Optionally, add a message to the wheel image."),
+    )
 
   async execute() {
     const input = this.interaction.options.getString(OptionName.Choices, true)
     const choices = input.split(";").map((el) => el.trim())
-
     if (choices.length < 2) {
       this.fail('At least two choices are required. Separate them with ";".')
       return
     }
+
+    const message = this.interaction.options.getString(OptionName.Message)
 
     // Image generation might take a while, request wait time...
     await this.interaction.deferReply()
@@ -34,6 +41,7 @@ export default class WheelCommand extends BaseCommand {
     const image = await getWheelImage(choices)
 
     this.editReply({
+      content: message?.length ? message : undefined,
       files: [
         {
           name: "wheel.gif",
