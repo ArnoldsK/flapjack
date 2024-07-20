@@ -14,3 +14,7 @@ export const clipEllipse = (
   draw(x, y, w, h)
   ctx.restore()
 }
+
+export const deg2rad = (deg: number): number => deg * Math.PI / 180
+
+export const rad2deg = (rad: number): number => rad * 180 / Math.PI
