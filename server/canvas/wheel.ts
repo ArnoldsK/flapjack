@@ -4,16 +4,17 @@ import { deg2rad } from "../utils/canvas"
 import { randomInt } from "../utils/random"
 import { interpolate } from "../utils/number"
 
-const WHEEL_SIZE = 550
+const WHEEL_SIZE = 800
 const WHEEL_COLORS = {
+  background: "#313338",
   white: "#fff",
   primary: "#2B2D31",
   accent: "#1E1F22",
   muted: "#949BA4",
 }
 
-const SPIN_DELAY = 1_000 / 60
-const SPIN_DURATION = 3_000
+const SPIN_DELAY = Math.ceil(1_000 / 30)
+const SPIN_DURATION = 2_000
 const spinDegMaxStep = 30
 const SPIN_COUNT = Math.ceil(SPIN_DURATION / SPIN_DELAY)
 
@@ -23,13 +24,7 @@ export const getWheelImage = async (items: string[]): Promise<Buffer> => {
   const ctx = canvas.getContext("2d")
 
   // Setup encoder
-  const encoder = new GIFEncoder(
-    WHEEL_SIZE,
-    WHEEL_SIZE,
-    "neuquant",
-    true,
-    SPIN_COUNT,
-  )
+  const encoder = new GIFEncoder(WHEEL_SIZE, WHEEL_SIZE, "neuquant", true)
   encoder.setDelay(SPIN_DELAY)
   encoder.setRepeat(-1)
   encoder.start()
@@ -158,7 +153,8 @@ const drawWheel = (
     radSpinOffset: number
   },
 ) => {
-  ctx.clearRect(0, 0, WHEEL_SIZE, WHEEL_SIZE)
+  ctx.fillStyle = WHEEL_COLORS.background
+  ctx.fillRect(0, 0, WHEEL_SIZE, WHEEL_SIZE)
 
   for (const [index, item] of items.entries()) {
     drawSegment(ctx, {
