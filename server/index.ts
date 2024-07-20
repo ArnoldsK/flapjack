@@ -17,6 +17,8 @@ import { getGroupedEvents } from "./utils/event"
 import { handleCron } from "./utils/cron"
 import { BaseContext } from "./types"
 import CacheManager from "./cache"
+import { getWheelImage } from "./canvas/wheel"
+import { writeFileSync } from "fs"
 
 // Prepare next app
 const nextApp = next({ dev: appConfig.dev })
@@ -25,6 +27,21 @@ const handle = nextApp.getRequestHandler()
 nextApp.prepare().then(async () => {
   assert(!!appConfig.discord.token, "Discord token missing")
   assert(!!appConfig.discord.client, "Discord client missing")
+
+  if (1 + 1) {
+    const image = await getWheelImage([
+      "Hello World",
+      "Something Something",
+      "|",
+      "Lorem ipsum dolor sit amet",
+      "HH",
+    ])
+
+    writeFileSync("image.gif", image, "binary")
+    console.log("SAVED")
+
+    return
+  }
 
   // #############################################################################
   // Database
