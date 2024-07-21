@@ -8,7 +8,7 @@ enum OptionName {
 }
 
 export default class WheelCommand extends BaseCommand {
-  static version = 2
+  static version = 3
 
   static command = new SlashCommandBuilder()
     .setName("wheel")
@@ -16,7 +16,7 @@ export default class WheelCommand extends BaseCommand {
     .addStringOption((option) =>
       option
         .setName(OptionName.Choices)
-        .setDescription('Choices for the wheel, separated by ";".')
+        .setDescription('Choices for the wheel, separated by "/".')
         .setRequired(true),
     )
     .addStringOption((option) =>
@@ -27,9 +27,9 @@ export default class WheelCommand extends BaseCommand {
 
   async execute() {
     const input = this.interaction.options.getString(OptionName.Choices, true)
-    const choices = input.split(";").map((el) => el.trim())
+    const choices = input.split("/").map((el) => el.trim())
     if (choices.length < 2) {
-      this.fail('At least two choices are required. Separate them with ";".')
+      this.fail('At least two choices are required. Separate them with "/".')
       return
     }
 
