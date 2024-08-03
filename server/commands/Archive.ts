@@ -3,6 +3,7 @@ import { BaseCommand } from "../base/Command"
 import { PermissionFlags, permission } from "../utils/permission"
 import { Color } from "../constants"
 import { discordIds } from "../config"
+import { isTextChannel } from "../utils/channel"
 
 export default class ArchiveCommand extends BaseCommand {
   static version = 1
@@ -17,7 +18,7 @@ export default class ArchiveCommand extends BaseCommand {
   })
 
   async execute() {
-    if (this.channel.type !== ChannelType.GuildText) {
+    if (!isTextChannel(this.channel)) {
       this.fail("Unable to archive this channel")
       return
     }
