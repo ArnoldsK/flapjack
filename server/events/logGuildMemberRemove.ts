@@ -14,17 +14,25 @@ export default createEvent(
     const ch = member.guild.channels.cache.get(discordIds.channels.logs)
     if (!isTextChannel(ch)) return
 
+    const name =
+      member.displayName === member.user.username
+        ? `<@${member.id}>`
+        : `<@${member.id}> (${member.user.username})`
     const joinedAt = moment(member.joinedAt).fromNow()
-    const roles = member.roles.cache.map((role) => role.name)
+    const roles = member.roles.cache
+      .filter((role) => role.id !== role.guild.id)
+      .map((role) => role.name)
 
     ch.send({
       embeds: [
         {
           color: Color.black,
           description: joinAsLines(
-            `<@${member.id}> (${member.displayName}) has left the server`,
-            `Joined: ${joinedAt}`,
-            `Roles: ${roles.join(", ")}`,
+            ...[
+              `${name} has left the server`,
+              `Joined: ${joinedAt}`,
+              roles.length ? `Roles: ${roles.join(", ")}` : "",
+            ].filter(Boolean),
           ),
         },
       ],
