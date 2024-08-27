@@ -47,6 +47,11 @@ export const appConfig = {
       },
     },
   },
+
+  openAi: {
+    projectId: "proj_48u4XHqz5O8MzQrCNrau66fZ",
+    secretKey: process.env.OPEN_AI_SECRET_KEY || "",
+  },
 }
 
 export const discordIds = appConfig.discord.ids
