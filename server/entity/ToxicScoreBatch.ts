@@ -7,22 +7,18 @@ import {
 } from "typeorm"
 
 @Entity()
-export default class ToxicScoreEntity extends BaseEntity {
+export default class ToxicScoreBatchEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: string
 
   @Column()
-  userId: string
+  body: string
 
   @Column()
-  messageId: string
+  sent: 0 | 1
 
-  @Column()
-  // TODO make a boolean
-  score: number
-
-  @Column()
-  info: string
+  @Column({ type: "varchar", nullable: true })
+  remoteBatchId: string | null
 
   @CreateDateColumn()
   createdAt: Date

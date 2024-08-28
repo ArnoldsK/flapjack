@@ -4,6 +4,7 @@ import { db } from "../database"
 import ToxicScoreEntity from "../entity/ToxicScore"
 
 export interface ToxicScoreInput {
+  messageId: string
   score: number
   info: string
 }
@@ -22,10 +23,14 @@ export default class ToxicScoreModel {
   }
 
   async addScore(input: ToxicScoreInput) {
-    await this.#repository.create({
-      userId: this.#member.id,
-      score: input.score,
-      info: input.info,
-    })
+    await this.#repository
+      .create({
+        userId: this.#member.id,
+        messageId: input.messageId,
+        score: input.score,
+        info: input.info,
+        createdAt: new Date(),
+      })
+      .save()
   }
 }

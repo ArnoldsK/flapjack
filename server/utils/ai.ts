@@ -1,5 +1,10 @@
 import { Message } from "discord.js"
+import OpenAI from "openai"
+
 import { isUrl } from "./web"
+import { appConfig } from "../config"
+import { createReadStream, writeFileSync } from "fs"
+import path from "path"
 
 /**
  * Replace emoji syntax with the name.
@@ -53,4 +58,36 @@ export const parseMessageContentForAi = (message: Message): string => {
     .join("\n")
 
   return content
+}
+
+export const getAiClient = () => {
+  if (!appConfig.openAi.secretKey) {
+    return null
+  }
+
+  return new OpenAI({
+    apiKey: appConfig.openAi.secretKey,
+    project: appConfig.openAi.projectId,
+  })
+}
+
+export const handleCreateAiBatch = async (batches: string[]) => {
+  const ai = getAiClient()
+  if (!ai) {
+    throw new Error("AI not configured")
+  }
+
+  const filename = path.join(process.cwd(), "tmp", "openai-batches.jsonl")
+  writeFileSync(filename, batches.join("\n"))
+
+  const file = await ai.files.create({
+    file: createReadStream(filename),
+    purpose: "batch",
+  })
+
+  return await ai.batches.create({
+    input_file_id: file.id,
+    endpoint: "/v1/chat/completions",
+    completion_window: "24h",
+  })
 }

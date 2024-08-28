@@ -39,4 +39,5 @@ yarn-error.log*
 next-env.d.ts
 
 # random
-/tmp
+/tmp/*
+!/tmp/.gitkeep
