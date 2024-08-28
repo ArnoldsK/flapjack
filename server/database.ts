@@ -15,7 +15,7 @@ export const db = new DataSource({
   subscribers: [],
   migrations: [join(__dirname, "migration", "*.{ts,js}")],
   // Auto-update tables
-  synchronize: false,
-  // Run migrations for table removals
-  migrationsRun: true,
+  synchronize: true,
+  // Screw migrations... I tried, it's a pain with MySQL
+  migrationsRun: false,
 })

@@ -18,7 +18,7 @@ import {
 } from "engine-blackjack-ts"
 
 import { BaseCommand } from "../base/Command"
-import CreditsModel from "../models/Credits"
+import { CreditsModel } from "../models/Credits"
 import { formatCredits, parseCreditsAmount } from "../utils/credits"
 import { OPTION_DESCRIPTION_AMOUNT, Unicode } from "../constants"
 import { isCasinoChannel } from "../utils/channel"

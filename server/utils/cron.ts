@@ -2,7 +2,9 @@ import type { Client } from "discord.js"
 import cron from "node-cron"
 import fs from "fs"
 import { join } from "path"
+
 import { appConfig } from "../config"
+import { BaseContext } from "../types"
 
 const cronTranslate = require("cron-translate")
 
@@ -11,7 +13,7 @@ export interface CronTask {
   expression: string
   isRawExpression?: boolean
   productionOnly?: boolean
-  execute: (client: Client) => Promise<void>
+  execute: (ctx: BaseContext) => Promise<void>
 }
 
 const getTasks = () => {
@@ -28,7 +30,7 @@ const getTasks = () => {
   return tasks
 }
 
-export const handleCron = (client: Client) => {
+export const handleCron = (context: BaseContext) => {
   const tasks = getTasks()
 
   for (const task of tasks) {
@@ -40,7 +42,7 @@ export const handleCron = (client: Client) => {
 
     cron.schedule(expression, () => {
       // console.log(">", task.description)
-      task.execute(client)
+      task.execute(context)
     })
   }
 }

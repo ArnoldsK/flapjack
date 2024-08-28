@@ -3,7 +3,7 @@ import { encodingForModel } from "js-tiktoken"
 
 import { createEvent } from "../utils/event"
 import { parseMessageContentForAi } from "../utils/ai"
-import ToxicScoreBatchBatchModel from "../models/ToxicScoreBatch"
+import { ToxicScoreModel } from "../models/ToxicScore"
 
 const tokenEncoder = encodingForModel("gpt-4o-mini")
 
@@ -24,8 +24,10 @@ export default createEvent(
     if (tokenCount <= 1) return
 
     // Add to batch list
-    const model = new ToxicScoreBatchBatchModel()
-    await model.addBatch({
+    const model = new ToxicScoreModel()
+    await model.create({
+      userId: message.author.id,
+      channelId: message.channel.id,
       messageId: message.id,
       content,
     })

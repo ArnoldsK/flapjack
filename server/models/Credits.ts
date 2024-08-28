@@ -11,7 +11,7 @@ export interface Wallet {
   updatedAt: Date
 }
 
-export default class CreditsModel {
+export class CreditsModel {
   #member: GuildMember
   #repository: Repository<CreditsEntity>
 

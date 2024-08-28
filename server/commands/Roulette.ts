@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
-import CreditsModel from "../models/Credits"
+import { CreditsModel } from "../models/Credits"
 import { formatCredits, parseCreditsAmount } from "../utils/credits"
 import { Color, OPTION_DESCRIPTION_AMOUNT } from "../constants"
 import { randomValue } from "../utils/random"

@@ -1,10 +1,11 @@
 import { Message } from "discord.js"
 import OpenAI from "openai"
+import path from "path"
 
 import { isUrl } from "./web"
 import { appConfig } from "../config"
-import { createReadStream, writeFileSync } from "fs"
-import path from "path"
+import { z } from "zod"
+import { isNonNullish } from "./boolean"
 
 /**
  * Replace emoji syntax with the name.
@@ -71,23 +72,45 @@ export const getAiClient = () => {
   })
 }
 
-export const handleCreateAiBatch = async (batches: string[]) => {
-  const ai = getAiClient()
-  if (!ai) {
-    throw new Error("AI not configured")
-  }
+export const getAiBatchTmpFilePath = () => {
+  return path.join(process.cwd(), "tmp", `openai-batches-${Date.now()}.jsonl`)
+}
 
-  const filename = path.join(process.cwd(), "tmp", "openai-batches.jsonl")
-  writeFileSync(filename, batches.join("\n"))
+const batchFileResponseSchema = z.object({
+  id: z.string(),
+  custom_id: z.string(),
+  response: z.object({
+    body: z.object({
+      choices: z
+        .array(
+          z.object({
+            message: z.object({
+              content: z.string(),
+            }),
+          }),
+        )
+        .nonempty(),
+    }),
+  }),
+})
 
-  const file = await ai.files.create({
-    file: createReadStream(filename),
-    purpose: "batch",
-  })
+export const parseAiBatchFileResponses = (contents: string) => {
+  return (
+    contents
+      .split("\n")
+      // Scuffed json validation; could also just try catch json parse
+      .filter((el) => !!el && el.startsWith("{"))
+      .map((el) => batchFileResponseSchema.safeParse(JSON.parse(el)).data)
+      .filter(isNonNullish)
+  )
+}
 
-  return await ai.batches.create({
-    input_file_id: file.id,
-    endpoint: "/v1/chat/completions",
-    completion_window: "24h",
-  })
+export const aiCustomId = {
+  get: (channelId: string, messageId: string) => {
+    return `${channelId}_${messageId}`
+  },
+  parse: (value: string) => {
+    const [channelId, messageId] = value.split("_")
+    return { channelId, messageId }
+  },
 }

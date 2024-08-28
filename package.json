@@ -6,8 +6,7 @@
     "dev": "nodemon",
     "build": "rm -rf dist/ && next build && tsc --project tsconfig.server.json",
     "start": "cross-env NODE_ENV=development node dist/server/index.js",
-    "lint": "next lint",
-    "migration:create": "typeorm migration:create ./server/migration/update"
+    "lint": "next lint"
   },
   "dependencies": {
     "@types/node": "20.3.1",

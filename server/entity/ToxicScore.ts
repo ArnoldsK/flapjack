@@ -15,14 +15,19 @@ export default class ToxicScoreEntity extends BaseEntity {
   userId: string
 
   @Column()
+  channelId: string
+
+  @Column()
   messageId: string
 
-  @Column()
-  // TODO make a boolean
-  score: number
+  @Column({ type: "text" })
+  content: string
 
-  @Column()
-  info: string
+  @Column({ type: "varchar", nullable: true })
+  remoteBatchId: string | null
+
+  @Column({ type: "tinyint", nullable: true })
+  isToxic: boolean | null
 
   @CreateDateColumn()
   createdAt: Date

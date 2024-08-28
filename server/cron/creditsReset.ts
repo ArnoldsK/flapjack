@@ -1,6 +1,4 @@
-import { discordIds } from "../config"
-import { Color } from "../constants"
-import CreditsEntity from "../entity/Credits"
+import { resetCredits } from "../tasks/resetCredits"
 import { CronTask } from "../utils/cron"
 
 export default {
@@ -13,25 +11,7 @@ export default {
 
   productionOnly: true,
 
-  async execute(client) {
-    await CreditsEntity.createQueryBuilder().delete().execute()
-
-    const embeds = [
-      {
-        color: Color.red,
-        title: `All credits have been reset`,
-      },
-    ]
-
-    const channelIds = [discordIds.channels.casino, discordIds.channels.logs]
-
-    await Promise.all(
-      channelIds.map(async (id) => {
-        const channel = client.channels.cache.get(id)
-        if (channel?.isTextBased()) {
-          await channel.send({ embeds })
-        }
-      }),
-    )
+  async execute(context) {
+    await resetCredits(context)
   },
 } as CronTask

@@ -3,7 +3,7 @@ import { Repository } from "typeorm"
 import { db } from "../database"
 import ExperienceEntity from "../entity/Experience"
 
-export default class ExperienceModel {
+export class ExperienceModel {
   #member: GuildMember
   #repository: Repository<ExperienceEntity>
 
