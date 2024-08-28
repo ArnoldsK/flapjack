@@ -2,12 +2,16 @@ import OpenAI from "openai"
 
 import { ToxicScoreModel } from "../models/ToxicScore"
 import { AiTask } from "../types/tasks"
-import { aiCustomId, parseAiBatchFileResponses } from "../utils/ai"
+import { parseAiBatchFileResponses } from "../utils/ai"
 import { checkUnreachable } from "../utils/error"
 import { BaseContext } from "../types"
 import { appConfig } from "../config"
 import { isTextChannel } from "../utils/channel"
-import { TextChannel } from "discord.js"
+import { dedupe } from "../utils/array"
+import { isNonNullish } from "../utils/boolean"
+import { ToxicUserFlagModel } from "../models/ToxicUserFlag"
+import ToxicScoreEntity from "../entity/ToxicScore"
+import { joinAsLines } from "../utils/string"
 
 export const aiHandleRemoteBatches: AiTask = async (context, ai) => {
   const model = new ToxicScoreModel()
@@ -49,6 +53,7 @@ const handleRemoteBatch = async ({
         context,
         ai,
         model,
+        batchId,
         fileId: batch.output_file_id!,
       })
       return
@@ -79,56 +84,73 @@ const handleCompletedBatch = async ({
   context,
   ai,
   model,
+  batchId,
   fileId,
 }: {
   context: BaseContext
   ai: OpenAI
   model: ToxicScoreModel
+  batchId: string
   fileId: string
 }) => {
+  // Parse response file
   const fileResponse = await ai.files.content(fileId)
   const fileContents = await fileResponse.text()
   const responses = parseAiBatchFileResponses(fileContents)
 
+  // There should be only one response
+  const response = responses[0]!
+  const answer = response.response.body.choices[0].message.content.toLowerCase()
+
+  // Get all used entities
+  const entities = await model.getByRemoveBatchId({ remoteBatchId: batchId })
+  const entityUserIds = dedupe(entities.map((el) => el.userId))
+
+  // Parse answer to get flagged user ids
+  const flaggedUserIds = answer
+    .split(",")
+    .map((el) => el.trim())
+    .map((partialId) => entityUserIds.find((id) => id.startsWith(partialId)))
+    .filter(isNonNullish)
+
+  const userFlagModel = new ToxicUserFlagModel()
+
   await Promise.all(
-    responses.map(async (item) => {
-      const { channelId, messageId } = aiCustomId.parse(item.custom_id)
-      const answer = item.response.body.choices[0].message.content.toLowerCase()
+    entityUserIds.map(async (userId) => {
+      const isToxic = flaggedUserIds.includes(userId)
 
-      // Sometimes there's "Not enough info" and such, just check for "true"
-      const isToxic = answer === "true"
-
-      await model.setIsToxic({
-        channelId,
-        messageId,
+      await userFlagModel.create({
+        userId,
         isToxic,
       })
 
       if (isToxic) {
-        await sendToxicMessageLog({ context, model, channelId, messageId })
+        await sendToxicMessageLog({
+          context,
+          userId,
+          entities: entities.filter((el) => el.userId === userId),
+        })
       }
     }),
   )
+
+  // Delete handled batches
+  await model.deleteByRemoteBatchId([batchId])
 }
 
 const sendToxicMessageLog = async ({
   context,
-  model,
-  channelId,
-  messageId,
+  userId,
+  entities,
 }: {
   context: BaseContext
-  model: ToxicScoreModel
-  channelId: string
-  messageId: string
+  userId: string
+  entities: ToxicScoreEntity[]
 }) => {
-  const entity = await model.getByMessageId({ channelId, messageId })
-  if (!entity) return
-
   const guild = context.client.guilds.cache.get(appConfig.discord.ids.guild)
   if (!guild) return
 
-  const member = guild.members.cache.get(entity.userId)
+  const member = guild.members.cache.get(userId)
   if (!member) return
 
   const logsChannel = guild.channels.cache.get(
@@ -137,14 +159,21 @@ const sendToxicMessageLog = async ({
   )
   if (!isTextChannel(logsChannel)) return
 
-  const channel = guild.channels.cache.get(channelId) as TextChannel | undefined
-  const message = channel?.messages.cache.get(messageId)
+  const messages = entities
+    .flatMap((entity) => {
+      const channel = guild.channels.cache.get(entity.channelId)
+
+      return isTextChannel(channel)
+        ? channel.messages.cache.get(entity.messageId)
+        : null
+    })
+    .filter(isNonNullish)
+  if (!messages.length) return
 
   await logsChannel.send({
     embeds: [
       {
         title: "Flagged as toxic",
-        url: message?.url,
         author: {
           name: member.displayName,
           icon_url: member.displayAvatarURL({
@@ -153,12 +182,13 @@ const sendToxicMessageLog = async ({
             size: 64,
           }),
         },
-        description: entity.content,
-        footer: channel
-          ? {
-              text: `#${channel.name}`,
-            }
-          : undefined,
+        description: joinAsLines(
+          ...messages.map((message) => {
+            const content = message.content.split("\n").join("; ")
+
+            return `[#${message.channel.name}](${message.url}) ${content}`
+          }),
+        ),
       },
     ],
   })

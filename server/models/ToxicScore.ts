@@ -31,7 +31,9 @@ export class ToxicScoreModel {
     return await this.#repository.find({
       where: {
         remoteBatchId: IsNull(),
-        isToxic: IsNull(),
+      },
+      order: {
+        createdAt: "asc",
       },
     })
   }
@@ -48,7 +50,6 @@ export class ToxicScoreModel {
     const entities = await this.#repository.find({
       where: {
         remoteBatchId: Not(IsNull()),
-        isToxic: IsNull(),
       },
     })
 
@@ -66,20 +67,12 @@ export class ToxicScoreModel {
     })
   }
 
-  async setIsToxic(input: {
-    channelId: string
-    messageId: string
-    isToxic: boolean
-  }) {
-    await this.#repository.update(
-      {
-        channelId: input.channelId,
-        messageId: input.messageId,
+  async getByRemoveBatchId(input: { remoteBatchId: string }) {
+    return await this.#repository.find({
+      where: {
+        remoteBatchId: input.remoteBatchId,
       },
-      {
-        isToxic: input.isToxic,
-      },
-    )
+    })
   }
 
   async getByMessageId(input: { channelId: string; messageId: string }) {

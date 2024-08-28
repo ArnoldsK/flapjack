@@ -5,11 +5,26 @@ import { AiTask } from "../types/tasks"
 import { aiCustomId, getAiBatchTmpFilePath } from "../utils/ai"
 import ToxicScoreEntity from "../entity/ToxicScore"
 
-const MIN_BATCH_SIZE = 10
+const MIN_BATCH_SIZE = 20
 
-const entityToBatchItem = (entity: ToxicScoreEntity): string => {
+const entitiesToBatch = (entities: ToxicScoreEntity[]): string => {
+  const prompt =
+    "User chat in Latvian, oldest first. Give only comma separated users who are toxic to others."
+  const content = entities
+    .map((entity) => {
+      const userId = entity.userId.substring(0, 4)
+      return `${userId}: ${entity.content.split("\n").join("; ")}`
+    })
+    .join("\n")
+
+  const oldestEntity = entities.at(0)!
+  const newestEntity = entities.at(-1)!
+
   return JSON.stringify({
-    custom_id: aiCustomId.get(entity.channelId, entity.messageId),
+    custom_id: aiCustomId.get({
+      oldestEntityId: oldestEntity.id,
+      newestEntityId: newestEntity.id,
+    }),
     method: "POST",
     url: "/v1/chat/completions",
     body: {
@@ -17,11 +32,11 @@ const entityToBatchItem = (entity: ToxicScoreEntity): string => {
       messages: [
         {
           role: "system",
-          content: "Moderate Latvian for toxicity. Give only boolean",
+          content: prompt,
         },
         {
           role: "user",
-          content: entity.content,
+          content,
         },
       ],
     },
@@ -37,7 +52,7 @@ export const aiCreateRemoteBatches: AiTask = async (_context, ai) => {
 
   // Create and upload batch data
   const filePath = getAiBatchTmpFilePath()
-  writeFileSync(filePath, unsentBatches.map(entityToBatchItem).join("\n"))
+  writeFileSync(filePath, entitiesToBatch(unsentBatches))
 
   const file = await ai.files.create({
     file: createReadStream(filePath),

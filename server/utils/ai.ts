@@ -106,11 +106,17 @@ export const parseAiBatchFileResponses = (contents: string) => {
 }
 
 export const aiCustomId = {
-  get: (channelId: string, messageId: string) => {
-    return `${channelId}_${messageId}`
+  get: ({
+    oldestEntityId,
+    newestEntityId,
+  }: {
+    oldestEntityId: string
+    newestEntityId: string
+  }) => {
+    return `${oldestEntityId}-${newestEntityId}`
   },
   parse: (value: string) => {
-    const [channelId, messageId] = value.split("_")
-    return { channelId, messageId }
+    const [oldestEntityId, newestEntityId] = value.split("-")
+    return { oldestEntityId, newestEntityId }
   },
 }
