@@ -140,7 +140,7 @@ const sendToxicMessageLog = async ({
   const channel = guild.channels.cache.get(channelId) as TextChannel | undefined
   const message = channel?.messages.cache.get(messageId)
 
-  logsChannel.send({
+  await logsChannel.send({
     embeds: [
       {
         title: "Flagged as toxic",
