@@ -81,4 +81,13 @@ export class ToxicScoreModel {
       },
     )
   }
+
+  async getByMessageId(input: { channelId: string; messageId: string }) {
+    return await this.#repository.findOne({
+      where: {
+        channelId: input.channelId,
+        messageId: input.messageId,
+      },
+    })
+  }
 }
