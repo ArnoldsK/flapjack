@@ -8,15 +8,16 @@ import { appConfig } from "../config"
 
 const tokenEncoder = encodingForModel("gpt-4o-mini")
 
-const channelIds = appConfig.discord.ids.channels
-const IGNORE_CHANNEL_IDS = [
-  channelIds.casino,
-  channelIds.copyPasta,
-  channelIds.nsfw,
-  channelIds.vTubers,
-  channelIds.numbersGame,
-  channelIds.upperClass,
+const ids = appConfig.discord.ids
+const IGNORED_CHANNEL_IDS = [
+  ids.channels.casino,
+  ids.channels.copyPasta,
+  ids.channels.nsfw,
+  ids.channels.vTubers,
+  ids.channels.numbersGame,
+  ids.channels.upperClass,
 ]
+const IGNORED_CATEGORY_IDS = [ids.categories.moderation]
 
 export default createEvent(
   Events.MessageCreate,
@@ -29,7 +30,14 @@ export default createEvent(
     // Allowed channels
     if (
       message.channel.type !== ChannelType.GuildText ||
-      IGNORE_CHANNEL_IDS.includes(message.channel.id)
+      IGNORED_CHANNEL_IDS.includes(message.channel.id)
+    )
+      return
+
+    // Allowed categories
+    if (
+      message.channel.parentId &&
+      IGNORED_CATEGORY_IDS.includes(message.channel.parentId)
     )
       return
 

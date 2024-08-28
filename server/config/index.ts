@@ -36,6 +36,7 @@ export const appConfig = {
       },
       categories: {
         archive: "525995353821151242",
+        moderation: "625639453867900938",
       },
       channels: {
         general: "411593264211296258",
