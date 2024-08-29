@@ -37,6 +37,29 @@ const cleanMentions = (content: string): string => {
  */
 export const parseMessageContentForAi = (message: Message): string => {
   let content = message.content
+  const singleLineContent = content.split("\n").join(" ")
+
+  // Remove number only messages
+  if (
+    !singleLineContent
+      .split(" ")
+      .map((part) => part.replace(/\d+/g, ""))
+      .join("")
+      .trim().length
+  ) {
+    return ""
+  }
+
+  // Scuffed way to remove emoji only messages
+  if (
+    !singleLineContent
+      .split(" ")
+      .map((part) => removeEmojis(part))
+      .join("")
+      .trim().length
+  ) {
+    return ""
+  }
 
   // Overall cleanup
   content = cleanEmojis(content)
@@ -61,31 +84,6 @@ export const parseMessageContentForAi = (message: Message): string => {
         .join(" "),
     )
     .join("\n")
-
-  // Single line for parsing overall stuff
-  const singleLineContent = content.split("\n").join(" ")
-
-  // Remove number only messages
-  if (
-    !singleLineContent
-      .split(" ")
-      .map((part) => part.replace(/\d+/g, ""))
-      .join("")
-      .trim().length
-  ) {
-    return ""
-  }
-
-  // Scuffed way to remove emoji only messages
-  if (
-    !singleLineContent
-      .split(" ")
-      .map((part) => removeEmojis(part))
-      .join("")
-      .trim().length
-  ) {
-    return ""
-  }
 
   // Trim too long messages
   return content.substring(0, 255)
