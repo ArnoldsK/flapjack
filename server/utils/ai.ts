@@ -17,6 +17,10 @@ const cleanEmojis = (content: string): string => {
   return content.replace(/<a?(:.+?:)\d+>/g, "$1")
 }
 
+const removeEmojis = (content: string): string => {
+  return content.replace(/<a?:.+?:\d+>/g, "")
+}
+
 /**
  * Replace any mention syntax with just the mention id.
  *
@@ -58,7 +62,33 @@ export const parseMessageContentForAi = (message: Message): string => {
     )
     .join("\n")
 
-  return content
+  // Single line for parsing overall stuff
+  const singleLineContent = content.split("\n").join(" ")
+
+  // Remove number only messages
+  if (
+    !singleLineContent
+      .split(" ")
+      .map((part) => part.replace(/\d+/g, ""))
+      .join("")
+      .trim().length
+  ) {
+    return ""
+  }
+
+  // Scuffed way to remove emoji only messages
+  if (
+    !singleLineContent
+      .split(" ")
+      .map((part) => removeEmojis(part))
+      .join("")
+      .trim().length
+  ) {
+    return ""
+  }
+
+  // Trim too long messages
+  return content.substring(0, 255)
 }
 
 export const getAiClient = () => {
