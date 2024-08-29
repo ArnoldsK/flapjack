@@ -136,7 +136,7 @@ const handleCompletedBatch = async ({
     }),
   )
 
-  // Delete handled batches
+  // Set as completed
   await model.updateByRemoteBatchId([batchId], {
     status: ToxicScoreStatus.Completed,
     response: fileContents,
@@ -153,27 +153,32 @@ const sendToxicMessageLog = async ({
   entities: ToxicScoreEntity[]
 }) => {
   const guild = context.client.guilds.cache.get(appConfig.discord.ids.guild)
-  if (!guild) return
+  if (!guild) {
+    console.error("> AI > Couldn't log > !guild")
+    return
+  }
 
   const member = guild.members.cache.get(userId)
-  if (!member) return
+  if (!member) {
+    console.error("> AI > Couldn't log > !member")
+    return
+  }
+
+  const firstEntity = entities.at(0)!
+  const channel = guild.channels.cache.get(firstEntity.channelId)
+  if (!channel) {
+    console.error("> AI > Couldn't log > !channel")
+    return
+  }
 
   const logsChannel = guild.channels.cache.get(
     // ai-test-logs
     "1278435765105201163",
   )
-  if (!isTextChannel(logsChannel)) return
-
-  const messages = entities
-    .flatMap((entity) => {
-      const channel = guild.channels.cache.get(entity.channelId)
-
-      return isTextChannel(channel)
-        ? channel.messages.cache.get(entity.messageId)
-        : null
-    })
-    .filter(isNonNullish)
-  if (!messages.length) return
+  if (!isTextChannel(logsChannel)) {
+    console.error("> AI > Couldn't log > !isTextChannel(logsChannel)")
+    return
+  }
 
   await logsChannel.send({
     embeds: [
@@ -188,10 +193,9 @@ const sendToxicMessageLog = async ({
           }),
         },
         description: joinAsLines(
-          ...messages.map((message) => {
-            const content = message.content.split("\n").join("; ")
-
-            return `[#${message.channel.name}](${message.url}) ${content}`
+          `[#${channel.name}](${channel.url})`,
+          ...entities.map((entity) => {
+            return entity.content.split("\n").join("; ")
           }),
         ),
       },
