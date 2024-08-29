@@ -9,7 +9,7 @@ const MIN_BATCH_SIZE = 20
 
 const entitiesToBatch = (entities: ToxicScoreEntity[]): string => {
   const prompt =
-    "User chat in Latvian, oldest first. Give only comma separated users who are toxic to others."
+    "User chat in Latvian, oldest first. Give only comma-separated users who are being directly rude or offensive to others."
   const content = entities
     .map((entity) => {
       const userId = entity.userId.substring(0, 4)
