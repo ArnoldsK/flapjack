@@ -18,4 +18,8 @@ export class ToxicUserFlagModel {
       })
       .save()
   }
+
+  async getAll() {
+    return await this.#repository.find()
+  }
 }
