@@ -6,6 +6,11 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm"
 
+export enum ToxicScoreStatus {
+  Failed = "failed",
+  Completed = "completed",
+}
+
 @Entity()
 export default class ToxicScoreEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -25,6 +30,12 @@ export default class ToxicScoreEntity extends BaseEntity {
 
   @Column({ type: "varchar", nullable: true })
   remoteBatchId: string | null
+
+  @Column({ type: "varchar", nullable: true })
+  status: ToxicScoreStatus | null
+
+  @Column({ type: "text", nullable: true })
+  response: string | null
 
   @CreateDateColumn()
   createdAt: Date

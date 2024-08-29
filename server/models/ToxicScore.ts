@@ -1,6 +1,6 @@
 import { In, IsNull, Not, Repository } from "typeorm"
 import { db } from "../database"
-import ToxicScoreEntity from "../entity/ToxicScore"
+import ToxicScoreEntity, { ToxicScoreStatus } from "../entity/ToxicScore"
 import { dedupe } from "../utils/array"
 
 export class ToxicScoreModel {
@@ -31,6 +31,7 @@ export class ToxicScoreModel {
     return await this.#repository.find({
       where: {
         remoteBatchId: IsNull(),
+        status: IsNull(),
       },
       order: {
         createdAt: "asc",
@@ -46,10 +47,20 @@ export class ToxicScoreModel {
     })
   }
 
+  async updateByRemoteBatchId(
+    remoteBatchIds: string[],
+    data: Partial<ToxicScoreEntity>,
+  ) {
+    if (!remoteBatchIds.length) return
+
+    await this.#repository.update({ remoteBatchId: In(remoteBatchIds) }, data)
+  }
+
   async getUnhandledRemoteBatchIds(): Promise<string[]> {
     const entities = await this.#repository.find({
       where: {
         remoteBatchId: Not(IsNull()),
+        status: IsNull(),
       },
     })
 
@@ -59,18 +70,18 @@ export class ToxicScoreModel {
     )
   }
 
-  async deleteByRemoteBatchId(remoteBatchIds: string[]) {
-    if (!remoteBatchIds.length) return
+  // async deleteByRemoteBatchId(remoteBatchIds: string[]) {
+  //   if (!remoteBatchIds.length) return
 
-    await this.#repository.delete({
-      remoteBatchId: In(remoteBatchIds),
-    })
-  }
+  //   await this.#repository.delete({
+  //     remoteBatchId: In(remoteBatchIds),
+  //   })
+  // }
 
-  async getByRemoveBatchId(input: { remoteBatchId: string }) {
+  async getByRemoteBatchId(remoteBatchIds: string[]) {
     return await this.#repository.find({
       where: {
-        remoteBatchId: input.remoteBatchId,
+        remoteBatchId: In(remoteBatchIds),
       },
     })
   }

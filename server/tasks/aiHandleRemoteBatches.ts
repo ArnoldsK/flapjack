@@ -10,7 +10,7 @@ import { isTextChannel } from "../utils/channel"
 import { dedupe } from "../utils/array"
 import { isNonNullish } from "../utils/boolean"
 import { ToxicUserFlagModel } from "../models/ToxicUserFlag"
-import ToxicScoreEntity from "../entity/ToxicScore"
+import ToxicScoreEntity, { ToxicScoreStatus } from "../entity/ToxicScore"
 import { joinAsLines } from "../utils/string"
 
 export const aiHandleRemoteBatches: AiTask = async (context, ai) => {
@@ -77,7 +77,9 @@ const handleFailedBatch = async ({
   model: ToxicScoreModel
   batchId: string
 }) => {
-  await model.deleteByRemoteBatchId([batchId])
+  await model.updateByRemoteBatchId([batchId], {
+    status: ToxicScoreStatus.Failed,
+  })
 }
 
 const handleCompletedBatch = async ({
@@ -103,7 +105,7 @@ const handleCompletedBatch = async ({
   const answer = response.response.body.choices[0].message.content.toLowerCase()
 
   // Get all used entities
-  const entities = await model.getByRemoveBatchId({ remoteBatchId: batchId })
+  const entities = await model.getByRemoteBatchId([batchId])
   const entityUserIds = dedupe(entities.map((el) => el.userId))
 
   // Parse answer to get flagged user ids
@@ -135,7 +137,10 @@ const handleCompletedBatch = async ({
   )
 
   // Delete handled batches
-  await model.deleteByRemoteBatchId([batchId])
+  await model.updateByRemoteBatchId([batchId], {
+    status: ToxicScoreStatus.Completed,
+    response: fileContents,
+  })
 }
 
 const sendToxicMessageLog = async ({
