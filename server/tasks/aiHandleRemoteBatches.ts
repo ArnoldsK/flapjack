@@ -126,13 +126,13 @@ const handleCompletedBatch = async ({
         isToxic,
       })
 
-      if (isToxic) {
-        await sendToxicMessageLog({
-          context,
-          userId,
-          entities: entities.filter((el) => el.userId === userId),
-        })
-      }
+      // if (isToxic) {
+      //   await sendToxicMessageLog({
+      //     context,
+      //     userId,
+      //     entities: entities.filter((el) => el.userId === userId),
+      //   })
+      // }
     }),
   )
 
