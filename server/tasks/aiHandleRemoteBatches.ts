@@ -13,8 +13,7 @@ import {
   ToxicUserFlagCreateOrUpdateResult,
   ToxicUserFlagModel,
 } from "../models/ToxicUserFlag"
-import ToxicScoreEntity, { ToxicScoreStatus } from "../entity/ToxicScore"
-import { joinAsLines } from "../utils/string"
+import { ToxicScoreStatus } from "../entity/ToxicScore"
 
 export const aiHandleRemoteBatches: AiTask = async (context, ai) => {
   const model = new ToxicScoreModel()

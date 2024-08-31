@@ -6,7 +6,9 @@ import { CronTask } from "../utils/cron"
 export default {
   description: "Toxic score handler",
 
-  expression: "every 30 minutes",
+  // It can take up to 24 hours to parse, but usually it's done in like 1 minute
+  // I rather get less messages to check than get too many at once with longer duration
+  expression: "every 10 minutes",
 
   productionOnly: true,
 
