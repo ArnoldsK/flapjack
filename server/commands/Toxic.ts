@@ -49,7 +49,7 @@ export default class ToxicCommand extends BaseCommand {
         ...data,
       }))
       .filter((el) => el.totalCount >= 10)
-      .toSorted((a, b) => b.toxicPercent - a.toxicPercent)
+      .sort((a, b) => b.toxicPercent - a.toxicPercent)
       .slice(0, 10)
 
     if (!toxic.length) {
