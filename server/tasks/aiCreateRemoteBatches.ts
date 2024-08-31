@@ -7,9 +7,9 @@ import ToxicScoreEntity from "../entity/ToxicScore"
 
 const MIN_BATCH_SIZE = 20
 
-const entitiesToBatch = (entities: ToxicScoreEntity[]): string => {
+export const entitiesToBatch = (entities: ToxicScoreEntity[]): string => {
   const prompt =
-    "User chat in Latvian, oldest first. Give only comma-separated users who are being directly rude or offensive to others."
+    "Ziņas latviski starp lietotājiem, vecākās pirmās. Izvērtē kurš lietotājs uzvedas agresīvi un uzbrūkoši pret citiem. Atgriezt ar komatiem atdalītus lietotāja ID."
   const content = entities
     .map((entity) => {
       const userId = entity.userId.substring(0, 4)

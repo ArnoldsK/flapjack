@@ -9,7 +9,10 @@ import { appConfig } from "../config"
 import { isTextChannel } from "../utils/channel"
 import { dedupe } from "../utils/array"
 import { isNonNullish } from "../utils/boolean"
-import { ToxicUserFlagModel } from "../models/ToxicUserFlag"
+import {
+  ToxicUserFlagCreateOrUpdateResult,
+  ToxicUserFlagModel,
+} from "../models/ToxicUserFlag"
 import ToxicScoreEntity, { ToxicScoreStatus } from "../entity/ToxicScore"
 import { joinAsLines } from "../utils/string"
 
@@ -120,19 +123,14 @@ const handleCompletedBatch = async ({
   await Promise.all(
     entityUserIds.map(async (userId) => {
       const isToxic = flaggedUserIds.includes(userId)
-
-      await userFlagModel.create({
+      const entity = await userFlagModel.createOrUpdate({
         userId,
         isToxic,
       })
 
-      // if (isToxic) {
-      //   await sendToxicMessageLog({
-      //     context,
-      //     userId,
-      //     entities: entities.filter((el) => el.userId === userId),
-      //   })
-      // }
+      if (isToxic) {
+        await sendFlaggedLog(context, entity)
+      }
     }),
   )
 
@@ -143,61 +141,35 @@ const handleCompletedBatch = async ({
   })
 }
 
-const sendToxicMessageLog = async ({
-  context,
-  userId,
-  entities,
-}: {
-  context: BaseContext
-  userId: string
-  entities: ToxicScoreEntity[]
-}) => {
-  const guild = context.client.guilds.cache.get(appConfig.discord.ids.guild)
-  if (!guild) {
-    console.error("> AI > Couldn't log > !guild")
-    return
-  }
+export const sendFlaggedLog = async (
+  context: BaseContext,
+  entity: ToxicUserFlagCreateOrUpdateResult,
+) => {
+  const guild = context.client.guilds.cache.get(appConfig.discord.ids.guild)!
+  const channel = guild.channels.cache.get(appConfig.discord.ids.channels.logs)
+  if (!isTextChannel(channel)) return
 
-  const member = guild.members.cache.get(userId)
-  if (!member) {
-    console.error("> AI > Couldn't log > !member")
-    return
-  }
+  const member = guild.members.cache.get(entity.userId)
+  if (!member) return
 
-  const firstEntity = entities.at(0)!
-  const channel = guild.channels.cache.get(firstEntity.channelId)
-  if (!channel) {
-    console.error("> AI > Couldn't log > !channel")
-    return
-  }
-
-  const logsChannel = guild.channels.cache.get(
-    // ai-test-logs
-    "1278435765105201163",
-  )
-  if (!isTextChannel(logsChannel)) {
-    console.error("> AI > Couldn't log > !isTextChannel(logsChannel)")
-    return
-  }
-
-  await logsChannel.send({
+  await channel.send({
     embeds: [
       {
         title: "Flagged as toxic",
         author: {
           name: member.displayName,
           icon_url: member.displayAvatarURL({
-            forceStatic: true,
             extension: "png",
-            size: 64,
+            forceStatic: true,
+            size: 32,
           }),
         },
-        description: joinAsLines(
-          `[#${channel.name}](${channel.url})`,
-          ...entities.map((entity) => {
-            return entity.content.split("\n").join("; ")
-          }),
-        ),
+        footer:
+          entity.toxicInARow > 1
+            ? {
+                text: `Flagged ${entity.toxicInARow} times in a row`,
+              }
+            : undefined,
       },
     ],
   })

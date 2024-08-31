@@ -22,33 +22,13 @@ export default class ToxicCommand extends BaseCommand {
     const model = new ToxicUserFlagModel()
     const items = await model.getAll()
 
-    const byUserId = items.reduce<Record<string, UserData>>((result, item) => {
-      const data = result[item.userId] || {
-        toxicCount: 0,
-        notToxicCount: 0,
-        totalCount: 0,
-        toxicPercent: 0,
-      }
-
-      data.totalCount++
-      if (item.isToxic) {
-        data.toxicCount++
-      } else {
-        data.notToxicCount++
-      }
-      data.toxicPercent = Math.round((data.toxicCount / data.totalCount) * 100)
-
-      result[item.userId] = data
-      return result
-    }, {})
-
     // For now, take only users with at least 10 total items
-    const toxic = Object.entries(byUserId)
-      .map(([userId, data]) => ({
-        userId,
-        ...data,
-      }))
+    const toxic = items
       .filter((el) => el.totalCount >= 10)
+      .map((el) => ({
+        ...el,
+        toxicPercent: Math.round((el.toxicCount / el.totalCount) * 100),
+      }))
       .sort((a, b) => b.toxicPercent - a.toxicPercent)
       .slice(0, 10)
 
