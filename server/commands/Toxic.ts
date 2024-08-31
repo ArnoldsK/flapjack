@@ -12,7 +12,7 @@ interface UserData {
 }
 
 export default class ToxicCommand extends BaseCommand {
-  static version = 1
+  static version = 2
 
   static command = new SlashCommandBuilder()
     .setName("toxic")
