@@ -1,6 +1,5 @@
 import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
-import { permission, PermissionFlags } from "../utils/permission"
 import { ToxicUserFlagModel } from "../models/ToxicUserFlag"
 import { appConfig } from "../config"
 import { joinAsLines } from "../utils/string"
@@ -18,11 +17,6 @@ export default class ToxicCommand extends BaseCommand {
   static command = new SlashCommandBuilder()
     .setName("toxic")
     .setDescription("Get users toxicity estimate")
-
-  static permissions = permission({
-    type: "allow",
-    permissions: [PermissionFlags.Administrator],
-  })
 
   async execute() {
     const model = new ToxicUserFlagModel()
@@ -55,8 +49,10 @@ export default class ToxicCommand extends BaseCommand {
         ...data,
       }))
       .filter((el) => el.totalCount >= 10)
+      .toSorted((a, b) => b.toxicPercent - a.toxicPercent)
+      .slice(0, 10)
 
-    if (!toxic) {
+    if (!toxic.length) {
       this.reply({
         ephemeral: true,
         content: "Not enough data yet",
@@ -65,11 +61,9 @@ export default class ToxicCommand extends BaseCommand {
     }
 
     this.reply({
-      ephemeral:
-        this.channel.parentId !== appConfig.discord.ids.categories.moderation,
       embeds: [
         {
-          title: "Toxicity estimate",
+          title: "Toxicity estimate top 10",
           description: joinAsLines(
             ...toxic.map((item) => `<@${item.userId}> ${item.toxicPercent}%`),
           ),
