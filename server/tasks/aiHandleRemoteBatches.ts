@@ -105,7 +105,7 @@ const handleCompletedBatch = async ({
   const entityUserIds = dedupe(entities.map((el) => el.userId))
 
   // Parse answer to get flagged user ids
-  const flaggedUsers: Array<{ userId: string; info: string }> = []
+  const flaggedUsers: Array<{ userId: string; reason: string }> = []
   try {
     const items = JSON.parse(answer)
 
@@ -115,7 +115,7 @@ const handleCompletedBatch = async ({
 
       flaggedUsers.push({
         userId,
-        info: item.info,
+        reason: item.reason,
       })
     }
   } catch (error) {
@@ -134,7 +134,7 @@ const handleCompletedBatch = async ({
       await userFlagModel.create({
         userId,
         isToxic: !!flaggedUser,
-        info: flaggedUser?.info ?? "",
+        info: flaggedUser?.reason ?? "",
       })
     }),
   )

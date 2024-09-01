@@ -18,7 +18,7 @@ export default class ToxicUserFlagEntity extends BaseEntity {
   isToxic: boolean
 
   @Column({ type: "text" })
-  info: string
+  reason: string
 
   @CreateDateColumn()
   createdAt: Date
