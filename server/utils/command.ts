@@ -177,4 +177,24 @@ export const handleApiCommands = async (commands: SetupCommand[]) => {
       body: updateCommands,
     },
   )
+
+  // Delete commands
+  // TODO test that this works as expected
+  const deleteCommands = apiCommands.filter((apiCommand) =>
+    updateCommands.some(
+      (updateCommand) => updateCommand.name === apiCommand.name,
+    ),
+  )
+
+  if (deleteCommands.length) {
+    await rest.delete(
+      Routes.applicationGuildCommands(
+        appConfig.discord.client,
+        appConfig.discord.ids.guild,
+      ),
+      {
+        body: deleteCommands,
+      },
+    )
+  }
 }
