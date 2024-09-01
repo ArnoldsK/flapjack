@@ -11,7 +11,7 @@ const tokenEncoder = encodingForModel("gpt-4o-mini")
 export default createEvent(
   Events.MessageCreate,
   {
-    productionOnly: false,
+    productionOnly: true,
   },
   async (message) => {
     // Get member
