@@ -179,8 +179,9 @@ export const handleApiCommands = async (commands: SetupCommand[]) => {
   )
 
   // Delete commands
-  const deleteCommands = apiCommands.filter((apiCommand) =>
-    commands.some((command) => command.name === apiCommand.name),
+  const deleteCommands = apiCommands.filter(
+    (apiCommand) =>
+      !commands.some((command) => command.name === apiCommand.name),
   )
 
   if (deleteCommands.length) {
