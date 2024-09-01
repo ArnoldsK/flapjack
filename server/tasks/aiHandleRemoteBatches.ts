@@ -127,7 +127,7 @@ const handleCompletedBatch = async ({
         isToxic,
       })
 
-      if (isToxic) {
+      if (isToxic && entity.toxicInARow >= 3) {
         await sendFlaggedLog(context, entity)
       }
     }),
