@@ -9,7 +9,7 @@ const MIN_BATCH_SIZE = 20
 
 export const entitiesToBatch = (entities: ToxicScoreEntity[]): string => {
   const prompt =
-    'Ziņas latviski starp lietotājiem, vecākās pirmās. Izvērtē kurš lietotājs uzvedas agresīvi un uzbrūkoši pret citiem. Atgriezt ar komatiem atdalītus lietotāja ID, vai "-" ja tādu nav vai nav pārliecības.'
+    'User messages in Latvian, oldest first. Moderate for aggressive or very toxic behavior to others. Return JSON array with "user" and "info".'
   const content = entities
     .map((entity) => {
       const userId = entity.userId.substring(0, 4)

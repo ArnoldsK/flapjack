@@ -11,17 +11,14 @@ export default class ToxicUserFlagEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: string
 
-  @Column({ unique: true })
+  @Column()
   userId: string
 
-  @Column()
-  toxicCount: number
+  @Column({ type: "tinyint" })
+  isToxic: boolean
 
-  @Column()
-  totalCount: number
-
-  @Column()
-  toxicInARow: number
+  @Column({ type: "text" })
+  info: string
 
   @CreateDateColumn()
   createdAt: Date

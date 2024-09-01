@@ -10,7 +10,7 @@ export default {
   // I rather get less messages to check than get too many at once with longer duration
   expression: "every 10 minutes",
 
-  productionOnly: true,
+  productionOnly: false,
 
   async execute(context) {
     const ai = getAiClient()
