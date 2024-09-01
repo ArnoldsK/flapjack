@@ -134,7 +134,7 @@ const handleCompletedBatch = async ({
       await userFlagModel.create({
         userId,
         isToxic: !!flaggedUser,
-        info: flaggedUser?.reason ?? "",
+        reason: flaggedUser?.reason ?? "",
       })
     }),
   )

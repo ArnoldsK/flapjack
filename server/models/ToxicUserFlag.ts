@@ -13,11 +13,11 @@ export class ToxicUserFlagModel {
     return await this.#repository.find()
   }
 
-  async create(input: { userId: string; isToxic: boolean; info: string }) {
+  async create(input: { userId: string; isToxic: boolean; reason: string }) {
     await this.#repository.create({
       userId: input.userId,
       isToxic: input.isToxic,
-      info: input.info,
+      reason: input.reason,
       createdAt: new Date(),
     })
   }
