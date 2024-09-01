@@ -179,7 +179,6 @@ export const handleApiCommands = async (commands: SetupCommand[]) => {
   )
 
   // Delete commands
-  // TODO test that this works as expected
   const deleteCommands = apiCommands.filter((apiCommand) =>
     updateCommands.some(
       (updateCommand) => updateCommand.name === apiCommand.name,
@@ -187,14 +186,15 @@ export const handleApiCommands = async (commands: SetupCommand[]) => {
   )
 
   if (deleteCommands.length) {
-    await rest.delete(
-      Routes.applicationGuildCommands(
-        appConfig.discord.client,
-        appConfig.discord.ids.guild,
-      ),
-      {
-        body: deleteCommands,
-      },
-    )
+    for (const deleteCommand of deleteCommands) {
+      console.log("> Commands > Delete >", deleteCommand.name)
+      await rest.delete(
+        Routes.applicationGuildCommand(
+          appConfig.discord.client,
+          appConfig.discord.ids.guild,
+          deleteCommand.id,
+        ),
+      )
+    }
   }
 }
