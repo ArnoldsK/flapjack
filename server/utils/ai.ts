@@ -42,7 +42,7 @@ export const parseMessageContentForAi = (message: Message): string => {
   // Ignore specific stuff
   if (
     new RegExp(
-      `^${decodeURIComponent("%2E")}|${decodeURIComponent("%2F")}`,
+      `^\\${decodeURIComponent("%2E")}|\\${decodeURIComponent("%2F")}`,
     ).test(content)
   ) {
     return ""
