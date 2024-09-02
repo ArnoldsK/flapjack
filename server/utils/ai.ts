@@ -36,8 +36,17 @@ const cleanMentions = (content: string): string => {
  * Removes emoji ids, cleans up mentions, links, etc.
  */
 export const parseMessageContentForAi = (message: Message): string => {
-  let content = message.content
+  let content = message.content.trim()
   const singleLineContent = content.split("\n").join(" ")
+
+  // Ignore specific stuff
+  if (
+    new RegExp(
+      `^${decodeURIComponent("%2E")}|${decodeURIComponent("%2F")}`,
+    ).test(content)
+  ) {
+    return ""
+  }
 
   // Remove number only messages
   if (
