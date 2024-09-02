@@ -36,6 +36,7 @@ export default createEvent(
     const model = new ToxicScoreModel()
     await model.create({
       userId: message.author.id,
+      replyUserId: message.mentions.members?.first()?.id ?? null,
       channelId: message.channel.id,
       messageId: message.id,
       content,

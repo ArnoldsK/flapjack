@@ -13,7 +13,15 @@ export const entitiesToBatch = (entities: ToxicScoreEntity[]): string => {
   const content = entities
     .map((entity) => {
       const userId = entity.userId.substring(0, 4)
-      return `${userId}: ${entity.content.split("\n").join("; ")}`
+      const replyUserId =
+        entity.replyUserId && entity.replyUserId.substring(0, 4)
+
+      let prefix = `${userId}`
+      if (replyUserId) {
+        prefix += ` to ${replyUserId}`
+      }
+
+      return `${prefix}: ${entity.content.split("\n").join("; ")}`
     })
     .join("\n")
 

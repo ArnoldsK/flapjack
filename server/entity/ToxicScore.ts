@@ -19,6 +19,9 @@ export default class ToxicScoreEntity extends BaseEntity {
   @Column()
   userId: string
 
+  @Column({ nullable: true })
+  replyUserId: string | null
+
   @Column()
   channelId: string
 

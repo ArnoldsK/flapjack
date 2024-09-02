@@ -12,6 +12,7 @@ export class ToxicScoreModel {
 
   async create(input: {
     userId: string
+    replyUserId: string | null
     channelId: string
     messageId: string
     content: string
@@ -19,6 +20,7 @@ export class ToxicScoreModel {
     await this.#repository
       .create({
         userId: input.userId,
+        replyUserId: input.replyUserId,
         channelId: input.channelId,
         messageId: input.messageId,
         content: input.content,
