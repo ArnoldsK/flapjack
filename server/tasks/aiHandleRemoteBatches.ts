@@ -107,7 +107,7 @@ const handleCompletedBatch = async ({
   // Parse answer to get flagged user ids
   const flaggedUsers: Array<{ userId: string; reason: string }> = []
   try {
-    const items = JSON.parse(answer)
+    const items = JSON.parse(answer.replace("```json", "").replace("```", ""))
 
     for (const item of items) {
       const userId = entityUserIds.find((id) => id.startsWith(item.user))

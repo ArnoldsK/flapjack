@@ -18,6 +18,9 @@ export default createEvent(
     const member = message.member
     if (!member || member.user.bot) return
 
+    // No AI config
+    if (!appConfig.openAi.secretKey) return
+
     // Limit to general
     if (message.channel.id !== appConfig.discord.ids.channels.general) return
 
