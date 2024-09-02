@@ -142,13 +142,7 @@ const handleCompletedBatch = async ({
       })
 
       if (flaggedUser) {
-        await sendFlaggedLog(context, {
-          userId,
-          reason,
-          messages: entities
-            .filter((el) => el.userId === userId)
-            .map((el) => el.content),
-        })
+        await sendFlaggedLog(context, { userId, reason })
       }
     }),
   )
@@ -165,11 +159,9 @@ export const sendFlaggedLog = async (
   {
     userId,
     reason,
-    messages,
   }: {
     userId: string
     reason: string
-    messages: string[]
   },
 ) => {
   const guild = context.client.guilds.cache.get(appConfig.discord.ids.guild)!
@@ -191,14 +183,7 @@ export const sendFlaggedLog = async (
             size: 32,
           }),
         },
-        description: joinAsLines(
-          ...messages.map((message) =>
-            message.length > 80 ? message.substring(0, 75) + "(...)" : message,
-          ),
-        ),
-        footer: {
-          text: reason ?? "Unknown reason",
-        },
+        description: reason ?? "Unknown reason",
       },
     ],
   })
