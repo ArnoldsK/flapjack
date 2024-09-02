@@ -30,19 +30,24 @@ const getTasks = () => {
   return tasks
 }
 
-export const handleCron = (context: BaseContext) => {
+export const handleCron = async (context: BaseContext) => {
   const tasks = getTasks()
 
-  for (const task of tasks) {
-    const expression = task.isRawExpression
-      ? task.expression
-      : cronTranslate.toCron(task.expression)
+  await Promise.all(
+    tasks.map(async (task) => {
+      const expression = task.isRawExpression
+        ? task.expression
+        : cronTranslate.toCron(task.expression)
 
-    if (task.productionOnly && appConfig.dev) continue
+      if (task.productionOnly && appConfig.dev) return
 
-    cron.schedule(expression, () => {
-      // console.log(">", task.description)
-      task.execute(context)
-    })
-  }
+      cron.schedule(expression, async () => {
+        try {
+          await task.execute(context)
+        } catch (err) {
+          console.error("> Cron error >", task.description, err)
+        }
+      })
+    }),
+  )
 }
