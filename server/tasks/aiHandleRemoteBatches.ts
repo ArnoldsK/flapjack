@@ -10,6 +10,7 @@ import { ToxicUserFlagModel } from "../models/ToxicUserFlag"
 import { ToxicScoreStatus } from "../entity/ToxicScore"
 import { appConfig } from "../config"
 import { isTextChannel } from "../utils/channel"
+import { joinAsLines } from "../utils/string"
 
 export const aiHandleRemoteBatches: AiTask = async (context, ai) => {
   const model = new ToxicScoreModel()
@@ -141,7 +142,13 @@ const handleCompletedBatch = async ({
       })
 
       if (flaggedUser) {
-        await sendFlaggedLog(context, { userId, reason })
+        await sendFlaggedLog(context, {
+          userId,
+          reason,
+          messages: entities
+            .filter((el) => el.userId === userId)
+            .map((el) => el.content),
+        })
       }
     }),
   )
@@ -158,9 +165,11 @@ export const sendFlaggedLog = async (
   {
     userId,
     reason,
+    messages,
   }: {
     userId: string
     reason: string
+    messages: string[]
   },
 ) => {
   const guild = context.client.guilds.cache.get(appConfig.discord.ids.guild)!
@@ -182,7 +191,14 @@ export const sendFlaggedLog = async (
             size: 32,
           }),
         },
-        description: reason ?? "Unknown reason",
+        description: joinAsLines(
+          ...messages.map((message) =>
+            message.length > 80 ? message.substring(0, 75) + "(...)" : message,
+          ),
+        ),
+        footer: {
+          text: reason ?? "Unknown reason",
+        },
       },
     ],
   })
