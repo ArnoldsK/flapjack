@@ -11,7 +11,7 @@ export const entitiesToBatch = (entities: ToxicScoreEntity[]): string => {
   const prompt = [
     "User messages in Latvian, oldest first.",
     "Moderate for toxic remarks towards other users.",
-    "Ignore inappropriate language.",
+    "Ignore aggressive and inappropriate language.",
     'Give only JSON array with "user" and "reason".',
   ].join(" ")
 
