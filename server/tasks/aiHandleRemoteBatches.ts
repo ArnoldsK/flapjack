@@ -8,6 +8,8 @@ import { BaseContext } from "../types"
 import { dedupe } from "../utils/array"
 import { ToxicUserFlagModel } from "../models/ToxicUserFlag"
 import { ToxicScoreStatus } from "../entity/ToxicScore"
+import { appConfig } from "../config"
+import { isTextChannel } from "../utils/channel"
 
 export const aiHandleRemoteBatches: AiTask = async (context, ai) => {
   const model = new ToxicScoreModel()
@@ -130,12 +132,17 @@ const handleCompletedBatch = async ({
   await Promise.all(
     entityUserIds.map(async (userId) => {
       const flaggedUser = flaggedUsers.find((el) => el.userId === userId)
+      const reason = flaggedUser?.reason ?? ""
 
       await userFlagModel.create({
         userId,
-        isToxic: !!flaggedUser,
-        reason: flaggedUser?.reason ?? "",
+        isToxic: !!reason,
+        reason,
       })
+
+      if (flaggedUser) {
+        await sendFlaggedLog(context, { userId, reason })
+      }
     }),
   )
 
@@ -143,5 +150,40 @@ const handleCompletedBatch = async ({
   await model.updateByRemoteBatchId([batchId], {
     status: ToxicScoreStatus.Completed,
     response: fileContents,
+  })
+}
+
+export const sendFlaggedLog = async (
+  context: BaseContext,
+  {
+    userId,
+    reason,
+  }: {
+    userId: string
+    reason: string
+  },
+) => {
+  const guild = context.client.guilds.cache.get(appConfig.discord.ids.guild)!
+  const channel = guild.channels.cache.get(appConfig.discord.ids.channels.logs)
+  if (!isTextChannel(channel)) return
+
+  const member = guild.members.cache.get(userId)
+  if (!member) return
+
+  await channel.send({
+    embeds: [
+      {
+        title: "Flagged as toxic",
+        author: {
+          name: member.displayName,
+          icon_url: member.displayAvatarURL({
+            extension: "png",
+            forceStatic: true,
+            size: 32,
+          }),
+        },
+        description: reason ?? "Unknown reason",
+      },
+    ],
   })
 }
