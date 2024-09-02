@@ -19,7 +19,7 @@ export default class ToxicScoreEntity extends BaseEntity {
   @Column()
   userId: string
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", nullable: true })
   replyUserId: string | null
 
   @Column()
