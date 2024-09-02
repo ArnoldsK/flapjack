@@ -5,7 +5,7 @@ import { AiTask } from "../types/tasks"
 import { aiCustomId, getAiBatchTmpFilePath } from "../utils/ai"
 import ToxicScoreEntity from "../entity/ToxicScore"
 
-const MIN_BATCH_SIZE = 10
+const MIN_BATCH_SIZE = 15
 
 export const entitiesToBatch = (entities: ToxicScoreEntity[]): string => {
   const prompt =
