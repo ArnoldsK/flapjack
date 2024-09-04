@@ -71,7 +71,7 @@ export const isTimedOut = (member: GuildMember) =>
   !!member.communicationDisabledUntil &&
   d(member.communicationDisabledUntil).isSameOrAfter(d())
 
-export const getEmbedAuthor = (member: GuildMember): APIEmbedAuthor => {
+export const embedAuthor = (member: GuildMember): APIEmbedAuthor => {
   return {
     name: member.displayName,
     icon_url: member.displayAvatarURL({

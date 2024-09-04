@@ -2,7 +2,7 @@ import { Events } from "discord.js"
 
 import { createEvent } from "../utils/event"
 import { TimeoutModel } from "../models/Timeout"
-import { getEmbedAuthor, isTimedOut } from "../utils/member"
+import { embedAuthor, isTimedOut } from "../utils/member"
 import { d } from "../utils/date"
 import { sendLogMessage } from "../utils/message"
 import { Color } from "../constants"
@@ -30,7 +30,7 @@ export default createEvent(
         embeds: [
           {
             color: Color.blue,
-            author: getEmbedAuthor(newMember),
+            author: embedAuthor(newMember),
             title: "Timeout removed",
           },
         ],
@@ -60,7 +60,7 @@ export default createEvent(
         embeds: [
           {
             color: Color.orange,
-            author: getEmbedAuthor(newMember),
+            author: embedAuthor(newMember),
             title: "Timeout added",
             description: `Expires <t:${Math.round(
               timeoutUntil.getTime() / 1000,

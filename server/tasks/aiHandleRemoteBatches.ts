@@ -12,7 +12,7 @@ import { appConfig } from "../config"
 import { isTextChannel } from "../utils/channel"
 import { joinAsLines } from "../utils/string"
 import { sendLogMessage } from "../utils/message"
-import { getEmbedAuthor } from "../utils/member"
+import { embedAuthor } from "../utils/member"
 
 export const aiHandleRemoteBatches: AiTask = async (context, ai) => {
   const model = new ToxicScoreModel()
@@ -173,7 +173,7 @@ export const sendFlaggedLog = async (
     embeds: [
       {
         title: "Flagged as toxic",
-        author: getEmbedAuthor(member),
+        author: embedAuthor(member),
         description: reason ?? "Unknown reason",
       },
     ],
