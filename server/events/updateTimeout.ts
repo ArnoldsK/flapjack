@@ -11,7 +11,7 @@ import { asPlural } from "../utils/string"
 export default createEvent(
   Events.GuildMemberUpdate,
   {
-    productionOnly: false,
+    productionOnly: true,
   },
   async (context, oldMember, newMember) => {
     if (newMember.user.bot) return
