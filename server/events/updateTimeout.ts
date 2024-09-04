@@ -52,7 +52,7 @@ export default createEvent(
       if (penaltyMs) {
         timeoutUntil = d(timeoutUntil).add(penaltyMs).toDate()
 
-        // Apparently I can just set it and it won't trigger the event again
+        // ! As long as `oldIsTimedOut === newIsTimedOut` exists, this won't loop
         await newMember.disableCommunicationUntil(timeoutUntil, penaltyText)
       }
 
