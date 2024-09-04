@@ -1,7 +1,6 @@
-import { Guild, GuildMember } from "discord.js"
-import moment from "moment"
+import { APIEmbedAuthor, Guild, GuildMember } from "discord.js"
 import { collectionToArray } from "./array"
-import { formatDays } from "./date"
+import { d } from "./date"
 
 export const getMemberByJoinPosition = async (
   guild: Guild,
@@ -41,7 +40,6 @@ export const getMemberJoinPosition = async (
 }
 
 export const getMemberInfo = async (member: GuildMember) => {
-  const daysSinceJoined = moment().diff(moment(member.joinedAt), "days")
   const joinedDate = new Date(member.joinedTimestamp!).toLocaleDateString(
     "en-US",
     {
@@ -63,8 +61,23 @@ export const getMemberInfo = async (member: GuildMember) => {
 
   return {
     position: await getMemberJoinPosition(member),
-    joinedAgo: formatDays(-daysSinceJoined),
+    joinedAgo: d(member.joinedAt).fromNow(),
     joinedDate,
     createdDate,
+  }
+}
+
+export const isTimedOut = (member: GuildMember) =>
+  !!member.communicationDisabledUntil &&
+  d(member.communicationDisabledUntil).isSameOrAfter(d())
+
+export const getEmbedAuthor = (member: GuildMember): APIEmbedAuthor => {
+  return {
+    name: member.displayName,
+    icon_url: member.displayAvatarURL({
+      extension: "png",
+      forceStatic: true,
+      size: 32,
+    }),
   }
 }

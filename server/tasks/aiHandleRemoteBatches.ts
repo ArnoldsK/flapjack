@@ -11,6 +11,8 @@ import { ToxicScoreStatus } from "../entity/ToxicScore"
 import { appConfig } from "../config"
 import { isTextChannel } from "../utils/channel"
 import { joinAsLines } from "../utils/string"
+import { sendLogMessage } from "../utils/message"
+import { getEmbedAuthor } from "../utils/member"
 
 export const aiHandleRemoteBatches: AiTask = async (context, ai) => {
   const model = new ToxicScoreModel()
@@ -164,25 +166,14 @@ export const sendFlaggedLog = async (
     reason: string
   },
 ) => {
-  const guild = context.client.guilds.cache.get(appConfig.discord.ids.guild)!
-  const channel = guild.channels.cache.get(appConfig.discord.ids.channels.logs)
-  if (!isTextChannel(channel)) return
-
-  const member = guild.members.cache.get(userId)
+  const member = context.guild().members.cache.get(userId)
   if (!member) return
 
-  await channel.send({
+  await sendLogMessage(context, {
     embeds: [
       {
         title: "Flagged as toxic",
-        author: {
-          name: member.displayName,
-          icon_url: member.displayAvatarURL({
-            extension: "png",
-            forceStatic: true,
-            size: 32,
-          }),
-        },
+        author: getEmbedAuthor(member),
         description: reason ?? "Unknown reason",
       },
     ],

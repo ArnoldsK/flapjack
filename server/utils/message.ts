@@ -1,7 +1,11 @@
-import { Guild } from "discord.js"
-import { Unicode } from "../constants"
+import { Guild, MessageCreateOptions } from "discord.js"
 
-export const escapeMentions = (content: string, guild: Guild) => {
+import { Unicode } from "../constants"
+import { BaseContext } from "../types"
+import { isTextChannel } from "./channel"
+import { appConfig } from "../config"
+
+export const parseMentions = (content: string, guild: Guild) => {
   return content
     .split(" ")
     .map((part) => {
@@ -20,4 +24,17 @@ export const escapeMentions = (content: string, guild: Guild) => {
       return part
     })
     .join(" ")
+}
+
+export const sendLogMessage = async (
+  context: BaseContext,
+  content: MessageCreateOptions,
+) => {
+  const channel = context
+    .guild()
+    .channels.cache.get(appConfig.discord.ids.channels.logs)
+
+  if (isTextChannel(channel)) {
+    await channel.send(content)
+  }
 }

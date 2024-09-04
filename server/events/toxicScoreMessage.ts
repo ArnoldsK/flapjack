@@ -13,7 +13,7 @@ export default createEvent(
   {
     productionOnly: true,
   },
-  async (message) => {
+  async (_context, message) => {
     // Get member
     const member = message.member
     if (!member || member.user.bot) return

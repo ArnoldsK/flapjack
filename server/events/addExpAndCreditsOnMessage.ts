@@ -7,7 +7,7 @@ import { MIN_CREDITS_PER_MESSAGE } from "../constants"
 export default createEvent(
   Events.MessageCreate,
   { productionOnly: false },
-  async (message) => {
+  async (_context, message) => {
     if (message.author.bot) return
     if (!message.member) return
 

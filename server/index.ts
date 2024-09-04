@@ -51,6 +51,7 @@ nextApp.prepare().then(async () => {
   // #############################################################################
   const context: BaseContext = {
     client,
+    guild: () => client.guilds.cache.get(appConfig.discord.ids.guild)!,
     cache: new CacheManager(),
   }
 
@@ -98,7 +99,7 @@ nextApp.prepare().then(async () => {
       try {
         await Promise.all(
           event.callbacks.map((callback) => {
-            return callback.apply(null, args)
+            return callback.apply(null, [context, ...args])
           }),
         )
       } catch (err) {

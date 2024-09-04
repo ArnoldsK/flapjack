@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { Unicode } from "../constants"
-import { escapeMentions } from "../utils/message"
+import { parseMentions } from "../utils/message"
 
 enum OptionName {
   Message = "message",
@@ -22,7 +22,7 @@ export default class MockCommand extends BaseCommand {
 
   async execute() {
     const input = this.interaction.options.getString(OptionName.Message, true)
-    const result = escapeMentions(input, this.guild)
+    const result = parseMentions(input, this.guild)
       .split(" ")
       .map((word) =>
         word

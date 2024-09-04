@@ -1,7 +1,8 @@
-import moment from "moment"
+import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter"
 
-export const formatDays = (days: number): string => {
-  moment.relativeTimeRounding(Math.floor)
+dayjs.extend(relativeTime)
+dayjs.extend(isSameOrAfter)
 
-  return moment().add(days, "days").fromNow()
-}
+export { dayjs as d }

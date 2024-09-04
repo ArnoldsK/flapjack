@@ -23,10 +23,9 @@ const getAmount = (): number => {
 }
 
 export const handleCreditsLotteries: Task = async (context) => {
-  const guild = context.client.guilds.cache.get(discordIds.guild)!
-  const channel = guild.channels.cache.get(
-    discordIds.channels.general,
-  ) as GuildTextBasedChannel
+  const channel = context
+    .guild()
+    .channels.cache.get(discordIds.channels.general) as GuildTextBasedChannel
 
   // One in x minutes chance
   if (!randomBool(20)) return
@@ -63,7 +62,7 @@ export const handleCreditsLotteries: Task = async (context) => {
 
     // Get at least 2 members
     const members = userIds
-      .map((id) => guild.members.cache.get(id))
+      .map((id) => context.guild().members.cache.get(id))
       .filter(Boolean)
 
     if (members.length < 2) return

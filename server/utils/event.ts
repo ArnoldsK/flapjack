@@ -2,6 +2,7 @@ import { ClientEvents } from "discord.js"
 import fs from "fs"
 import { join } from "path"
 import { appConfig } from "../config"
+import { BaseContext } from "../types"
 
 export interface EventOptions {
   productionOnly: boolean
@@ -10,7 +11,10 @@ export interface EventOptions {
 export type EventTask<K extends keyof ClientEvents> = {
   event: K
   options: EventOptions
-  callback: (...args: ClientEvents[K]) => PromiseLike<void>
+  callback: (
+    context: BaseContext,
+    ...args: ClientEvents[K]
+  ) => PromiseLike<void>
 }
 
 export type EventsGroup<K extends keyof ClientEvents> = Record<
@@ -21,7 +25,10 @@ export type EventsGroup<K extends keyof ClientEvents> = Record<
 export function createEvent<K extends keyof ClientEvents>(
   event: K,
   options: EventOptions,
-  callback: (...args: ClientEvents[K]) => PromiseLike<void>,
+  callback: (
+    context: BaseContext,
+    ...args: ClientEvents[K]
+  ) => PromiseLike<void>,
 ): EventTask<K> {
   return {
     event,

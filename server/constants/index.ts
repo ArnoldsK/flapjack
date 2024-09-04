@@ -4,6 +4,7 @@ export enum Unicode {
   middot = "·",
   zeroWidthSpace = "​",
   thinSpace = " ",
+  longDash = "—",
 }
 
 export enum Color {

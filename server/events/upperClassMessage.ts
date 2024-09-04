@@ -7,7 +7,7 @@ import { UPPER_CLASS_MESSAGE_CREDITS } from "../constants"
 export default createEvent(
   Events.MessageCreate,
   { productionOnly: true },
-  async (message) => {
+  async (_context, message) => {
     if (message.channel.id !== discordIds.channels.upperClass) return
     if (message.author.bot) return
     if (!message.member) return
