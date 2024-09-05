@@ -44,9 +44,8 @@ export default createEvent(
       const msSincePrevious = entity ? d().diff(entity.until) : 0
       const penaltyMs = Math.max(0, (entity?.durationMs ?? 0) - msSincePrevious)
 
-      const penaltyMinutes = Math.floor(penaltyMs / 1000 / 60)
-      const penaltyText = penaltyMinutes
-        ? `Added ${asPlural(penaltyMinutes, "minute", "$1 $2")} penalty`
+      const penaltyText = penaltyMs
+        ? `Added ${d().add(penaltyMs).fromNow(true)} penalty`
         : ""
 
       if (penaltyMs) {
