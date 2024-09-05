@@ -169,13 +169,18 @@ export const sendFlaggedLog = async (
   const member = context.guild().members.cache.get(userId)
   if (!member) return
 
-  await sendLogMessage(context, {
-    embeds: [
-      {
-        title: "Flagged as toxic",
-        author: embedAuthor(member),
-        description: reason ?? "Unknown reason",
-      },
-    ],
-  })
+  await sendLogMessage(
+    context,
+    {
+      embeds: [
+        {
+          title: "Flagged as toxic",
+          author: embedAuthor(member),
+          description: reason ?? "Unknown reason",
+        },
+      ],
+    },
+    // #ai-spam
+    "1281294886393610311",
+  )
 }

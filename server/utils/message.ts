@@ -29,10 +29,13 @@ export const parseMentions = (content: string, guild: Guild) => {
 export const sendLogMessage = async (
   context: BaseContext,
   content: MessageCreateOptions,
+  overrideChannelId?: string,
 ) => {
   const channel = context
     .guild()
-    .channels.cache.get(appConfig.discord.ids.channels.logs)
+    .channels.cache.get(
+      overrideChannelId ?? appConfig.discord.ids.channels.logs,
+    )
 
   if (isTextChannel(channel)) {
     await channel.send(content)
