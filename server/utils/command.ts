@@ -125,6 +125,9 @@ export const removeApiCommands = async () => {
 }
 
 export const handleApiCommands = async (commands: SetupCommand[]) => {
+  // Setup commands on dev only if allowed
+  if (appConfig.dev && !appConfig.discord.localCommands) return
+
   const rest = new REST({ version: "10" }).setToken(appConfig.discord.token)
   const apiCommands = (await rest.get(
     Routes.applicationGuildCommands(

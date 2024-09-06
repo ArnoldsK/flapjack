@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "nodemon",
+    "dev:cmd": "cross-env LOCAL_COMMANDS=true nodemon",
     "build": "rm -rf dist/ && next build && tsc --project tsconfig.server.json",
     "start": "cross-env NODE_ENV=development node dist/server/index.js",
     "lint": "next lint"

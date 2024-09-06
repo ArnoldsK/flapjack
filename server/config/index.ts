@@ -24,6 +24,7 @@ export const appConfig = {
   discord: {
     token: process.env.DISCORD_TOKEN || "",
     client: process.env.DISCORD_CLIENT || "",
+    localCommands: process.env.LOCAL_COMMANDS === "true",
 
     ids: {
       guild: "411593263615836172",

@@ -6,7 +6,6 @@ import { embedAuthor, isTimedOut } from "../utils/member"
 import { d } from "../utils/date"
 import { sendLogMessage } from "../utils/message"
 import { Color } from "../constants"
-import { asPlural } from "../utils/string"
 
 export default createEvent(
   Events.GuildMemberUpdate,
