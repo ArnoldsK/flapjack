@@ -4,7 +4,11 @@ import { createEvent } from "../utils/event"
 import { TimeoutModel } from "../models/Timeout"
 import { embedAuthor, isTimedOut } from "../utils/member"
 import { d } from "../utils/date"
-import { sendLogMessage } from "../utils/message"
+import {
+  getTimeoutAddedEmbed,
+  getTimeoutRemovedEmbed,
+  sendLogMessage,
+} from "../utils/message"
 import { Color } from "../constants"
 
 export default createEvent(
@@ -27,11 +31,9 @@ export default createEvent(
     if (oldIsTimedOut && !newIsTimedOut) {
       await sendLogMessage(context, {
         embeds: [
-          {
-            color: Color.blue,
-            author: embedAuthor(newMember),
-            title: "Timeout removed",
-          },
+          getTimeoutRemovedEmbed({
+            member: newMember,
+          }),
         ],
       })
 
@@ -56,19 +58,11 @@ export default createEvent(
 
       await sendLogMessage(context, {
         embeds: [
-          {
-            color: Color.orange,
-            author: embedAuthor(newMember),
-            title: "Timeout added",
-            description: `Expires <t:${Math.round(
-              timeoutUntil.getTime() / 1000,
-            )}:R>`,
-            footer: penaltyText
-              ? {
-                  text: penaltyText,
-                }
-              : undefined,
-          },
+          getTimeoutAddedEmbed({
+            member: newMember,
+            timeoutUntil,
+            penaltyText,
+          }),
         ],
       })
       await model.set({

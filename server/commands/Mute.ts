@@ -1,32 +1,38 @@
 import { SlashCommandBuilder } from "discord.js"
 
 import { BaseCommand } from "../base/Command"
-import { permission, PermissionFlags } from "../utils/permission"
+import {
+  memberHasPermission,
+  permission,
+  PermissionFlags,
+} from "../utils/permission"
 import { checkUnreachable } from "../utils/error"
 import { d } from "../utils/date"
 import { Unicode } from "../constants"
 import { isTimedOut } from "../utils/member"
+import { getTimeoutAddedEmbed, getTimeoutRemovedEmbed } from "../utils/message"
+import { appConfig } from "../config"
 
 enum SubcommandName {
   List = "list",
-  // Add = "add",
-  // Remove = "remove",
+  Add = "add",
+  Remove = "remove",
 }
 
 enum OptionName {
   User = "user",
-  // DurationType = "duration",
-  // DurationValue = "value",
+  DurationType = "duration",
+  DurationValue = "value",
 }
 
-// enum DurationType {
-//   Minutes = "minutes",
-//   Hours = "hours",
-//   Days = "days",
-// }
+enum DurationType {
+  Minutes = "minutes",
+  Hours = "hours",
+  Days = "days",
+}
 
 export default class MuteCommand extends BaseCommand {
-  static version = 1
+  static version = 2
 
   static command = new SlashCommandBuilder()
     .setName("mute")
@@ -36,47 +42,47 @@ export default class MuteCommand extends BaseCommand {
         .setName(SubcommandName.List)
         .setDescription("List all active timeouts"),
     )
-  // .addSubcommand((subcommand) =>
-  //   subcommand
-  //     .setName(SubcommandName.Add)
-  //     .setDescription("Add user timeout")
-  //     .addUserOption((option) =>
-  //       option
-  //         .setName(OptionName.User)
-  //         .setDescription("The user to timeout")
-  //         .setRequired(true),
-  //     )
-  //     .addStringOption((option) =>
-  //       option
-  //         .setName(OptionName.DurationType)
-  //         .setDescription("Timeout duration type")
-  //         .setChoices(
-  //           ...Object.entries(DurationType).map(([name, value]) => ({
-  //             name,
-  //             value,
-  //           })),
-  //         )
-  //         .setRequired(true),
-  //     )
-  //     .addIntegerOption((option) =>
-  //       option
-  //         .setName(OptionName.DurationValue)
-  //         .setDescription("Timeout duration value")
-  //         .setMinValue(1)
-  //         .setRequired(true),
-  //     ),
-  // )
-  // .addSubcommand((subcommand) =>
-  //   subcommand
-  //     .setName(SubcommandName.Remove)
-  //     .setDescription("Remove user timeout")
-  //     .addUserOption((option) =>
-  //       option
-  //         .setName(OptionName.User)
-  //         .setDescription("The user to remove timeout from")
-  //         .setRequired(true),
-  //     ),
-  // )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName(SubcommandName.Add)
+        .setDescription("Add user timeout (Admin)")
+        .addUserOption((option) =>
+          option
+            .setName(OptionName.User)
+            .setDescription("The user to timeout")
+            .setRequired(true),
+        )
+        .addStringOption((option) =>
+          option
+            .setName(OptionName.DurationType)
+            .setDescription("Timeout duration type")
+            .setChoices(
+              ...Object.entries(DurationType).map(([name, value]) => ({
+                name,
+                value,
+              })),
+            )
+            .setRequired(true),
+        )
+        .addIntegerOption((option) =>
+          option
+            .setName(OptionName.DurationValue)
+            .setDescription("Timeout duration value")
+            .setMinValue(1)
+            .setRequired(true),
+        ),
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName(SubcommandName.Remove)
+        .setDescription("Remove user timeout (Admin)")
+        .addUserOption((option) =>
+          option
+            .setName(OptionName.User)
+            .setDescription("The user to remove timeout from")
+            .setRequired(true),
+        ),
+    )
 
   static permissions = permission({
     type: "either",
@@ -86,6 +92,13 @@ export default class MuteCommand extends BaseCommand {
     ],
   })
 
+  #canModerate() {
+    return memberHasPermission(this.member, {
+      type: "allow",
+      permissions: [PermissionFlags.ModerateMembers],
+    })
+  }
+
   async execute() {
     const subcommand = this.getSubcommand<SubcommandName>()
 
@@ -94,13 +107,21 @@ export default class MuteCommand extends BaseCommand {
         await this.#handleList()
         break
 
-      // case SubcommandName.Add:
-      //   await this.#handleAdd()
-      //   break
+      case SubcommandName.Add:
+        if (!this.#canModerate()) {
+          this.deny()
+          return
+        }
+        await this.#handleAdd()
+        break
 
-      // case SubcommandName.Remove:
-      //   await this.#handleRemove()
-      //   break
+      case SubcommandName.Remove:
+        if (!this.#canModerate()) {
+          this.deny()
+          return
+        }
+        await this.#handleRemove()
+        break
 
       default:
         checkUnreachable(subcommand)
@@ -134,50 +155,67 @@ export default class MuteCommand extends BaseCommand {
     })
   }
 
-  // async #handleAdd() {
-  //   // Parse input member
-  //   const user = this.interaction.options.getUser(OptionName.User, true)
-  //   const member = this.guild.members.cache.get(user.id)
+  async #handleAdd() {
+    // Parse input member
+    const user = this.interaction.options.getUser(OptionName.User, true)
+    const member = this.guild.members.cache.get(user.id)
 
-  //   if (!member) {
-  //     this.fail("User not found")
-  //     return
-  //   }
+    if (!member) {
+      this.fail("User not found")
+      return
+    }
 
-  //   if (isTimedOut(member)) {
-  //     this.fail("User is already timed out")
-  //     return
-  //   }
+    if (isTimedOut(member)) {
+      this.fail("User is already timed out")
+      return
+    }
 
-  //   // Parse input date
-  //   const durationType = this.interaction.options.getString(
-  //     OptionName.DurationType,
-  //     true,
-  //   ) as DurationType
-  //   const durationValue = this.interaction.options.getInteger(
-  //     OptionName.DurationValue,
-  //     true,
-  //   )
+    // Parse input date
+    const durationType = this.interaction.options.getString(
+      OptionName.DurationType,
+      true,
+    ) as DurationType
+    const durationValue = this.interaction.options.getInteger(
+      OptionName.DurationValue,
+      true,
+    )
 
-  //   // TODO nitro boosters can't mute for a longer time than 5 mins
-  //   // TODO nitro boosters can't add penalty
+    // Add timeout
+    const timeoutUntil = d().add(durationValue, durationType).toDate()
+    await member.disableCommunicationUntil(timeoutUntil)
 
-  //   // Parse the penalty duration
-  //   const model = new TimeoutModel(member)
-  //   const entity = await model.get()
+    this.reply({
+      ephemeral: true,
+      embeds: [
+        {
+          ...getTimeoutAddedEmbed({ member, timeoutUntil }),
+          description: `See <#${appConfig.discord.ids.channels.logs}> for details`,
+        },
+      ],
+    })
+  }
 
-  //   const msSincePrevious = entity ? d().diff(entity.until, "ms") : 0
+  async #handleRemove() {
+    // Parse input member
+    const user = this.interaction.options.getUser(OptionName.User, true)
+    const member = this.guild.members.cache.get(user.id)
 
-  //   this.reply({
-  //     ephemeral: true,
-  //     content: "TODO",
-  //   })
-  // }
+    if (!member) {
+      this.fail("User not found")
+      return
+    }
 
-  // async #handleRemove() {
-  //   this.reply({
-  //     ephemeral: true,
-  //     content: "TODO",
-  //   })
-  // }
+    if (!isTimedOut(member)) {
+      this.fail("User is not timed out")
+      return
+    }
+
+    // Remove timeout
+    await member.disableCommunicationUntil(null)
+
+    this.reply({
+      ephemeral: true,
+      embeds: [getTimeoutRemovedEmbed({ member })],
+    })
+  }
 }

@@ -1,9 +1,10 @@
-import { Guild, MessageCreateOptions } from "discord.js"
+import { APIEmbed, Guild, GuildMember, MessageCreateOptions } from "discord.js"
 
-import { Unicode } from "../constants"
+import { Color, Unicode } from "../constants"
 import { BaseContext } from "../types"
 import { isTextChannel } from "./channel"
 import { appConfig } from "../config"
+import { embedAuthor } from "./member"
 
 export const parseMentions = (content: string, guild: Guild) => {
   return content
@@ -39,5 +40,39 @@ export const sendLogMessage = async (
 
   if (isTextChannel(channel)) {
     await channel.send(content)
+  }
+}
+
+export const getTimeoutAddedEmbed = ({
+  member,
+  timeoutUntil,
+  penaltyText,
+}: {
+  member: GuildMember
+  timeoutUntil: Date
+  penaltyText?: string
+}): APIEmbed => {
+  return {
+    color: Color.orange,
+    author: embedAuthor(member),
+    title: "Timeout added",
+    description: `Expires <t:${Math.round(timeoutUntil.getTime() / 1000)}:R>`,
+    footer: penaltyText
+      ? {
+          text: penaltyText,
+        }
+      : undefined,
+  }
+}
+
+export const getTimeoutRemovedEmbed = ({
+  member,
+}: {
+  member: GuildMember
+}): APIEmbed => {
+  return {
+    color: Color.blue,
+    author: embedAuthor(member),
+    title: "Timeout removed",
   }
 }
