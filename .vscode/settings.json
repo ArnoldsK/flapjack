@@ -2,10 +2,12 @@
   "editor.formatOnSave": true,
   "typescript.preferences.importModuleSpecifier": "relative",
   "cSpell.words": [
+    "gifs",
     "magik",
     "middot",
     "moderations",
     "openai",
+    "Redgifs",
     "runescape",
     "Trueish",
     "typeorm"

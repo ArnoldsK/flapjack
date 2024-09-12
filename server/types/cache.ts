@@ -1,10 +1,5 @@
 import { CacheObjectManager } from "../cache"
-
-export interface CacheNsfwPost {
-  title: string
-  url: string
-  mediaUrl: string
-}
+import { RedGifsGif } from "./redgifs"
 
 export enum CacheKey {
   NsfwPosts = "nsfwPosts",
@@ -12,6 +7,6 @@ export enum CacheKey {
 }
 
 export interface AppCache {
-  [CacheKey.NsfwPosts]: CacheNsfwPost[]
+  [CacheKey.NsfwPosts]: RedGifsGif[]
   [CacheKey.Blackjack]: CacheObjectManager<string>
 }
