@@ -22,6 +22,10 @@ export const getCreditsEmoji = (value: bigint | number): string => {
 }
 
 export const formatCredits = (value: bigint | number): string => {
+  if (typeof value === "number") {
+    value = Math.floor(value)
+  }
+
   const items = [
     {
       from: BigInt("1"),
