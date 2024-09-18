@@ -23,6 +23,9 @@ export default class ArchiveCommand extends BaseCommand {
       return
     }
 
+    // For some reason must defer the reply
+    await this.interaction.deferReply()
+
     await this.channel.setParent(discordIds.categories.archive, {
       // Sync permissions
       lockPermissions: true,
@@ -30,7 +33,7 @@ export default class ArchiveCommand extends BaseCommand {
 
     await this.channel.setPosition(0)
 
-    this.reply({
+    this.editReply({
       embeds: [
         {
           description: "Channel has been archived",
