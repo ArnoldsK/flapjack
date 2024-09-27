@@ -22,7 +22,7 @@ enum SubcommandName {
 enum OptionName {
   User = "user",
   DurationType = "duration",
-  DurationValue = "value",
+  DurationValue = "amount",
 }
 
 enum DurationType {
@@ -32,7 +32,7 @@ enum DurationType {
 }
 
 export default class MuteCommand extends BaseCommand {
-  static version = 2
+  static version = 3
 
   static command = new SlashCommandBuilder()
     .setName("mute")

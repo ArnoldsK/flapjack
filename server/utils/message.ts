@@ -43,6 +43,10 @@ export const sendLogMessage = async (
   }
 }
 
+export const contentRelativeTime = (timestamp: number): string => {
+  return `<t:${Math.round(timestamp / 1000)}:R>`
+}
+
 export const getTimeoutAddedEmbed = ({
   member,
   timeoutUntil,
@@ -56,7 +60,7 @@ export const getTimeoutAddedEmbed = ({
     color: Color.orange,
     author: embedAuthor(member),
     title: "Timeout added",
-    description: `Expires <t:${Math.round(timeoutUntil.getTime() / 1000)}:R>`,
+    description: `Expires ${contentRelativeTime(timeoutUntil.getTime())}`,
     footer: penaltyText
       ? {
           text: penaltyText,
