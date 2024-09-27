@@ -8,7 +8,7 @@ export default {
 
   expression: "every minute",
 
-  productionOnly: false,
+  productionOnly: true,
 
   async execute(context) {
     const model = new ReminderModel()
