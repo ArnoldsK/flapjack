@@ -20,13 +20,17 @@ export default {
         const channel = context.guild().channels.cache.get(reminder.channelId)
         if (!isTextChannel(channel)) return
 
-        const message = await channel.messages.fetch(reminder.messageId)
-        if (!message) return
+        try {
+          const message = await channel.messages.fetch(reminder.messageId)
+          if (!message) return
 
-        const fromNow = d(reminder.createdAt).fromNow()
-        message.reply(
-          `<@${reminder.userId}> here's a reminder you set ${fromNow}`,
-        )
+          const fromNow = d(reminder.createdAt).fromNow()
+          message.reply(
+            `<@${reminder.userId}> here's a reminder you set ${fromNow}`,
+          )
+        } catch {
+          // Do nothing
+        }
       }),
     )
 
