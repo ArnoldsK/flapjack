@@ -1,6 +1,6 @@
 import { LessThanOrEqual, Repository } from "typeorm"
 import { db } from "../database"
-import { ReminderEntity } from "../entity/Reminder"
+import ReminderEntity from "../entity/Reminder"
 
 interface CreateInput {
   channelId: string

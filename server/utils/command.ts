@@ -15,6 +15,7 @@ import { getPermissionFlagName, memberHasPermission } from "./permission"
 import { dedupe } from "./array"
 import { appConfig } from "../config"
 import { BaseContext } from "../types"
+import { CommandExecuteModel } from "../models/CommandExecute"
 
 export type SetupCommand = RESTPostAPIChatInputApplicationCommandsJSONBody & {
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>
@@ -104,8 +105,30 @@ export const getSetupCommands = (context: BaseContext): SetupCommand[] => {
         // Execute
         // #############################################################################
         await command.execute()
+
+        // #############################################################################
+        // Statistics
+        // #############################################################################
+        await handleCommandExecuteStatistics(interaction)
       },
     } satisfies SetupCommand
+  })
+}
+
+const handleCommandExecuteStatistics = async (
+  interaction: ChatInputCommandInteraction,
+) => {
+  let input = `/${interaction.commandName}`
+  for (const option of interaction.options.data) {
+    if (!option.value) continue
+    input += ` ${option.name}:${option.value}`
+  }
+
+  const model = new CommandExecuteModel()
+  await model.create({
+    input,
+    commandName: interaction.commandName,
+    userId: interaction.user.id,
   })
 }
 
@@ -136,7 +159,7 @@ export const handleApiCommands = async (commands: SetupCommand[]) => {
     ),
   )) as APIApplicationCommand[]
 
-  // Due to how updating works, create a single update body based on current API commands
+  // Update is an override so there's a single update body with all API commands
   const updateCommands: Omit<SetupCommand, "execute">[] = apiCommands.map(
     (el) => ({
       ...el,

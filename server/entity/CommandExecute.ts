@@ -7,24 +7,18 @@ import {
 } from "typeorm"
 
 @Entity()
-export default class ReminderEntity extends BaseEntity {
+export default class CommandExecuteEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number
 
   @Column()
-  channelId: string
-
-  @Column()
-  messageId: string
-
-  @Column()
   userId: string
 
-  @Column({ type: "text" })
-  value: string
-
   @Column()
-  expiresAt: Date
+  commandName: string
+
+  @Column({ type: "text" })
+  input: string
 
   @CreateDateColumn()
   createdAt: Date

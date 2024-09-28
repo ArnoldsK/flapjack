@@ -3,11 +3,11 @@ import { BaseCommand } from "../base/Command"
 
 enum OptionName {
   User = "user",
-  Spying = "spying",
+  Spying = "spy",
 }
 
 export default class AvatarCommand extends BaseCommand {
-  static version = 2
+  static version = 3
 
   static command = new SlashCommandBuilder()
     .setName("avatar")

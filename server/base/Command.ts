@@ -89,10 +89,8 @@ class BaseCommand {
   }
 
   fail(message?: string) {
-    return this.reply({
-      content: message ?? "Unable to execute the command",
-      ephemeral: true,
-    })
+    // This error is handled in the top level execute try catch
+    throw new Error(message ?? "Unable to execute the command")
   }
 
   success(message?: string) {
