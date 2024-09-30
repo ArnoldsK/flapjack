@@ -15,6 +15,9 @@ export default class CommandExecuteEntity extends BaseEntity {
   userId: string
 
   @Column()
+  channelId: string
+
+  @Column()
   commandName: string
 
   @Column({ type: "text" })

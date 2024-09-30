@@ -118,17 +118,12 @@ export const getSetupCommands = (context: BaseContext): SetupCommand[] => {
 const handleCommandExecuteStatistics = async (
   interaction: ChatInputCommandInteraction,
 ) => {
-  let input = `/${interaction.commandName}`
-  for (const option of interaction.options.data) {
-    if (!option.value) continue
-    input += ` ${option.name}:${option.value}`
-  }
-
   const model = new CommandExecuteModel()
   await model.create({
-    input,
+    input: interaction.toString(),
     commandName: interaction.commandName,
     userId: interaction.user.id,
+    channelId: interaction.channelId,
   })
 }
 

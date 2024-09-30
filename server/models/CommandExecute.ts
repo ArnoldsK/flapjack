@@ -3,6 +3,7 @@ import { db } from "../database"
 import CommandExecuteEntity from "../entity/CommandExecute"
 
 interface CreateInput {
+  channelId: string
   userId: string
   commandName: string
   input: string
