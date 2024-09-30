@@ -59,7 +59,7 @@ export default class MagikCommand extends BaseCommand {
         files: [
           {
             name: "magik.png",
-            attachment: `${API_URL}${imageUrl}`,
+            attachment: `${API_URL}${encodeURIComponent(imageUrl)}`,
           },
         ],
       })
@@ -84,7 +84,7 @@ export default class MagikCommand extends BaseCommand {
       }
 
       case SubcommandName.Url:
-        return this.interaction.options.getString(OptionName.Url)
+        return this.interaction.options.getString(OptionName.Url, true).trim()
 
       default:
         checkUnreachable(subcommand)
