@@ -53,19 +53,20 @@ export default class MagikCommand extends BaseCommand {
       return
     }
 
-    try {
-      // Attempt to send the image as an attachment
-      this.reply({
-        files: [
-          {
-            name: "magik.png",
-            attachment: `${API_URL}${encodeURIComponent(imageUrl)}`,
-          },
-        ],
-      })
-    } catch (err) {
-      this.fail((err as Error).message)
+    if (imageUrl.includes("cdn.discordapp.com") && imageUrl.includes(".webp")) {
+      this.fail("WEBP is not supported")
+      return
     }
+
+    // Attempt to send the image as an attachment
+    this.reply({
+      files: [
+        {
+          name: "magik.png",
+          attachment: `${API_URL}${encodeURIComponent(imageUrl)}`,
+        },
+      ],
+    })
   }
 
   getImageUrl(): string | null {
