@@ -1,9 +1,13 @@
+import { GuildPremiumTier } from "discord.js"
 import { appConfig } from "../config"
 import { Task } from "../types/tasks"
 
 export const updateBanner: Task = async (context) => {
   const apiKey = appConfig.giphy.apiKey
   if (!apiKey) return
+
+  const guild = context.guild()
+  if (guild.premiumTier !== GuildPremiumTier.Tier3) return
 
   const url = new URL("/v1/gifs/random", "https://api.giphy.com")
   url.searchParams.set("api_key", apiKey)
@@ -14,7 +18,7 @@ export const updateBanner: Task = async (context) => {
     const json = await res.json()
     const imageUrl = json.data.images.original.url as string
 
-    await context.guild().setBanner(imageUrl)
+    await guild.setBanner(imageUrl)
   } catch {
     // Whatever
   }
