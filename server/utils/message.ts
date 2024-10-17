@@ -43,6 +43,28 @@ export const sendLogMessage = async (
   }
 }
 
+export const sendRankUpMessage = async (
+  member: GuildMember,
+  lvlNew: number,
+) => {
+  const channel = member.guild.channels.cache.get(
+    appConfig.discord.ids.channels.bepsi,
+  )
+
+  if (isTextChannel(channel) && !appConfig.dev) {
+    await channel.send({
+      embeds: [
+        {
+          author: embedAuthor(member),
+          color: member.displayColor,
+          title: "Rank Up!",
+          description: `LVL ${lvlNew}`,
+        },
+      ],
+    })
+  }
+}
+
 export const contentRelativeTime = (timestamp: number): string => {
   return `<t:${Math.round(timestamp / 1000)}:R>`
 }

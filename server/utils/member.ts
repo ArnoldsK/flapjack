@@ -1,6 +1,7 @@
 import { APIEmbedAuthor, Guild, GuildMember } from "discord.js"
 import { collectionToArray } from "./array"
 import { d } from "./date"
+import { appConfig } from "../config"
 
 export const getMemberByJoinPosition = async (
   guild: Guild,
@@ -79,5 +80,16 @@ export const embedAuthor = (member: GuildMember): APIEmbedAuthor => {
       forceStatic: true,
       size: 32,
     }),
+  }
+}
+
+export const addActiveMemberRole = async (member: GuildMember) => {
+  if (appConfig.dev) return
+
+  const role = appConfig.discord.ids.roles.activeMember
+  if (!role) return
+
+  if (!member.roles.cache.has(role)) {
+    await member.roles.add(role)
   }
 }

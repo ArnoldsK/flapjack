@@ -31,3 +31,6 @@ export const CREDITS_BANK_HOURLY_RATE = {
 }
 
 export const UPPER_CLASS_MESSAGE_CREDITS = 500_000
+
+export const RANK_MAX_LEVEL = 250
+export const RANK_ACTIVE_ROLE_LEVEL = 20
