@@ -1,0 +1,21 @@
+import { appConfig } from "../config"
+import { Task } from "../types/tasks"
+
+export const updateBanner: Task = async (context) => {
+  const apiKey = appConfig.giphy.apiKey
+  if (!apiKey) return
+
+  const url = new URL("/v1/gifs/random", "https://api.giphy.com")
+  url.searchParams.set("api_key", apiKey)
+  url.searchParams.set("tag", "fail")
+
+  try {
+    const res = await fetch(url)
+    const json = await res.json()
+    const imageUrl = json.data.images.original.url as string
+
+    await context.guild().setBanner(imageUrl)
+  } catch {
+    // Whatever
+  }
+}

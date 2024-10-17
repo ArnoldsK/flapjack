@@ -52,6 +52,10 @@ export const appConfig = {
       },
     },
   },
+
+  giphy: {
+    apiKey: process.env.GIPHY_API_KEY || "",
+  },
 }
 
 export const discordIds = appConfig.discord.ids

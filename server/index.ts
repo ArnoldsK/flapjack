@@ -17,6 +17,7 @@ import { getGroupedEvents } from "./utils/event"
 import { handleCron } from "./utils/cron"
 import { BaseContext } from "./types"
 import CacheManager from "./cache"
+import { updateBanner } from "./tasks/updateBanner"
 
 // Prepare next app
 const nextApp = next({ dev: appConfig.dev })
