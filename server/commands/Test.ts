@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { permission, PermissionFlags } from "../utils/permission"
+import { mcStatus } from "../tasks/mcStatus"
 
 export default class TestCommand extends BaseCommand {
   static version = 1
@@ -15,9 +16,11 @@ export default class TestCommand extends BaseCommand {
   })
 
   async execute() {
+    await mcStatus(this.context)
+
     this.reply({
       ephemeral: true,
-      content: "Done",
+      content: "yeet",
     })
   }
 }

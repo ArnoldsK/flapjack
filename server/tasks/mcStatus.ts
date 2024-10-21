@@ -19,31 +19,29 @@ export const mcStatus: Task = async (context) => {
   // #############################################################################
   // Get status
   // #############################################################################
-  const apiUrl = new URL("/server/status", "https://mcapi.us")
-  apiUrl.searchParams.set("ip", SERVER_IP)
-
+  const apiUrl = new URL(`https://api.mcsrvstat.us/3/${SERVER_IP}`)
   const res = await fetch(apiUrl)
   const data = z
     .object({
       online: z.boolean(),
-      players: z.object({
-        now: z.number(),
-        max: z.number(),
-        sample: z.array(
-          z.object({
-            name: z.string(),
-            id: z.string(),
-          }),
-        ),
-      }),
+      players: z
+        .object({
+          online: z.number(),
+          max: z.number(),
+          list: z.array(
+            z.object({
+              name: z.string(),
+              uuid: z.string().uuid(),
+            }),
+          ),
+        })
+        .optional(),
     })
     .parse(await res.json())
 
   const status: McStatus = {
     isOnline: data.online,
-    playerNames: data.players.sample
-      .flatMap((player) => player.name)
-      .sort((a, b) => a.localeCompare(b)),
+    playerNames: data.players?.list.flatMap((player) => player.name) ?? [],
   }
   const prevStatus = context.cache.get(CacheKey.McStatus)
 
@@ -53,9 +51,10 @@ export const mcStatus: Task = async (context) => {
   const topicLines = (channel.topic ?? "").split("\n")
 
   if (topicLines[0]?.startsWith(SERVER_IP)) {
-    const statusString = status.isOnline
-      ? `${data.players.now}/${data.players.max}`
-      : "off"
+    const statusString =
+      status.isOnline && data.players
+        ? `${data.players.online}/${data.players.max}`
+        : "off"
 
     await channel.setTopic(
       joinAsLines(`${SERVER_IP} (${statusString})`, ...topicLines.slice(1)),
