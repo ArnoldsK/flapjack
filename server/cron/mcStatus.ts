@@ -9,6 +9,7 @@ export default {
   productionOnly: true,
 
   async execute(context) {
-    await mcStatus(context)
+    // TODO re-enable
+    // await mcStatus(context)
   },
 } as CronTask
