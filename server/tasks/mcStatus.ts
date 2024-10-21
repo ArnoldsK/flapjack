@@ -10,6 +10,22 @@ import { Color } from "../constants"
 
 const SERVER_IP = "mc.pepsidog.lv"
 
+export const DATA_SCHEMA = z.object({
+  online: z.boolean(),
+  players: z.object({
+    online: z.number(),
+    max: z.number(),
+    list: z
+      .array(
+        z.object({
+          name: z.string(),
+          uuid: z.string().uuid(),
+        }),
+      )
+      .optional(),
+  }),
+})
+
 export const mcStatus: Task = async (context) => {
   const channel = context
     .guild()
@@ -21,27 +37,11 @@ export const mcStatus: Task = async (context) => {
   // #############################################################################
   const apiUrl = new URL(`https://api.mcsrvstat.us/3/${SERVER_IP}`)
   const res = await fetch(apiUrl)
-  const data = z
-    .object({
-      online: z.boolean(),
-      players: z
-        .object({
-          online: z.number(),
-          max: z.number(),
-          list: z.array(
-            z.object({
-              name: z.string(),
-              uuid: z.string().uuid(),
-            }),
-          ),
-        })
-        .optional(),
-    })
-    .parse(await res.json())
+  const data = DATA_SCHEMA.parse(await res.json())
 
   const status: McStatus = {
     isOnline: data.online,
-    playerNames: data.players?.list.flatMap((player) => player.name) ?? [],
+    playerNames: data.players.list?.flatMap((player) => player.name) ?? [],
   }
   const prevStatus = context.cache.get(CacheKey.McStatus)
 
