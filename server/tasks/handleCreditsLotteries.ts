@@ -12,6 +12,7 @@ import { formatCredits } from "../utils/credits"
 import { randomBool, randomInt, randomValue } from "../utils/random"
 import { dedupe } from "../utils/array"
 import { Task } from "../types/tasks"
+import { isNonNullish } from "../utils/boolean"
 
 const getAmount = (): number => {
   // One in 50 to get a mil
@@ -63,7 +64,7 @@ export const handleCreditsLotteries: Task = async (context) => {
     // Get at least 2 members
     const members = userIds
       .map((id) => context.guild().members.cache.get(id))
-      .filter(Boolean)
+      .filter(isNonNullish)
 
     if (members.length < 2) return
 

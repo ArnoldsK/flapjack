@@ -49,6 +49,7 @@ export const appConfig = {
         copyPasta: "673897295598845952",
         vTubers: "829428335288516619",
         numbersGame: "831055945022963742",
+        minecraft: "584768527454568448",
       },
     },
   },

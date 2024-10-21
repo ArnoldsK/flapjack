@@ -34,6 +34,7 @@ export default class CacheManager {
   #cache: AppCache = {
     [CacheKey.NsfwPosts]: [],
     [CacheKey.Blackjack]: new CacheObjectManager(),
+    [CacheKey.McStatus]: null,
   }
 
   constructor() {}
