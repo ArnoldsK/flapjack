@@ -4,7 +4,7 @@ import { CronTask } from "../utils/cron"
 export default {
   description: "MC status",
 
-  expression: "every minute",
+  expression: "every 5 minutes",
 
   productionOnly: true,
 
