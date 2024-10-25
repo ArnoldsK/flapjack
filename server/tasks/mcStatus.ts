@@ -76,32 +76,32 @@ export const mcStatus: Task = async (context) => {
     })
   }
 
-  // #############################################################################
-  // Player join and left
-  // #############################################################################
-  if (prevStatus != null && status.isOnline) {
-    const joinedNames = status.playerNames.filter(
-      (name) => !prevStatus.playerNames.includes(name),
-    )
-    const leftNames = prevStatus.playerNames.filter(
-      (name) => !status.playerNames.includes(name),
-    )
+  // // #############################################################################
+  // // Player join and left
+  // // #############################################################################
+  // if (prevStatus != null && status.isOnline) {
+  //   const joinedNames = status.playerNames.filter(
+  //     (name) => !prevStatus.playerNames.includes(name),
+  //   )
+  //   const leftNames = prevStatus.playerNames.filter(
+  //     (name) => !status.playerNames.includes(name),
+  //   )
 
-    const descriptionLines = [
-      joinedNames.length ? `${joinedNames.join(", ")} joined` : null,
-      leftNames.length ? `${leftNames.join(", ")} left` : null,
-    ].filter(isNonNullish)
+  //   const descriptionLines = [
+  //     joinedNames.length ? `${joinedNames.join(", ")} joined` : null,
+  //     leftNames.length ? `${leftNames.join(", ")} left` : null,
+  //   ].filter(isNonNullish)
 
-    if (descriptionLines.length) {
-      await channel.send({
-        embeds: [
-          {
-            description: descriptionLines.join("\n"),
-          },
-        ],
-      })
-    }
-  }
+  //   if (descriptionLines.length) {
+  //     await channel.send({
+  //       embeds: [
+  //         {
+  //           description: descriptionLines.join("\n"),
+  //         },
+  //       ],
+  //     })
+  //   }
+  // }
 
   // #############################################################################
   // Update cache
