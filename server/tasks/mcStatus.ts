@@ -50,14 +50,15 @@ export const mcStatus: Task = async (context) => {
   // #############################################################################
   const topicLines = (channel.topic ?? "").split("\n")
 
-  if (topicLines[0]?.startsWith(SERVER_IP)) {
+  if (topicLines[0]?.includes(SERVER_IP)) {
+    const ipString = `[${SERVER_IP}](https://mcsrvstat.us/server/${SERVER_IP})`
     const statusString =
       status.isOnline && data.players
         ? `${data.players.online}/${data.players.max}`
         : "off"
 
     await channel.setTopic(
-      joinAsLines(`${SERVER_IP} (${statusString})`, ...topicLines.slice(1)),
+      joinAsLines(`${ipString} (${statusString})`, ...topicLines.slice(1)),
     )
   }
 
