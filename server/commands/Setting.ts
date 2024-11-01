@@ -22,7 +22,7 @@ enum OptionName {
 
 // ! Must increase version on any change
 const SETTING_KEY_CHOICES = Object.entries({
-  "tasks.updateBanners.enabled": true,
+  "tasks.hourlyGifBanners.enabled": true,
 } satisfies Record<SettingKey, boolean>).map(([key]) => ({
   name: `${key} ${Unicode.longDash} ${typeof DEFAULT_SETTINGS[
     key as SettingKey
@@ -31,7 +31,7 @@ const SETTING_KEY_CHOICES = Object.entries({
 }))
 
 export class SettingCommand extends BaseCommand {
-  static version = 1
+  static version = 2
 
   static command = new SlashCommandBuilder()
     .setName("setting")

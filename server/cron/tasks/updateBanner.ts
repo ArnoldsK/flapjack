@@ -4,7 +4,7 @@ import { Task } from "../../types/tasks"
 import { requireSetting } from "../../utils/setting"
 
 export const updateBanner: Task = async (context) => {
-  if (!(await requireSetting(context, "tasks.updateBanners.enabled", true)))
+  if (!(await requireSetting(context, "tasks.hourlyGifBanners.enabled", true)))
     return
 
   const apiKey = appConfig.giphy.apiKey

@@ -1,9 +1,10 @@
-import { Repository } from "typeorm"
+import { In, Repository } from "typeorm"
 import { db } from "../database"
 import SettingEntity from "../entity/Setting"
 import { BaseContext } from "../types"
 import { CacheKey } from "../types/cache"
 import { SettingKey, DEFAULT_SETTINGS, Settings } from "../constants/setting"
+import { dedupe } from "../utils/array"
 
 export class SettingModel {
   #context: BaseContext
@@ -15,20 +16,51 @@ export class SettingModel {
   }
 
   // #############################################################################
+  // Cache
+  // #############################################################################
+  #validateCache(cached: Settings | null): cached is Settings {
+    if (!cached) {
+      return false
+    }
+
+    const defaultKeys = Object.keys(DEFAULT_SETTINGS)
+    const uniqueKeys = dedupe([...defaultKeys, ...Object.keys(cached)])
+
+    return defaultKeys.length === uniqueKeys.length
+  }
+
+  // #############################################################################
   // Getter
   // #############################################################################
   async getAll(): Promise<Settings> {
     // Return cached early
     const cached = this.#context.cache.get(CacheKey.Setting)
-    if (cached) {
+    if (this.#validateCache(cached)) {
       return cached
     }
 
+    // Get saved
     const entities = await this.#repository.find()
     const settings = { ...DEFAULT_SETTINGS }
 
-    for (const entity of entities) {
-      settings[entity.key] = JSON.parse(entity.value)
+    for (const [key, defaultValue] of Object.entries(settings)) {
+      const entity = entities.find((el) => el.key === key)
+
+      settings[key as SettingKey] = entity
+        ? JSON.parse(entity.value)
+        : defaultValue
+    }
+
+    // Remove old settings
+    const defaultKeys = Object.keys(DEFAULT_SETTINGS)
+    const oldKeys = entities
+      .map((el) => el.key)
+      .filter((key) => !defaultKeys.includes(key))
+
+    if (oldKeys.length) {
+      await this.#repository.delete({
+        key: In(oldKeys),
+      })
     }
 
     // Update cache
