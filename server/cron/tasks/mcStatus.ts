@@ -35,8 +35,15 @@ export const mcStatus: Task = async (context) => {
   // Get status
   // #############################################################################
   const apiUrl = new URL(`https://api.mcsrvstat.us/3/${SERVER_IP}`)
-  const res = await fetch(apiUrl)
-  const data = DATA_SCHEMA.parse(await res.json())
+
+  let data: z.TypeOf<typeof DATA_SCHEMA>
+  try {
+    const res = await fetch(apiUrl)
+    data = DATA_SCHEMA.parse(await res.json())
+  } catch (err) {
+    // Shrug
+    return
+  }
 
   const status: McStatus = {
     isOnline: data.online,

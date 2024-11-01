@@ -1,4 +1,4 @@
-import { createCanvas, loadImage } from "@napi-rs/canvas"
+import { createCanvas, loadImage, GlobalFonts } from "@napi-rs/canvas"
 
 import { clipEllipse } from "../utils/canvas"
 import { DISCORD_BACKGROUND_COLOR_HEX } from "../constants"
@@ -12,6 +12,8 @@ export const getUserColorPreviewImage = async ({
   displayName: string
   hexColors: string[]
 }): Promise<Buffer> => {
+  console.log("GlobalFonts", GlobalFonts.families)
+
   // Vars
   const sectionAvatarSize = 40
   const sectionPadding = 10
