@@ -6,6 +6,9 @@ export const updateBanner: Task = async (context) => {
   const apiKey = appConfig.giphy.apiKey
   if (!apiKey) return
 
+// TODO: add dynamic config command
+if (1+1) return;
+
   const guild = context.guild()
   if (guild.premiumTier !== GuildPremiumTier.Tier3) return
 
