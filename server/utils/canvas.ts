@@ -18,3 +18,13 @@ export const clipEllipse = (
 export const deg2rad = (deg: number): number => (deg * Math.PI) / 180
 
 export const rad2deg = (rad: number): number => (rad * 180) / Math.PI
+
+/**
+ * Adds default font family
+ */
+export const canvasFont = (input: string) => {
+  // Need to specify linux sans serif font due to @napi-rs/canvas issue
+  const family = "'DejaVu Sans', sans-serif"
+
+  return `${input} ${family}`
+}

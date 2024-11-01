@@ -2,7 +2,7 @@ import { createCanvas, loadImage } from "@napi-rs/canvas"
 import type { GuildMember } from "discord.js"
 
 import { getImageAverageColorData } from "../utils/color"
-import { clipEllipse } from "../utils/canvas"
+import { canvasFont, clipEllipse } from "../utils/canvas"
 import { getMemberInfo } from "../utils/member"
 
 export const getUserInfoImage = async (
@@ -41,7 +41,7 @@ export const getUserInfoImage = async (
   })
 
   // Position
-  ctx.font = "bold 26px sans-serif"
+  ctx.font = canvasFont("bold 26px")
   ctx.fillStyle = primaryColor
   ctx.textBaseline = "top"
   ctx.textAlign = "center"
@@ -56,37 +56,37 @@ export const getUserInfoImage = async (
   const createdX = avatarX + avatarWidth + margin
   const createdY = margin
 
-  ctx.font = "bold 11px sans-serif"
+  ctx.font = canvasFont("bold 11px")
   ctx.fillStyle = primaryColor
   ctx.textBaseline = "top"
   ctx.textAlign = "left"
   ctx.fillText(`On Discord since`, createdX, createdY)
 
-  ctx.font = "13px sans-serif"
+  ctx.font = canvasFont("13px")
   ctx.fillText(info.createdDate, createdX, createdY + 14)
 
   // Joined since
   const joinedX = createdX
   const joinedY = createdY + 27 + margin
 
-  ctx.font = "bold 11px sans-serif"
+  ctx.font = canvasFont("bold 11px")
   ctx.fillStyle = primaryColor
   ctx.textBaseline = "top"
   ctx.textAlign = "left"
   ctx.fillText(`On ${member.guild.name} since`, joinedX, joinedY)
-  ctx.font = "13px sans-serif"
+  ctx.font = canvasFont("13px")
   ctx.fillText(info.joinedDate, joinedX, joinedY + 14)
 
   // Joined ago
   const agoX = createdX
   const agoY = joinedY + 27 + margin
 
-  ctx.font = "bold 11px sans-serif"
+  ctx.font = canvasFont("bold 11px")
   ctx.fillStyle = primaryColor
   ctx.textBaseline = "top"
   ctx.textAlign = "left"
   ctx.fillText(`Joined`, agoX, agoY)
-  ctx.font = "13px sans-serif"
+  ctx.font = canvasFont("13px")
   ctx.fillText(info.joinedAgo, agoX, agoY + 14)
 
   return canvas.toBuffer("image/png")

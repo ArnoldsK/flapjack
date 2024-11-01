@@ -1,6 +1,6 @@
 import GIFEncoder from "gif-encoder-2"
 import { createCanvas, SKRSContext2D } from "@napi-rs/canvas"
-import { deg2rad } from "../utils/canvas"
+import { canvasFont, deg2rad } from "../utils/canvas"
 import { randomInt } from "../utils/random"
 import { interpolate } from "../utils/number"
 
@@ -110,7 +110,7 @@ const drawSegment = (
   ctx.textBaseline = "middle"
   ctx.fillStyle = isActive ? WHEEL_COLORS.white : WHEEL_COLORS.muted
 
-  ctx.font = "1px sans-serif"
+  ctx.font = canvasFont("1px")
   const textSize = ctx.measureText(text)
   const textHeight =
     textSize.actualBoundingBoxAscent + textSize.actualBoundingBoxDescent
@@ -118,7 +118,7 @@ const drawSegment = (
   const fontSize = Math.floor(
     (radius - textInnerMargin - textOuterMargin) / textWidth,
   )
-  ctx.font = `${fontSize}px sans-serif`
+  ctx.font = canvasFont(`${fontSize}px`)
 
   ctx.fillText(text, radius - textOuterMargin, 0)
 
