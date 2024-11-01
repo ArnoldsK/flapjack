@@ -15,7 +15,7 @@ enum OptionName {
   Url = "url",
 }
 
-export default class MagikCommand extends BaseCommand {
+export class MagikCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()

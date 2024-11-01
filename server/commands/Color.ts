@@ -18,8 +18,8 @@ enum OptionName {
   Hex = "hex",
 }
 
-export default class ColorCommand extends BaseCommand {
-  static version = 1
+export class ColorCommand extends BaseCommand {
+  static version = 2
 
   static command = new SlashCommandBuilder()
     .setName("color")
@@ -27,7 +27,7 @@ export default class ColorCommand extends BaseCommand {
     .addSubcommand((subcommand) =>
       subcommand
         .setName(SubcommandName.Auto)
-        .setDescription("Find the best color based on your avatar"),
+        .setDescription("Sets the color to the average color of your avatar"),
     )
     .addSubcommand((subcommand) =>
       subcommand

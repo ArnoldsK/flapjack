@@ -31,7 +31,7 @@ enum DurationType {
   Days = "days",
 }
 
-export default class MuteCommand extends BaseCommand {
+export class MuteCommand extends BaseCommand {
   static version = 3
 
   static command = new SlashCommandBuilder()

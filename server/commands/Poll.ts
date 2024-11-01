@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 
-export default class PollCommand extends BaseCommand {
+export class PollCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()

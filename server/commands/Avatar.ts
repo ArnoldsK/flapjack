@@ -6,7 +6,7 @@ enum OptionName {
   Spying = "spy",
 }
 
-export default class AvatarCommand extends BaseCommand {
+export class AvatarCommand extends BaseCommand {
   static version = 3
 
   static command = new SlashCommandBuilder()

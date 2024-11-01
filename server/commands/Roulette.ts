@@ -15,7 +15,7 @@ enum OptionName {
 type ColorKey = keyof typeof Color
 const colors: Array<ColorKey> = ["red", "black", "green"]
 
-export default class RouletteCommand extends BaseCommand {
+export class RouletteCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()

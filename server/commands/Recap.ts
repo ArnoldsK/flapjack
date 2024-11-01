@@ -3,7 +3,7 @@ import { BaseCommand } from "../base/Command"
 
 const RECAP_YEAR = 2023
 
-export default class RecapCommand extends BaseCommand {
+export class RecapCommand extends BaseCommand {
   static version = RECAP_YEAR
 
   static command = new SlashCommandBuilder()

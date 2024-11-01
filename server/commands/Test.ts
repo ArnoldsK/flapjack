@@ -1,9 +1,9 @@
 import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { permission, PermissionFlags } from "../utils/permission"
-import { mcStatus } from "../tasks/mcStatus"
+import { mcStatus } from "../cron/tasks/mcStatus"
 
-export default class TestCommand extends BaseCommand {
+export class TestCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()

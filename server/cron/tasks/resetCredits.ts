@@ -1,7 +1,7 @@
-import { discordIds } from "../config"
-import { Task } from "../types/tasks"
-import CreditsEntity from "../entity/Credits"
-import { Color } from "../constants"
+import { discordIds } from "../../config"
+import { Task } from "../../types/tasks"
+import CreditsEntity from "../../entity/Credits"
+import { Color } from "../../constants"
 
 export const resetCredits: Task = async (context) => {
   await CreditsEntity.createQueryBuilder().delete().execute()

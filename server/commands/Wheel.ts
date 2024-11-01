@@ -7,7 +7,7 @@ enum OptionName {
   Message = "message",
 }
 
-export default class WheelCommand extends BaseCommand {
+export class WheelCommand extends BaseCommand {
   static version = 3
 
   static command = new SlashCommandBuilder()

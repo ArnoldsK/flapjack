@@ -1,3 +1,4 @@
+import { DEFAULT_SETTINGS } from "./constants/setting"
 import { AppCache, CacheKey } from "./types/cache"
 
 export class CacheObjectManager<T> {
@@ -35,6 +36,7 @@ export default class CacheManager {
     [CacheKey.NsfwPosts]: [],
     [CacheKey.Blackjack]: new CacheObjectManager(),
     [CacheKey.McStatus]: null,
+    [CacheKey.Setting]: null,
   }
 
   constructor() {}

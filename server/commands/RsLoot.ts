@@ -4,7 +4,7 @@ import { appConfig } from "../config"
 import { joinAsLines } from "../utils/string"
 import { isTextChannel } from "../utils/channel"
 
-export default class RsLootCommand extends BaseCommand {
+export class RsLootCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()

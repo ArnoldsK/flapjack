@@ -7,7 +7,7 @@ enum OptionName {
   Message = "message",
 }
 
-export default class MockCommand extends BaseCommand {
+export class MockCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()

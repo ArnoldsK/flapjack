@@ -32,7 +32,7 @@ enum OptionName {
   Amount = "amount",
 }
 
-export default class SlotsCommand extends BaseCommand {
+export class SlotsCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()

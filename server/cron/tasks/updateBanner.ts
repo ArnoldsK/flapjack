@@ -1,13 +1,14 @@
 import { GuildPremiumTier } from "discord.js"
-import { appConfig } from "../config"
-import { Task } from "../types/tasks"
+import { appConfig } from "../../config"
+import { Task } from "../../types/tasks"
+import { requireSetting } from "../../utils/setting"
 
 export const updateBanner: Task = async (context) => {
+  if (!(await requireSetting(context, "tasks.updateBanners.enabled", true)))
+    return
+
   const apiKey = appConfig.giphy.apiKey
   if (!apiKey) return
-
-// TODO: add dynamic config command
-if (1+1) return;
 
   const guild = context.guild()
   if (guild.premiumTier !== GuildPremiumTier.Tier3) return

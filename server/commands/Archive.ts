@@ -5,7 +5,7 @@ import { Color } from "../constants"
 import { discordIds } from "../config"
 import { isTextChannel } from "../utils/channel"
 
-export default class ArchiveCommand extends BaseCommand {
+export class ArchiveCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()

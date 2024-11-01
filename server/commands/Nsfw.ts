@@ -4,7 +4,7 @@ import { CacheKey } from "../types/cache"
 import { RedgifsModel } from "../models/Redgifs"
 import { RedGifsGif } from "../types/redgifs"
 
-export default class NsfwCommand extends BaseCommand {
+export class NsfwCommand extends BaseCommand {
   static version = 2
 
   static command = new SlashCommandBuilder()
