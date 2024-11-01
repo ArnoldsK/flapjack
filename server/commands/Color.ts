@@ -92,7 +92,7 @@ export class ColorCommand extends BaseCommand {
 
     const colors = await getColors(avatarUrl, {
       type: "image/png",
-      count: 8,
+      count: 6,
     })
 
     const hexColors = colors
@@ -105,7 +105,7 @@ export class ColorCommand extends BaseCommand {
       }))
       .filter((el) => {
         // Assumed value that is visible enough
-        return el.visibilityDelta > 20
+        return el.visibilityDelta > 18
       })
       .sort((a, b) => b.visibilityDelta - a.visibilityDelta)
       .slice(0, 4)

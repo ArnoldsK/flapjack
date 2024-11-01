@@ -80,8 +80,7 @@ nextApp.prepare().then(async () => {
       try {
         await command?.execute(interaction)
       } catch (err) {
-        // console.error("> Command error >", interaction.commandName, err)
-        interaction.reply({
+        interaction[interaction.deferred ? "editReply" : "reply"]({
           content: (err as Error).message,
           ephemeral: true,
         })

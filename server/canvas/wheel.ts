@@ -115,9 +115,9 @@ const drawSegment = (
   const textHeight =
     textSize.actualBoundingBoxAscent + textSize.actualBoundingBoxDescent
   const textWidth = Math.max(textSize.width, textHeight)
-  const fontSize = Math.floor(
-    (radius - textInnerMargin - textOuterMargin) / textWidth,
-  )
+  const fontSize = textWidth
+    ? Math.floor((radius - textInnerMargin - textOuterMargin) / textWidth)
+    : 0
   ctx.font = canvasFont(`${fontSize}px`)
 
   ctx.fillText(text, radius - textOuterMargin, 0)

@@ -27,7 +27,10 @@ export class WheelCommand extends BaseCommand {
 
   async execute() {
     const input = this.interaction.options.getString(OptionName.Choices, true)
-    const choices = input.split("/").map((el) => el.trim())
+    const choices = input
+      .split("/")
+      .map((el) => el.trim())
+      .filter(Boolean)
     if (choices.length < 2) {
       this.fail('At least two choices are required. Separate them with "/".')
       return
