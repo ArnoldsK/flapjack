@@ -46,7 +46,7 @@ export const getUserColorPreviewImage = async ({
     ctx.fillStyle = hexColor
     ctx.textAlign = "left"
     ctx.textBaseline = "middle"
-    ctx.font = "16px Helvetica, Arial, sans-serif"
+    ctx.font = "16px sans-serif"
     ctx.fillText(
       `${displayName} #${i + 1}`,
       sectionPadding + sectionAvatarSize + 14,
