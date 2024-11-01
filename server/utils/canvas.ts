@@ -1,7 +1,7 @@
-import type { CanvasRenderingContext2D } from "canvas"
+import type { SKRSContext2D } from "@napi-rs/canvas"
 
 export const clipEllipse = (
-  ctx: CanvasRenderingContext2D,
+  ctx: SKRSContext2D,
   x: number,
   y: number,
   w: number,
@@ -15,6 +15,6 @@ export const clipEllipse = (
   ctx.restore()
 }
 
-export const deg2rad = (deg: number): number => deg * Math.PI / 180
+export const deg2rad = (deg: number): number => (deg * Math.PI) / 180
 
-export const rad2deg = (rad: number): number => rad * 180 / Math.PI
+export const rad2deg = (rad: number): number => (rad * 180) / Math.PI

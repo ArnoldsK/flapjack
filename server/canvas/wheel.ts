@@ -1,5 +1,5 @@
 import GIFEncoder from "gif-encoder-2"
-import { createCanvas, type CanvasRenderingContext2D } from "canvas"
+import { createCanvas, SKRSContext2D } from "@napi-rs/canvas"
 import { deg2rad } from "../utils/canvas"
 import { randomInt } from "../utils/random"
 import { interpolate } from "../utils/number"
@@ -49,7 +49,7 @@ export const getWheelImage = async (items: string[]): Promise<Buffer> => {
 }
 
 const drawSegment = (
-  ctx: CanvasRenderingContext2D,
+  ctx: SKRSContext2D,
   {
     radius,
     sliceRad,
@@ -125,7 +125,7 @@ const drawSegment = (
   ctx.restore()
 }
 
-const drawArrow = (ctx: CanvasRenderingContext2D) => {
+const drawArrow = (ctx: SKRSContext2D) => {
   ctx.save()
 
   const arrowSize = WHEEL_SIZE * 0.07
@@ -145,7 +145,7 @@ const drawArrow = (ctx: CanvasRenderingContext2D) => {
 }
 
 const drawWheel = (
-  ctx: CanvasRenderingContext2D,
+  ctx: SKRSContext2D,
   {
     items,
     radSpinOffset,

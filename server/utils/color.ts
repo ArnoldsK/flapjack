@@ -1,6 +1,5 @@
-import { createCanvas, loadImage } from "canvas"
+import { createCanvas, loadImage } from "@napi-rs/canvas"
 import { HexColorString } from "discord.js"
-import { getColorFromURL } from "color-thief-node"
 
 export interface ColorData {
   R: number
@@ -56,17 +55,7 @@ export const isColorBright = (R: number, G: number, B: number): boolean => {
 export const getImageBestColorData = async (
   imageUrl: string,
 ): Promise<ColorData> => {
-  const { R: R1, G: G1, B: B1 } = await getImageAverageColorData(imageUrl)
-  const { R: R2, G: G2, B: B2 } = await getImageDominantColorData(imageUrl)
-  const getBrightestColor = () => {
-    const a = [R1, G1, B1]
-    const b = [R2, G2, B2]
-    const sumA = R1 + G1 + B1
-    const sumB = R2 + G2 + B2
-
-    return sumA > sumB ? a : b
-  }
-  const [R, G, B] = getBrightestColor()
+  const { R, G, B } = await getImageAverageColorData(imageUrl)
 
   return {
     R,
@@ -117,21 +106,6 @@ export const getImageAverageColorData = async (
     Math.floor(colorSum.G / colorCount),
     Math.floor(colorSum.B / colorCount),
   ]
-
-  return {
-    R,
-    G,
-    B,
-    color: rgbToHex(R, G, B, false) as number,
-    colorHex: rgbToHex(R, G, B) as `#${string}`,
-    isBright: isColorBright(R, G, B),
-  }
-}
-
-export const getImageDominantColorData = async (
-  imageUrl: string,
-): Promise<ColorData> => {
-  const [R, G, B] = await getColorFromURL(imageUrl)
 
   return {
     R,

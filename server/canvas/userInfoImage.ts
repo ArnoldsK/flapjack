@@ -1,15 +1,9 @@
-import { createCanvas, loadImage } from "canvas"
+import { createCanvas, loadImage } from "@napi-rs/canvas"
 import type { GuildMember } from "discord.js"
 
-import {
-  getImageAverageColorData,
-  getImageDominantColorData,
-} from "../utils/color"
+import { getImageAverageColorData } from "../utils/color"
 import { clipEllipse } from "../utils/canvas"
-import { randomInt } from "../utils/random"
 import { getMemberInfo } from "../utils/member"
-
-const trianglify = require("trianglify")
 
 export const getUserInfoImage = async (
   member: GuildMember,
@@ -23,7 +17,6 @@ export const getUserInfoImage = async (
     size: 64,
   })
   const averageColorData = await getImageAverageColorData(avatarImageUrl)
-  const dominantColorData = await getImageDominantColorData(avatarImageUrl)
   const isAvatarColorBright = averageColorData.isBright
 
   // Colors
@@ -36,18 +29,6 @@ export const getUserInfoImage = async (
   // Canvas
   const canvas = createCanvas(width, height)
   const ctx = canvas.getContext("2d")
-
-  // Background
-  trianglify({
-    width,
-    height,
-    xColors: [averageColorData.colorHex, dominantColorData.colorHex],
-    cellSize: randomInt(height / 3, height / 2),
-    variance: 1,
-    colorFunction: isAvatarColorBright
-      ? trianglify.colorFunctions.shadows(0.5)
-      : trianglify.colorFunctions.sparkle(1),
-  }).toCanvas(canvas)
 
   // Avatar
   const avatarImage = await loadImage(avatarImageUrl)
@@ -108,5 +89,5 @@ export const getUserInfoImage = async (
   ctx.font = "13px sans-serif"
   ctx.fillText(info.joinedAgo, agoX, agoY + 14)
 
-  return canvas.toBuffer()
+  return canvas.toBuffer("image/png")
 }
