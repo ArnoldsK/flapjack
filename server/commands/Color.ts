@@ -1,4 +1,12 @@
-import { SlashCommandBuilder } from "discord.js"
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  SlashCommandBuilder,
+} from "discord.js"
+import getColors from "get-image-colors"
+import deltaE from "delta-e"
+
 import { BaseCommand } from "../base/Command"
 import { checkUnreachable } from "../utils/error"
 import {
@@ -6,10 +14,16 @@ import {
   purgeRole,
   setMemberColorRole,
 } from "../utils/role"
-import { getImageBestColorData, parseHexColor } from "../utils/color"
+import {
+  labArrayToObject,
+  parseHexColor,
+  setColorInteractionId,
+} from "../utils/color"
+import { getUserColorPreviewImage } from "../canvas/userAutoColorPreview"
+import { DISCORD_BACKGROUND_COLOR_LAB } from "../constants"
 
 enum SubcommandName {
-  Auto = "auto",
+  Suggest = "suggest",
   Custom = "custom",
   None = "none",
 }
@@ -19,15 +33,15 @@ enum OptionName {
 }
 
 export class ColorCommand extends BaseCommand {
-  static version = 2
+  static version = 3
 
   static command = new SlashCommandBuilder()
     .setName("color")
     .setDescription("Change your display color")
     .addSubcommand((subcommand) =>
       subcommand
-        .setName(SubcommandName.Auto)
-        .setDescription("Sets the color to the average color of your avatar"),
+        .setName(SubcommandName.Suggest)
+        .setDescription("Suggest colors based on your avatar"),
     )
     .addSubcommand((subcommand) =>
       subcommand
@@ -52,8 +66,8 @@ export class ColorCommand extends BaseCommand {
     const subcommand = this.getSubcommand<SubcommandName>()
 
     switch (subcommand) {
-      case SubcommandName.Auto:
-        await this.#handleAuto()
+      case SubcommandName.Suggest:
+        await this.#handleSuggest()
         return
 
       case SubcommandName.Custom:
@@ -69,20 +83,59 @@ export class ColorCommand extends BaseCommand {
     }
   }
 
-  async #handleAuto() {
-    const avatarUrl = this.user.displayAvatarURL({
+  async #handleSuggest() {
+    const avatarUrl = this.member.displayAvatarURL({
       forceStatic: true,
       extension: "png",
       size: 64,
     })
 
-    const { colorHex } = await getImageBestColorData(avatarUrl)
+    const colors = await getColors(avatarUrl, {
+      type: "image/png",
+      count: 8,
+    })
 
-    await setMemberColorRole(this.member, colorHex)
+    const hexColors = colors
+      .map((color) => ({
+        hex: color.hex(),
+        visibilityDelta: deltaE.getDeltaE94(
+          labArrayToObject(color.lab()),
+          labArrayToObject(DISCORD_BACKGROUND_COLOR_LAB),
+        ),
+      }))
+      .filter((el) => {
+        // Assumed value that is visible enough
+        return el.visibilityDelta > 20
+      })
+      .sort((a, b) => b.visibilityDelta - a.visibilityDelta)
+      .slice(0, 4)
+      .map((el) => el.hex)
+
+    if (!hexColors.length) {
+      this.fail("Not enough colors with a good name visibility")
+      return
+    }
+
+    const previewImage = await getUserColorPreviewImage({
+      avatarUrl,
+      hexColors,
+      displayName: this.member.displayName,
+    })
+
+    const row = new ActionRowBuilder<ButtonBuilder>()
+    row.addComponents(
+      hexColors.map((hexColor, i) =>
+        new ButtonBuilder()
+          .setCustomId(setColorInteractionId.encode(hexColor))
+          .setLabel(`#${i + 1}`)
+          .setStyle(ButtonStyle.Primary),
+      ),
+    )
 
     this.reply({
       ephemeral: true,
-      content: `Changed your color to ${colorHex}`,
+      files: [previewImage],
+      components: [row],
     })
   }
 

@@ -18,6 +18,11 @@ export enum Color {
   purple = 0x771177,
 }
 
+export const DISCORD_BACKGROUND_COLOR_HEX = "#313338"
+export const DISCORD_BACKGROUND_COLOR_LAB: [number, number, number] = [
+  21.23, 0.37, -3.45,
+]
+
 export const COLOR_ROLE_PREFIX = "Color-"
 
 export const MIN_CREDITS_PER_MESSAGE = 10

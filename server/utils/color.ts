@@ -52,21 +52,9 @@ export const isColorBright = (R: number, G: number, B: number): boolean => {
   return R + G + B > 255 * 1.5
 }
 
-export const getImageBestColorData = async (
-  imageUrl: string,
-): Promise<ColorData> => {
-  const { R, G, B } = await getImageAverageColorData(imageUrl)
-
-  return {
-    R,
-    G,
-    B,
-    color: rgbToHex(R, G, B, false) as number,
-    colorHex: rgbToHex(R, G, B) as `#${string}`,
-    isBright: isColorBright(R, G, B),
-  }
-}
-
+/**
+ * @deprecated use `get-image-colors`
+ */
 export const getImageAverageColorData = async (
   imageUrl: string,
 ): Promise<ColorData> => {
@@ -114,5 +102,31 @@ export const getImageAverageColorData = async (
     color: rgbToHex(R, G, B, false) as number,
     colorHex: rgbToHex(R, G, B) as `#${string}`,
     isBright: isColorBright(R, G, B),
+  }
+}
+
+export const setColorInteractionId = {
+  encode: (hex: string) => {
+    hex = parseHexColor(hex)!
+    return `set-color-${hex}`
+  },
+  decode: (customId: string) => {
+    return customId.startsWith("set-color-")
+      ? parseHexColor(customId.replace("set-color-", ""))
+      : null
+  },
+}
+
+export const labArrayToObject = (
+  lab: [number, number, number],
+): {
+  L: number
+  A: number
+  B: number
+} => {
+  return {
+    L: lab[0],
+    A: lab[1],
+    B: lab[2],
   }
 }
