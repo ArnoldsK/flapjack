@@ -13,7 +13,7 @@ export class NsfwCommand extends BaseCommand {
     .setNSFW(true)
 
   async execute() {
-    // Wait for the posts to be fetched
+    // ! Defer
     await this.interaction.deferReply()
 
     // Get the next post

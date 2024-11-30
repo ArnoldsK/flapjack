@@ -38,7 +38,7 @@ export class WheelCommand extends BaseCommand {
 
     const message = this.interaction.options.getString(OptionName.Message)
 
-    // Image generation might take a while, request wait time...
+    // ! Defer
     await this.interaction.deferReply()
 
     const image = await getWheelImage(choices)

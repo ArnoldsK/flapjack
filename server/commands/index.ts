@@ -23,6 +23,7 @@ import { MuteCommand } from "./Mute"
 import { RemindCommand } from "./Remind"
 import { PollCommand } from "./Poll"
 import { SettingCommand } from "./Setting"
+import { RsLeagueCommand } from "./RsLeague"
 
 export const commands: Array<typeof BaseCommand> = [
   ...(appConfig.dev ? [TestCommand] : []),
@@ -42,6 +43,7 @@ export const commands: Array<typeof BaseCommand> = [
   SlotsCommand,
   BlackjackCommand,
   RsLootCommand,
+  RsLeagueCommand,
   WheelCommand,
   MuteCommand,
   RemindCommand,

@@ -23,7 +23,7 @@ export class ArchiveCommand extends BaseCommand {
       return
     }
 
-    // For some reason must defer the reply
+    // ! Defer
     await this.interaction.deferReply()
 
     await this.channel.setParent(discordIds.categories.archive, {
