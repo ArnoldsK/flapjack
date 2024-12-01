@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 
-const RECAP_YEAR = 2023
+const RECAP_YEAR = 2024
 
 export class RecapCommand extends BaseCommand {
   static version = RECAP_YEAR
