@@ -167,7 +167,13 @@ export class BoosterIconCommand extends BaseCommand {
         icon: value.url,
       })
 
-      await this.member.roles.add(role)
+      if (this.member.roles.cache.has(role.id)) {
+        await role.edit({
+          icon: value.url,
+        })
+      } else {
+        await this.member.roles.add(role)
+      }
 
       this.success()
     } catch {
