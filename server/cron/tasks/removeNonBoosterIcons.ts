@@ -9,7 +9,7 @@ export const removeNonBoosterIcons: Task = async (context) => {
     .members.cache.filter(
       (member) =>
         !member.user.bot &&
-        member.roles.cache.has(discordIds.roles.nitroBooster),
+        !member.roles.cache.has(discordIds.roles.nitroBooster),
     )
 
   const rolesToRemove: Role[] = []
