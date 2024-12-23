@@ -5,7 +5,7 @@ import {
   Role,
   RoleCreateOptions,
 } from "discord.js"
-import { COLOR_ROLE_PREFIX } from "../constants"
+import { BOOSTER_ICON_ROLE_PREFIX, COLOR_ROLE_PREFIX } from "../constants"
 
 export const getClientRole = (guild: Guild): Role => {
   return guild.members.me!.roles.cache.find((role) => role.managed)!
@@ -30,6 +30,16 @@ export const getOrCreateRole = async (
 
 export const getMemberColorRole = (member: GuildMember): Role | undefined =>
   member.roles.cache.find(({ name }) => name.startsWith(COLOR_ROLE_PREFIX))
+
+export const getMemberBoosterIconRole = (
+  member: GuildMember,
+): Role | undefined =>
+  member.roles.cache.find(({ name }) =>
+    name.startsWith(BOOSTER_ICON_ROLE_PREFIX),
+  )
+
+export const getMemberBoosterIconRoleName = (member: GuildMember): string =>
+  `${BOOSTER_ICON_ROLE_PREFIX}${member.id.substring(0, 4)}`
 
 /**
  * Delete the role if it has no members

@@ -36,3 +36,5 @@ export const CREDITS_BANK_HOURLY_RATE = {
 }
 
 export const UPPER_CLASS_MESSAGE_CREDITS = 500_000
+
+export const BOOSTER_ICON_ROLE_PREFIX = "Icon-"

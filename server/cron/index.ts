@@ -2,6 +2,7 @@ import { CronTask } from "../utils/cron"
 import { endReminders } from "./tasks/endReminders"
 import { handleCreditsLotteries } from "./tasks/handleCreditsLotteries"
 import { mcStatus } from "./tasks/mcStatus"
+import { removeNonBoosterIcons } from "./tasks/removeNonBoosterIcons"
 import { resetCredits } from "./tasks/resetCredits"
 import { updateBanner } from "./tasks/updateBanner"
 
@@ -41,5 +42,12 @@ export const cronTasks: CronTask[] = [
     isRawExpression: false,
     productionOnly: true,
     task: updateBanner,
+  },
+  {
+    description: "Remove non-booster icons",
+    expression: "every 10 minutes",
+    isRawExpression: false,
+    productionOnly: true,
+    task: removeNonBoosterIcons,
   },
 ]
