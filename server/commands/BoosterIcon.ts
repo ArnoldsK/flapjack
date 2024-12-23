@@ -140,7 +140,11 @@ export class BoosterIconCommand extends BaseCommand {
         ...emojiOption,
       })
 
-      await this.member.roles.add(role)
+      if (this.member.roles.cache.has(role.id)) {
+        await role.edit(emojiOption)
+      } else {
+        await this.member.roles.add(role)
+      }
 
       this.success()
     } catch {
