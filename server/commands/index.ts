@@ -40,7 +40,7 @@ export const commands: Array<typeof BaseCommand> = [
   UserInfoCommand,
   CreditsCommand,
   RouletteCommand,
-  NsfwCommand,
+  // NsfwCommand,
   SlotsCommand,
   BlackjackCommand,
   RsLootCommand,
