@@ -62,7 +62,7 @@ export class RedgifsModel {
   }
 
   async getGifs() {
-    const url = this.#url("/v2/feeds/home")
+    const url = this.#url("/v2/feeds/trending/popular")
     url.searchParams.set("page", "1")
     url.searchParams.set("count", "50")
 
