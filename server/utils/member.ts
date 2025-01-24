@@ -10,9 +10,8 @@ export const getMemberByJoinPosition = async (
     return null
   }
 
-  const members = await guild.members.fetch()
   const sortedMembers = collectionToArray(
-    members.sort((a, b) => a.joinedTimestamp! - b.joinedTimestamp!),
+    guild.members.cache.sort((a, b) => a.joinedTimestamp! - b.joinedTimestamp!),
   )
 
   if (position > sortedMembers.length) {

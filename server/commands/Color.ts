@@ -4,8 +4,8 @@ import {
   ButtonStyle,
   SlashCommandBuilder,
 } from "discord.js"
-import getColors from "get-image-colors"
 import deltaE from "delta-e"
+import colorPalette from "get-image-colors"
 
 import { BaseCommand } from "../base/Command"
 import { checkUnreachable } from "../utils/error"
@@ -90,7 +90,7 @@ export class ColorCommand extends BaseCommand {
       size: 64,
     })
 
-    const colors = await getColors(avatarUrl, {
+    const colors = await colorPalette(avatarUrl, {
       type: "image/png",
       count: 6,
     })

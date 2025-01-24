@@ -1,9 +1,10 @@
 import { createCanvas, loadImage } from "@napi-rs/canvas"
 import type { GuildMember } from "discord.js"
 
-import { getImageAverageColorData } from "../utils/color"
+import { getBackgroundTextColor } from "../utils/color"
 import { canvasFont, clipEllipse } from "../utils/canvas"
 import { getMemberInfo } from "../utils/member"
+import colorPalette from "get-image-colors"
 
 export const getUserInfoImage = async (
   member: GuildMember,
@@ -16,19 +17,26 @@ export const getUserInfoImage = async (
     extension: "png",
     size: 64,
   })
-  const averageColorData = await getImageAverageColorData(avatarImageUrl)
-  const isAvatarColorBright = averageColorData.isBright
 
   // Colors
-  const primaryColor = isAvatarColorBright ? "#000" : "#fff"
+  const colorData = await colorPalette(avatarImageUrl, {
+    type: "image/png",
+    count: 1,
+  })
+  const backgroundColor = colorData[0].hex("rgb")
+  const textColor = getBackgroundTextColor(backgroundColor)
 
   // Sizes
-  const [width, height] = [300, 120]
+  const [width, height] = [300, 115]
   const margin = 8
 
   // Canvas
   const canvas = createCanvas(width, height)
   const ctx = canvas.getContext("2d")
+
+  // Background
+  ctx.fillStyle = backgroundColor
+  ctx.fillRect(0, 0, width, height)
 
   // Avatar
   const avatarImage = await loadImage(avatarImageUrl)
@@ -42,7 +50,7 @@ export const getUserInfoImage = async (
 
   // Position
   ctx.font = canvasFont("bold 26px")
-  ctx.fillStyle = primaryColor
+  ctx.fillStyle = textColor
   ctx.textBaseline = "top"
   ctx.textAlign = "center"
   ctx.fillText(
@@ -57,7 +65,7 @@ export const getUserInfoImage = async (
   const createdY = margin
 
   ctx.font = canvasFont("bold 11px")
-  ctx.fillStyle = primaryColor
+  ctx.fillStyle = textColor
   ctx.textBaseline = "top"
   ctx.textAlign = "left"
   ctx.fillText(`On Discord since`, createdX, createdY)
@@ -70,7 +78,7 @@ export const getUserInfoImage = async (
   const joinedY = createdY + 27 + margin
 
   ctx.font = canvasFont("bold 11px")
-  ctx.fillStyle = primaryColor
+  ctx.fillStyle = textColor
   ctx.textBaseline = "top"
   ctx.textAlign = "left"
   ctx.fillText(`On ${member.guild.name} since`, joinedX, joinedY)
@@ -82,7 +90,7 @@ export const getUserInfoImage = async (
   const agoY = joinedY + 27 + margin
 
   ctx.font = canvasFont("bold 11px")
-  ctx.fillStyle = primaryColor
+  ctx.fillStyle = textColor
   ctx.textBaseline = "top"
   ctx.textAlign = "left"
   ctx.fillText(`Joined`, agoX, agoY)
