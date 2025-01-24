@@ -3,7 +3,7 @@ import { GuildMember } from "discord.js"
 import colorPalette from "get-image-colors"
 
 import { getBackgroundTextColor } from "../utils/color"
-import { clipEllipse } from "../utils/canvas"
+import { canvasFont, clipEllipse } from "../utils/canvas"
 import chroma from "chroma-js"
 import { Unicode } from "../constants"
 import { interpolate } from "../utils/number"
@@ -54,7 +54,7 @@ export const getRankImage = async (
   })
 
   // Rank and level
-  ctx.font = "16px sans-serif"
+  ctx.font = canvasFont("16px")
   ctx.fillStyle = textColor
   ctx.textBaseline = "bottom"
   ctx.fillText(
@@ -68,7 +68,7 @@ export const getRankImage = async (
   const percentTextY = height / 2 + margin / 2
   const percentText = `${rankData.levelData.percent}%`
 
-  ctx.font = "bold 16px sans-serif"
+  ctx.font = canvasFont("bold 16px")
   ctx.fillStyle = textColor
   ctx.textBaseline = "top"
   ctx.fillText(percentText, percentTextX, percentTextY)
