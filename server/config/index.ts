@@ -31,6 +31,7 @@ export const appConfig = {
       roles: {
         nitroBooster: "611953929835643024",
         upperClass: "1159244242074468503",
+        activeMember: "669608043713003521",
       },
       users: {
         owner: "221755442513051649",
@@ -41,6 +42,7 @@ export const appConfig = {
       },
       channels: {
         general: "411593264211296258",
+        bepsi: "414516218767081474",
         casino: "621834853696143360",
         nsfw: "632985833414066176",
         logs: "546830997983854592",

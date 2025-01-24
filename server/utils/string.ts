@@ -1,3 +1,5 @@
+import { Unicode } from "../constants"
+
 export const joinAsLines = (...values: string[]) => values.join("\n")
 
 export const ucFirst = (value: string): string => {
@@ -28,4 +30,22 @@ export const asPlural = (
   word = plural(number, word)
 
   return format.replace("$1", number.toString()).replace("$2", word)
+}
+
+export const makeEqualLengths = (
+  values: string[],
+  type: "before" | "after" = "after",
+  voidValue = Unicode.enSpace,
+): string[] => {
+  const longestValue = values.reduce(
+    (a, b) => (a.length > b.length ? a : b),
+    "",
+  )
+
+  return values.map((value) => {
+    const voidCount = longestValue.length - value.length
+    const voidText = voidValue.repeat(voidCount >= 0 ? voidCount : 0)
+
+    return type === "before" ? `${voidText}${value}` : `${value}${voidText}`
+  })
 }

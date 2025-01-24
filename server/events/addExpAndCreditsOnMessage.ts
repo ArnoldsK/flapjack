@@ -2,11 +2,19 @@ import { Events } from "discord.js"
 import { createEvent } from "../utils/event"
 import { ExperienceModel } from "../models/Experience"
 import { CreditsModel } from "../models/Credits"
-import { MIN_CREDITS_PER_MESSAGE } from "../constants"
+import {
+  EXP_PER_MESSAGE,
+  MIN_CREDITS_PER_MESSAGE,
+  RANK_ACTIVE_ROLE_LEVEL,
+} from "../constants"
+import { discordIds } from "../config"
+import { getExperienceLevelData } from "../utils/experience"
+import { isTextChannel } from "../utils/channel"
+import { embedAuthor } from "../utils/member"
 
 export default createEvent(
   Events.MessageCreate,
-  { productionOnly: false },
+  { productionOnly: true },
   async (_context, message) => {
     if (message.author.bot) return
     if (!message.member) return
@@ -15,7 +23,45 @@ export default createEvent(
     // Experience
     // #############################################################################
     const expModel = new ExperienceModel(message.member)
+    const exp = await expModel.getExp()
+
+    // Add exp
     await expModel.addExp()
+
+    // Parse exp change
+    const { lvl } = getExperienceLevelData(exp)
+    const { lvl: lvlNew } = getExperienceLevelData(exp + EXP_PER_MESSAGE)
+
+    // Active role
+    const activeRole = message.guild?.roles.cache.get(
+      discordIds.roles.activeMember,
+    )
+
+    if (lvlNew >= RANK_ACTIVE_ROLE_LEVEL && activeRole) {
+      if (!message.member.roles.cache.get(activeRole.id)) {
+        message.member.roles.add(activeRole)
+      }
+    }
+
+    // Level-up
+    if (lvlNew > lvl && lvlNew >= RANK_ACTIVE_ROLE_LEVEL) {
+      const channel = message.guild?.channels.cache.get(
+        discordIds.channels.bepsi,
+      )
+
+      if (isTextChannel(channel)) {
+        channel.send({
+          embeds: [
+            {
+              author: embedAuthor(message.member),
+              title: "Level Up!",
+              description: `LVL ${lvlNew}`,
+              color: message.member.displayColor,
+            },
+          ],
+        })
+      }
+    }
 
     // #############################################################################
     // Credits

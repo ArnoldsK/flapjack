@@ -25,6 +25,7 @@ import { PollCommand } from "./Poll"
 import { SettingCommand } from "./Setting"
 import { RsLeagueCommand } from "./RsLeague"
 import { BoosterIconCommand } from "./BoosterIcon"
+import { RankCommand } from "./Rank"
 
 export const commands: Array<typeof BaseCommand> = [
   ...(appConfig.dev ? [TestCommand] : []),
@@ -51,4 +52,5 @@ export const commands: Array<typeof BaseCommand> = [
   PollCommand,
   SettingCommand,
   BoosterIconCommand,
+  RankCommand,
 ].filter(Boolean)

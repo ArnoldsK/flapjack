@@ -2,6 +2,7 @@
   "editor.formatOnSave": true,
   "typescript.preferences.importModuleSpecifier": "relative",
   "cSpell.words": [
+    "bepsi",
     "gamemode",
     "gifs",
     "giphy",

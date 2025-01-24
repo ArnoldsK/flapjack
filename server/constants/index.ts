@@ -4,6 +4,7 @@ export enum Unicode {
   middot = "·",
   zeroWidthSpace = "​",
   thinSpace = " ",
+  enSpace = " ",
   longDash = "—",
 }
 
@@ -38,3 +39,8 @@ export const CREDITS_BANK_HOURLY_RATE = {
 export const UPPER_CLASS_MESSAGE_CREDITS = 500_000
 
 export const BOOSTER_ICON_ROLE_PREFIX = "Icon-"
+
+export const RANK_ACTIVE_ROLE_LEVEL = 20
+export const RANK_MAX_LEVEL = 99
+
+export const EXP_PER_MESSAGE = 1
