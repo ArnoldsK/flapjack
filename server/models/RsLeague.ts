@@ -52,4 +52,8 @@ export class RsLeagueModel {
       userId: this.#member.id,
     })
   }
+
+  async removeByUserId(userId: string) {
+    await this.#repository.delete({ userId })
+  }
 }

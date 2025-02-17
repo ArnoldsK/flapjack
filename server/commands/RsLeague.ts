@@ -65,7 +65,6 @@ export class RsLeagueCommand extends BaseCommand {
 
     try {
       await model.setName(name)
-      // TODO reply with current rank entry sample
       this.success()
     } catch {
       this.fail()
@@ -94,7 +93,8 @@ export class RsLeagueCommand extends BaseCommand {
         players[i].rank = rank
         players[i].score = score
       } catch {
-        // Do nothing
+        // Remove on fail
+        await model.removeByUserId(player.member.id)
       }
     }
 
