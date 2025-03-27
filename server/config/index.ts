@@ -32,6 +32,7 @@ export const appConfig = {
         nitroBooster: "611953929835643024",
         upperClass: "1159244242074468503",
         activeMember: "669608043713003521",
+        poe: "1354946502589550673",
       },
       users: {
         owner: "221755442513051649",
@@ -53,8 +54,6 @@ export const appConfig = {
         numbersGame: "831055945022963742",
         minecraft: "584768527454568448",
         poe: "701811325042688070",
-        poe1News: "1354936456233222174",
-        poe2News: "1354936851881918556",
       },
     },
   },

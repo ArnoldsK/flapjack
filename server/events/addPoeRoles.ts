@@ -1,7 +1,6 @@
 import { Events } from "discord.js"
 import { createEvent } from "../utils/event"
 import { discordIds } from "../config"
-import { isTextChannel } from "../utils/channel"
 
 export default createEvent(
   Events.MessageCreate,
@@ -13,22 +12,13 @@ export default createEvent(
     const { member, guild } = message
     if (!member || !guild) return
 
-    const channels = [
-      guild.channels.cache.get(discordIds.channels.poe1News),
-      guild.channels.cache.get(discordIds.channels.poe2News),
-    ].filter(isTextChannel)
+    const role = guild.roles.cache.get(discordIds.roles.poe)
+    if (!role) return
 
     try {
-      // Add user read permission to poe1-news and poe2-news
-      await Promise.all(
-        channels.map(async (channel) => {
-          if (!channel.permissionOverwrites.cache.has(member.id)) {
-            await channel.permissionOverwrites.create(member, {
-              ViewChannel: true,
-            })
-          }
-        }),
-      )
+      if (!member.roles.cache.has(role.id)) {
+        await member.roles.add(role)
+      }
     } catch {
       // Do nothing
     }
