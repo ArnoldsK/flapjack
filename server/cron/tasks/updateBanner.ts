@@ -24,17 +24,10 @@ export const updateBanner: Task = async (context) => {
   const guild = context.guild()
   const canUseGif = guild.premiumTier === GuildPremiumTier.Tier3
 
-  if (!canUseGif || guild.banner?.startsWith("a_")) return
+  if (guild.premiumTier !== GuildPremiumTier.Tier3) return
 
   try {
-    let imageUrl: string | null
-    if (canUseGif) {
-      imageUrl = await getGiphyImageUrl(apiKey)
-    } else if (guild.banner?.startsWith("a_")) {
-      imageUrl = "https://arnoldsk.lv/share/admini.png"
-    } else {
-      imageUrl = null
-    }
+    const imageUrl = await getGiphyImageUrl(apiKey)
 
     if (imageUrl) {
       await guild.setBanner(imageUrl)
