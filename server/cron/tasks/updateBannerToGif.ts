@@ -14,7 +14,7 @@ const getGiphyImageUrl = async (apiKey: string) => {
   return json.data.images.original.url as string
 }
 
-export const updateBanner: Task = async (context) => {
+export const updateBannerToGif: Task = async (context) => {
   if (!(await requireSetting(context, "tasks.hourlyGifBanners.enabled", true)))
     return
 

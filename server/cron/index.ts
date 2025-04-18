@@ -4,7 +4,7 @@ import { handleCreditsLotteries } from "./tasks/handleCreditsLotteries"
 import { mcStatus } from "./tasks/mcStatus"
 import { removeNonBoosterIcons } from "./tasks/removeNonBoosterIcons"
 import { resetCredits } from "./tasks/resetCredits"
-import { updateBanner } from "./tasks/updateBanner"
+import { updateBannerToGif } from "./tasks/updateBannerToGif"
 
 export const cronTasks: CronTask[] = [
   {
@@ -37,11 +37,11 @@ export const cronTasks: CronTask[] = [
     task: endReminders,
   },
   {
-    description: "Update banner",
+    description: "Update banner to a gif",
     expression: "every hour",
     isRawExpression: false,
     productionOnly: true,
-    task: updateBanner,
+    task: updateBannerToGif,
   },
   {
     description: "Remove non-booster icons",
