@@ -15,15 +15,15 @@ const getGiphyImageUrl = async (apiKey: string) => {
 }
 
 export const updateBannerToGif: Task = async (context) => {
-  if (!(await requireSetting(context, "tasks.hourlyGifBanners.enabled", true)))
-    return
-
   const apiKey = appConfig.giphy.apiKey
   if (!apiKey) return
 
   const guild = context.guild()
 
   if (guild.premiumTier !== GuildPremiumTier.Tier3) return
+
+  if (!(await requireSetting(context, "tasks.hourlyGifBanners.enabled", true)))
+    return
 
   try {
     const imageUrl = await getGiphyImageUrl(apiKey)
