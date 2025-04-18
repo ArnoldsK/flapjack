@@ -22,7 +22,6 @@ export const updateBanner: Task = async (context) => {
   if (!apiKey) return
 
   const guild = context.guild()
-  const canUseGif = guild.premiumTier === GuildPremiumTier.Tier3
 
   if (guild.premiumTier !== GuildPremiumTier.Tier3) return
 
