@@ -7,10 +7,14 @@ export default createEvent(
   Events.GuildUpdate,
   { productionOnly: true },
   async (context, oldGuild, newGuild) => {
+    // Skip if tier 3
+    if (newGuild.premiumTier === GuildPremiumTier.Tier3) return
     // Skip if wasn't a premium tier drop
     if (
-      oldGuild.premiumTier !== GuildPremiumTier.Tier3 &&
-      newGuild.premiumTier !== GuildPremiumTier.Tier2
+      !(
+        oldGuild.premiumTier === GuildPremiumTier.Tier3 &&
+        newGuild.premiumTier === GuildPremiumTier.Tier2
+      )
     )
       return
 
