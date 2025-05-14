@@ -21,6 +21,7 @@ export const getOrCreateRole = async (
   if (!role) {
     role = await guild.roles.create({
       position: clientRole.position,
+      permissions: [],
       ...options,
     })
   }
