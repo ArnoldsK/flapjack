@@ -15,7 +15,7 @@ enum OptionName {
   Position = "position",
 }
 
-export class UserInfoCommand extends BaseCommand {
+export default class UserInfoCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()

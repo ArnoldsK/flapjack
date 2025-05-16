@@ -18,7 +18,7 @@ enum OptionName {
   Amount = "amount",
 }
 
-export class CreditsCommand extends BaseCommand {
+export default class CreditsCommand extends BaseCommand {
   static version = 3
 
   static command = new SlashCommandBuilder()

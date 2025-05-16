@@ -8,7 +8,7 @@ import {
   Routes,
 } from "discord.js"
 import { BaseCommand } from "../base/Command"
-import { commands } from "../commands"
+import { getCommands } from "../commands"
 import { Unicode } from "../constants"
 import { assert } from "./error"
 import { getPermissionFlagName, memberHasPermission } from "./permission"
@@ -55,7 +55,11 @@ const parseDescription = (Command: typeof BaseCommand): string => {
   return dedupe(elements).join(` ${Unicode.middot} `)
 }
 
-export const getSetupCommands = (context: BaseContext): SetupCommand[] => {
+export const getSetupCommands = async (
+  context: BaseContext,
+): Promise<SetupCommand[]> => {
+  const commands = await getCommands()
+
   return commands.map((Command) => {
     return {
       ...Command.command.toJSON(),

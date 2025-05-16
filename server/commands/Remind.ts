@@ -22,7 +22,7 @@ enum DurationType {
   Years = "years",
 }
 
-export class RemindCommand extends BaseCommand {
+export default class RemindCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()

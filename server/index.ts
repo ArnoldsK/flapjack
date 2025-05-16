@@ -17,6 +17,7 @@ import { getGroupedEvents } from "./utils/event"
 import { handleCron } from "./utils/cron"
 import { BaseContext } from "./types"
 import CacheManager from "./cache"
+import { handleCustomRoutes } from "./utils/routes"
 
 // Prepare next app
 const nextApp = next({ dev: appConfig.dev })
@@ -58,7 +59,7 @@ nextApp.prepare().then(async () => {
   // #############################################################################
   // Commands
   // #############################################################################
-  const commands = getSetupCommands(context)
+  const commands = await getSetupCommands(context)
 
   await handleApiCommands(commands)
 
@@ -68,9 +69,11 @@ nextApp.prepare().then(async () => {
   client.once(Events.ClientReady, async () => {
     console.log(`> Discord client ready as ${client.user?.tag}`)
 
-    // Pre-fetch data for cache
-    const guild = client.guilds.cache.get(appConfig.discord.ids.guild)!
-    await guild.members.fetch()
+    // Pre-fetch members on live builds
+    if (!appConfig.dev) {
+      const guild = client.guilds.cache.get(appConfig.discord.ids.guild)!
+      await guild.members.fetch()
+    }
   })
 
   client.on(Events.InteractionCreate, async (interaction) => {
@@ -123,6 +126,12 @@ nextApp.prepare().then(async () => {
   // #############################################################################
   const server = express()
   const httpServer = http.createServer(server)
+
+  server.use(express.json())
+  server.use(express.urlencoded({ extended: true }))
+  server.use(express.static("public"))
+
+  await handleCustomRoutes(context, server)
 
   server.all("*", (req, res) => handle(req, res))
 

@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { permission, PermissionFlags } from "../utils/permission"
 
-export class PingCommand extends BaseCommand {
+export default class PingCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()

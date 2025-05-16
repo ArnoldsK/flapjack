@@ -32,7 +32,7 @@ enum OptionName {
   Hex = "hex",
 }
 
-export class ColorCommand extends BaseCommand {
+export default class ColorCommand extends BaseCommand {
   static version = 3
 
   static command = new SlashCommandBuilder()

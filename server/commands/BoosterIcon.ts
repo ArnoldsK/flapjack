@@ -27,7 +27,7 @@ enum OptionName {
   Value = "value",
 }
 
-export class BoosterIconCommand extends BaseCommand {
+export default class BoosterIconCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()

@@ -16,7 +16,7 @@ enum OptionName {
   Name = "name",
 }
 
-export class RsLeagueCommand extends BaseCommand {
+export default class RsLeagueCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()

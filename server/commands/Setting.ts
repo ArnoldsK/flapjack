@@ -30,7 +30,7 @@ const SETTING_KEY_CHOICES = Object.entries({
   value: key,
 }))
 
-export class SettingCommand extends BaseCommand {
+export default class SettingCommand extends BaseCommand {
   static version = 2
 
   static command = new SlashCommandBuilder()
