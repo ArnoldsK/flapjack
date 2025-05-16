@@ -25,7 +25,7 @@ import { isCasinoChannel } from "../utils/channel"
 import { joinAsLines, ucFirst } from "../utils/string"
 import { isNonNullish } from "../utils/boolean"
 import assert from "assert"
-import { CacheKey } from "../types/cache"
+import { CacheKey } from "../types/enums"
 
 type Action = keyof typeof actions
 type HandSide = keyof HandInfo

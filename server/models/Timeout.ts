@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js"
 import { Repository } from "typeorm"
 import { db } from "../database"
-import TimeoutEntity from "../entity/Timeout"
+import { TimeoutEntity } from "../entity/Timeout"
 import { d } from "../utils/date"
 
 export class TimeoutModel {

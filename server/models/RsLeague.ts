@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js"
 import { Repository } from "typeorm"
 import { db } from "../database"
-import RsLeagueEntity from "../entity/RsLeague"
+import { RsLeagueEntity } from "../entity/RsLeague"
 import { d } from "../utils/date"
 
 export class RsLeagueModel {

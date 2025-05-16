@@ -1,8 +1,8 @@
 import { In, Repository } from "typeorm"
 import { db } from "../database"
-import SettingEntity from "../entity/Setting"
+import { SettingEntity } from "../entity/Setting"
 import { BaseContext } from "../types"
-import { CacheKey } from "../types/cache"
+import { CacheKey } from "../types/enums"
 import { SettingKey, DEFAULT_SETTINGS, Settings } from "../constants/setting"
 import { dedupe } from "../utils/array"
 

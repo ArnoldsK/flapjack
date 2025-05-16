@@ -7,7 +7,7 @@ import {
 } from "typeorm"
 
 @Entity()
-export default class CreditsEntity extends BaseEntity {
+export class CreditsEntity extends BaseEntity {
   @PrimaryColumn({
     unique: true,
   })

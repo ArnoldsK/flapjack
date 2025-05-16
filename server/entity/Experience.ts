@@ -1,7 +1,7 @@
 import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm"
 
 @Entity()
-export default class ExperienceEntity extends BaseEntity {
+export class ExperienceEntity extends BaseEntity {
   @PrimaryColumn({
     unique: true,
   })

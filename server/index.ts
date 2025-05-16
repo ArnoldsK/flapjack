@@ -94,7 +94,7 @@ nextApp.prepare().then(async () => {
   // #############################################################################
   // Custom events
   // #############################################################################
-  const groupedEvents = getGroupedEvents()
+  const groupedEvents = await getGroupedEvents()
 
   for (const event of groupedEvents) {
     client.on(event.name, async (...args) => {

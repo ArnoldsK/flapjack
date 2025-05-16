@@ -1,6 +1,6 @@
 import { LessThanOrEqual, Repository } from "typeorm"
 import { db } from "../database"
-import CommandExecuteEntity from "../entity/CommandExecute"
+import { CommandExecuteEntity } from "../entity/CommandExecute"
 
 interface CreateInput {
   channelId: string

@@ -7,7 +7,7 @@ import {
 } from "typeorm"
 
 @Entity()
-export default class CommandExecuteEntity extends BaseEntity {
+export class CommandExecuteEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number
 

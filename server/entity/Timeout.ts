@@ -1,7 +1,7 @@
 import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm"
 
 @Entity()
-export default class TimeoutEntity extends BaseEntity {
+export class TimeoutEntity extends BaseEntity {
   @PrimaryColumn({
     unique: true,
   })

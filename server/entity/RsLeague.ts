@@ -1,7 +1,7 @@
 import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm"
 
 @Entity()
-export default class RsLeagueEntity extends BaseEntity {
+export class RsLeagueEntity extends BaseEntity {
   @PrimaryColumn({
     unique: true,
   })

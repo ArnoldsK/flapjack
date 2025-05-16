@@ -7,7 +7,7 @@ import {
 } from "typeorm"
 
 @Entity()
-export default class RedgifsEntity extends BaseEntity {
+export class RedgifsEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: string
 

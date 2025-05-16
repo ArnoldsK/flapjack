@@ -7,7 +7,7 @@ import {
 } from "typeorm"
 
 @Entity()
-export default class ReminderEntity extends BaseEntity {
+export class ReminderEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number
 

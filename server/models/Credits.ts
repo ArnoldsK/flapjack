@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js"
 import { Repository } from "typeorm"
 import { db } from "../database"
-import CreditsEntity from "../entity/Credits"
+import { CreditsEntity } from "../entity/Credits"
 import { appConfig, discordIds } from "../config"
 import { UPPER_CLASS_MESSAGE_CREDITS } from "../constants"
 

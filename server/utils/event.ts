@@ -1,8 +1,7 @@
 import { ClientEvents } from "discord.js"
-import fs from "fs"
-import { join } from "path"
 import { appConfig } from "../config"
 import { BaseContext } from "../types"
+import { getEvents } from "../events"
 
 export interface EventOptions {
   productionOnly: boolean
@@ -37,23 +36,9 @@ export function createEvent<K extends keyof ClientEvents>(
   }
 }
 
-const getEventTasks = () => {
-  const tasks: EventTask<any>[] = []
-  const path = join(__dirname, "..", "events")
-  const taskFiles = fs.readdirSync(path)
-
-  for (const taskFile of taskFiles) {
-    const task = require(join(path, taskFile)).default
-
-    tasks.push(task)
-  }
-
-  return tasks
-}
-
-export const getGroupedEvents = () => {
+export const getGroupedEvents = async () => {
   const group: EventsGroup<any> = {}
-  const events = getEventTasks()
+  const events = await getEvents()
 
   for (const { event, callback, options } of events) {
     if (options.productionOnly && appConfig.dev) continue

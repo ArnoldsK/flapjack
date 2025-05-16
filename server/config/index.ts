@@ -54,6 +54,7 @@ export const appConfig = {
         numbersGame: "831055945022963742",
         minecraft: "584768527454568448",
         poe: "701811325042688070",
+        videos: "581643451419066368",
       },
     },
   },
