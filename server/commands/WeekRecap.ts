@@ -23,9 +23,9 @@ export default class PingCommand extends BaseCommand {
     try {
       await createWeekRecap(this.context)
 
-      this.editReply(`Created week recap`)
+      this.editReply("Created week recap")
     } catch (error) {
-      this.editReply(`Failed to create week recap`)
+      this.editReply("Failed to create week recap")
       console.error("Failed to create week recap", error)
     }
   }

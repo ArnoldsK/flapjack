@@ -6,11 +6,11 @@ import { StatsModel } from "../db/model/Stats"
 export default createEvent(
   Events.MessageCreate,
   { productionOnly: false },
-  async (context, message) => {
+  async (_context, message) => {
     if (message.author.bot) return
     if (!message.member) return
 
-    const model = new StatsModel(context)
+    const model = new StatsModel()
     await model.create({
       channelId: message.channel.id,
       userId: message.author.id,
