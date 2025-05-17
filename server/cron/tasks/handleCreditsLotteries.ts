@@ -7,7 +7,7 @@ import {
 } from "discord.js"
 
 import { discordIds } from "../../config"
-import { CreditsModel } from "../../models/Credits"
+import { CreditsModel } from "../../db/model/Credits"
 import { formatCredits } from "../../utils/credits"
 import { randomBool, randomInt, randomValue } from "../../utils/random"
 import { dedupe } from "../../utils/array"

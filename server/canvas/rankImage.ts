@@ -7,7 +7,7 @@ import { canvasFont, clipEllipse } from "../utils/canvas"
 import chroma from "chroma-js"
 import { Unicode } from "../constants"
 import { interpolate } from "../utils/number"
-import { ExperienceRankData } from "../models/Experience"
+import { ExperienceRankData } from "../db/model/Experience"
 
 export const getRankImage = async (
   rankData: ExperienceRankData,

@@ -15,7 +15,8 @@ import { getPermissionFlagName, memberHasPermission } from "./permission"
 import { dedupe } from "./array"
 import { appConfig } from "../config"
 import { BaseContext } from "../types"
-import { CommandExecuteModel } from "../models/CommandExecute"
+import { CommandExecuteModel } from "../db/model/CommandExecute"
+import { CacheKey } from "../cache"
 
 export type SetupCommand = RESTPostAPIChatInputApplicationCommandsJSONBody & {
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>
@@ -113,13 +114,14 @@ export const getSetupCommands = async (
         // #############################################################################
         // Statistics
         // #############################################################################
-        await handleCommandExecuteStatistics(interaction)
+        await handleCommandExecuteStatistics(context, interaction)
       },
     } satisfies SetupCommand
   })
 }
 
 const handleCommandExecuteStatistics = async (
+  context: BaseContext,
   interaction: ChatInputCommandInteraction,
 ) => {
   const model = new CommandExecuteModel()
@@ -129,6 +131,8 @@ const handleCommandExecuteStatistics = async (
     userId: interaction.user.id,
     channelId: interaction.channelId,
   })
+
+  context.cache.set(CacheKey.StatsCommands, null)
 }
 
 export const removeApiCommands = async () => {

@@ -18,14 +18,14 @@ import {
 } from "engine-blackjack-ts"
 
 import { BaseCommand } from "../base/Command"
-import { CreditsModel } from "../models/Credits"
+import { CreditsModel } from "../db/model/Credits"
 import { formatCredits, parseCreditsAmount } from "../utils/credits"
 import { OPTION_DESCRIPTION_AMOUNT, Unicode } from "../constants"
 import { isCasinoChannel } from "../utils/channel"
 import { joinAsLines, ucFirst } from "../utils/string"
 import { isNonNullish } from "../utils/boolean"
 import assert from "assert"
-import { CacheKey } from "../types/enums"
+import { CacheKey } from "../cache"
 
 type Action = keyof typeof actions
 type HandSide = keyof HandInfo

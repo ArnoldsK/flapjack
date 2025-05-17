@@ -2,7 +2,7 @@ import { Events } from "discord.js"
 import { createEvent } from "../utils/event"
 import { discordIds } from "../config"
 import { PERSISTENT_THREAD_ARCHIVE_DURATION } from "../constants"
-import { PersistentThreadModel } from "../models/PersistentThread"
+import { PersistentThreadModel } from "../db/model/PersistentThread"
 
 const PERSISTENT_THREAD_CHANNEL_IDS = [discordIds.channels.garage]
 

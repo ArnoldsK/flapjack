@@ -3,7 +3,7 @@ import hiscores from "osrs-json-hiscores"
 import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { checkUnreachable } from "../utils/error"
-import { RsLeagueModel } from "../models/RsLeague"
+import { RsLeagueModel } from "../db/model/RsLeague"
 import { Unicode } from "../constants"
 import { discordIds } from "../config"
 

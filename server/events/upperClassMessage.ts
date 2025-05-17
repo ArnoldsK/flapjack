@@ -1,7 +1,7 @@
 import { Events } from "discord.js"
 import { createEvent } from "../utils/event"
 import { discordIds } from "../config"
-import { CreditsModel } from "../models/Credits"
+import { CreditsModel } from "../db/model/Credits"
 import { UPPER_CLASS_MESSAGE_CREDITS } from "../constants"
 
 export default createEvent(

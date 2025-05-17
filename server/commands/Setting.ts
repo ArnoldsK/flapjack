@@ -7,7 +7,7 @@ import {
   settingsSchema,
 } from "../constants/setting"
 import { checkUnreachable } from "../utils/error"
-import { SettingModel } from "../models/Setting"
+import { SettingModel } from "../db/model/Setting"
 import { Unicode } from "../constants"
 
 enum SubcommandName {

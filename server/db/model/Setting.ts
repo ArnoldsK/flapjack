@@ -1,10 +1,10 @@
 import { In, Repository } from "typeorm"
-import { db } from "../database"
+import { db } from "../../database"
 import { SettingEntity } from "../entity/Setting"
-import { BaseContext } from "../types"
-import { CacheKey } from "../types/enums"
-import { SettingKey, DEFAULT_SETTINGS, Settings } from "../constants/setting"
-import { dedupe } from "../utils/array"
+import { BaseContext } from "../../types"
+import { CacheKey } from "../../cache"
+import { SettingKey, DEFAULT_SETTINGS, Settings } from "../../constants/setting"
+import { dedupe } from "../../utils/array"
 
 export class SettingModel {
   #context: BaseContext

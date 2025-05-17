@@ -1,6 +1,6 @@
 import { discordIds } from "../../config"
 import { Task } from "../../types/tasks"
-import { CreditsEntity } from "../../entity/Credits"
+import { CreditsEntity } from "../../db/entity/Credits"
 import { Color } from "../../constants"
 
 export const resetCredits: Task = async (context) => {

@@ -1,7 +1,7 @@
 import { Events } from "discord.js"
 import { createEvent } from "../utils/event"
-import { ExperienceModel } from "../models/Experience"
-import { CreditsModel } from "../models/Credits"
+import { ExperienceModel } from "../db/model/Experience"
+import { CreditsModel } from "../db/model/Credits"
 import {
   EXP_PER_MESSAGE,
   MIN_CREDITS_PER_MESSAGE,

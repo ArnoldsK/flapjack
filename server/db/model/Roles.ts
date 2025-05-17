@@ -1,12 +1,11 @@
 import { GuildMember } from "discord.js"
 import { Repository } from "typeorm"
-import { db } from "../database"
-import { RsLeagueEntity } from "../entity/RsLeague"
-import { d } from "../utils/date"
+import { db } from "../../database"
+import { RolesEntity } from "../entity/Roles"
 
-export class RsLeagueModel {
+export class RolesModel {
   #member: GuildMember
-  #repository: Repository<RsLeagueEntity>
+  #repository: Repository<RolesEntity>
 
   constructor(member: GuildMember) {
     if (member.user.bot) {
@@ -14,7 +13,7 @@ export class RsLeagueModel {
     }
 
     this.#member = member
-    this.#repository = db.getRepository(RsLeagueEntity)
+    this.#repository = db.getRepository(RolesEntity)
   }
 
   async getAll() {
@@ -23,24 +22,36 @@ export class RsLeagueModel {
     return entities
       .map((entity) => ({
         member: this.#member.guild.members.cache.get(entity.userId),
-        name: entity.name,
+        roleIds: entity.roleIds,
       }))
       .filter(
         (
           el,
         ): el is {
           member: GuildMember
-          name: string
+          roleIds: string[]
         } => !!el.member,
       )
   }
 
-  async setName(name: string) {
+  async getRoleIds(): Promise<string[]> {
+    const entity = await this.#repository.findOneBy({
+      userId: this.#member.id,
+    })
+
+    if (!entity) {
+      return []
+    }
+
+    return entity.roleIds
+  }
+
+  async setRoleIds(roleIds: string[]) {
     await this.#repository.upsert(
       [
         {
           userId: this.#member.id,
-          name,
+          roleIds,
         },
       ],
       ["userId"],
@@ -51,9 +62,5 @@ export class RsLeagueModel {
     await this.#repository.delete({
       userId: this.#member.id,
     })
-  }
-
-  async removeByUserId(userId: string) {
-    await this.#repository.delete({ userId })
   }
 }

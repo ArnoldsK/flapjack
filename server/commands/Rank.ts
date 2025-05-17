@@ -2,7 +2,7 @@ import { Attachment, GuildMember, SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { checkUnreachable } from "../utils/error"
 import { getRankImage } from "../canvas/rankImage"
-import { ExperienceModel, ExperienceRankData } from "../models/Experience"
+import { ExperienceModel, ExperienceRankData } from "../db/model/Experience"
 import { makeEqualLengths } from "../utils/string"
 import { Unicode } from "../constants"
 

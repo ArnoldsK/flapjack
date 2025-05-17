@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
-import { CacheKey } from "../types/enums"
-import { RedgifsModel } from "../models/Redgifs"
+import { CacheKey } from "../cache"
+import { RedgifsModel } from "../db/model/Redgifs"
 import { RedGifsGif } from "../types/redgifs"
 
 export default class NsfwCommand extends BaseCommand {

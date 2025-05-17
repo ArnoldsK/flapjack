@@ -1,5 +1,5 @@
-import { VideoEntity } from "../entity/Video"
-import { CacheKey } from "../types/enums"
+import { VideoEntity } from "../db/entity/Video"
+import { CacheKey } from "../cache"
 import { createRoute } from "../utils/routes"
 
 export default createRoute({

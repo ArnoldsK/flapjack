@@ -1,9 +1,18 @@
-import { VideoEntity } from "./entity/Video"
-import { CacheKey } from "./types/enums"
+import { VideoEntity } from "./db/entity/Video"
 import { EntityFields } from "./types/entity"
 import { McStatus } from "./types/mc"
 import { RedGifsGif } from "./types/redgifs"
 import { Settings } from "./constants/setting"
+import { ApiStatsCommand } from "./types/api"
+
+export enum CacheKey {
+  NsfwPosts = "nsfwPosts",
+  Blackjack = "blackjack",
+  McStatus = "mcStatus",
+  Setting = "setting",
+  Videos = "videos",
+  StatsCommands = "statsCommands",
+}
 
 interface AppCache {
   [CacheKey.NsfwPosts]: RedGifsGif[]
@@ -11,6 +20,7 @@ interface AppCache {
   [CacheKey.McStatus]: McStatus | null
   [CacheKey.Setting]: Settings | null
   [CacheKey.Videos]: EntityFields<VideoEntity>[] | null
+  [CacheKey.StatsCommands]: ApiStatsCommand[] | null
 }
 
 export default class CacheManager {
@@ -20,6 +30,7 @@ export default class CacheManager {
     [CacheKey.McStatus]: null,
     [CacheKey.Setting]: null,
     [CacheKey.Videos]: null,
+    [CacheKey.StatsCommands]: null,
   }
 
   constructor() {}

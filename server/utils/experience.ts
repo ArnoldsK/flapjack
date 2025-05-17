@@ -1,5 +1,5 @@
 import { RANK_MAX_LEVEL } from "../constants"
-import { ExperienceLevelData } from "../models/Experience"
+import { ExperienceLevelData } from "../db/model/Experience"
 import { interpolate } from "./number"
 
 export const getExperienceForLevel = (lvl: number): number => {

@@ -1,5 +1,5 @@
 import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm"
-import type { SettingKey } from "../constants/setting"
+import type { SettingKey } from "../../constants/setting"
 
 @Entity()
 export class SettingEntity extends BaseEntity {

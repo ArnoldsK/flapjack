@@ -1,8 +1,8 @@
 import { Repository } from "typeorm"
-import { db } from "../database"
+import { db } from "../../database"
 import { RedgifsEntity } from "../entity/Redgifs"
-import { d } from "../utils/date"
-import { RedGifsResponse } from "../types/redgifs"
+import { d } from "../../utils/date"
+import { RedGifsResponse } from "../../types/redgifs"
 
 export class RedgifsModel {
   #repository: Repository<RedgifsEntity>
@@ -25,12 +25,8 @@ export class RedgifsModel {
       // Get a new token
       token = await this.#getNewToken()
 
-      // Create a new one
-      await this.#repository
-        .create({
-          token,
-        })
-        .save()
+      // Save it
+      await this.#repository.create({ token }).save()
     } else {
       token = entity.token
     }

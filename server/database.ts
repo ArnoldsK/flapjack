@@ -11,9 +11,9 @@ export const db = new DataSource({
   password: appConfig.db.password,
   database: appConfig.db.database,
   logging: false,
-  entities: [join(__dirname, "entity", "*.{ts,js}")],
+  entities: [join(__dirname, "db", "entity", "*.{ts,js}")],
   subscribers: [],
-  migrations: [join(__dirname, "migration", "*.{ts,js}")],
+  migrations: [join(__dirname, "db", "migration", "*.{ts,js}")],
   // Auto-update tables
   synchronize: true,
   // Screw migrations... I tried, it's a pain with MySQL
