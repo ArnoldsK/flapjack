@@ -1,14 +1,14 @@
 import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { permission, PermissionFlags } from "../utils/permission"
-import { createWeekRecap } from "../cron/tasks/createWeekRecap"
+import { createDailyStats } from "../cron/tasks/createDailyStats"
 
-export default class PingCommand extends BaseCommand {
+export default class ForceStatsCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()
-    .setName("week-recap")
-    .setDescription("Force a week recap creation")
+    .setName("force-states")
+    .setDescription("Force stats creation")
 
   static permissions = permission({
     type: "allow",
@@ -21,12 +21,12 @@ export default class PingCommand extends BaseCommand {
     })
 
     try {
-      await createWeekRecap(this.context)
+      await createDailyStats(this.context)
 
-      this.editReply("Created week recap")
+      this.editReply("Created stats")
     } catch (error) {
-      this.editReply("Failed to create week recap")
-      console.error("Failed to create week recap", error)
+      this.editReply("Failed to create stats")
+      console.error("Failed to create stats", error)
     }
   }
 }
