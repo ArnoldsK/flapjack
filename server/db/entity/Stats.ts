@@ -12,6 +12,9 @@ export class StatsEntity extends BaseEntity {
   id!: number
 
   @Column()
+  guildId!: string
+
+  @Column()
   channelId!: string
 
   @Column()
