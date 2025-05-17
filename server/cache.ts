@@ -12,7 +12,6 @@ export enum CacheKey {
   Videos = "videos",
   StatsMessagesPerDay = "statsMessagesPerDay",
   StatsCommands = "statsCommands",
-  WeekRecap = "weekRecap",
 }
 
 interface AppCache {

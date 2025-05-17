@@ -1,7 +1,8 @@
 import { createRoute } from "../utils/routes"
 import { ApiRecap } from "../../types/api"
-import { RecapModel } from "../db/model/Recap"
+import { StaticModel } from "../db/model/Static"
 import { dedupe } from "../utils/array"
+import { StaticDataType } from "../../types/entity"
 
 export default createRoute({
   path: "/api/recap",
@@ -16,7 +17,7 @@ export default createRoute({
       members: [],
     }
 
-    const model = new RecapModel(context)
+    const model = new StaticModel(StaticDataType.WeekRecap)
     const recap = await model.get()
 
     if (recap) {

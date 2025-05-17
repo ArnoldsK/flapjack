@@ -5,7 +5,7 @@ import {
   RECAP_PRIVATE_CHANNEL_IDS,
 } from "../../../constants"
 import { Task } from "../../../types/tasks"
-import { RecapModel } from "../../db/model/Recap"
+import { StaticModel } from "../../db/model/Static"
 import { d } from "../../utils/date"
 import { isTextChannel } from "../../utils/channel"
 import { WeekRecapData } from "../../../types/recap"
@@ -17,6 +17,7 @@ import { isDiscordAttachmentUrl } from "../../utils/web"
 import path from "path"
 import { appConfig } from "../../config"
 import { assert } from "../../utils/error"
+import { StaticDataType } from "../../../types/entity"
 
 type RecapMessageData = WeekRecapData["messages"][number]
 
@@ -37,7 +38,7 @@ export const createWeekRecap: Task = async (context) => {
     return
   }
 
-  const model = new RecapModel(context)
+  const model = new StaticModel(StaticDataType.WeekRecap)
   await model.set({
     createdAt: new Date(),
     messages: recapMessages,
