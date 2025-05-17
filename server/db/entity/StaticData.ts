@@ -12,7 +12,7 @@ export class StaticDataEntity<Type extends StaticDataType> extends BaseEntity {
     transformer: {
       from: (value?: string) => {
         if (!value) {
-          throw new Error("Recap value is empty")
+          throw new Error("Data value is empty")
         }
 
         return JSON.parse(value)
