@@ -45,7 +45,7 @@ export const Avatar = styled.div.attrs(({ $x, $y }: AvatarProps) => ({
     `}
 
   transition: opacity 200ms ease-in;
-  opacity: 0.5;
+  opacity: 0.33;
 
   &:hover {
     opacity: 1;
