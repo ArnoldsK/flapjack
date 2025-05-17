@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
-import { Unicode } from "../constants"
+import { Unicode } from "../../constants"
 import { parseMentions } from "../utils/message"
 
 enum OptionName {

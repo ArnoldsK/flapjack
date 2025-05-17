@@ -1,8 +1,7 @@
-import { ChannelType, SlashCommandBuilder } from "discord.js"
+import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { PermissionFlags, permission } from "../utils/permission"
-import { Color } from "../constants"
-import { discordIds } from "../config"
+import { Color, DISCORD_IDS } from "../../constants"
 import { isTextChannel } from "../utils/channel"
 
 export default class ArchiveCommand extends BaseCommand {
@@ -26,7 +25,7 @@ export default class ArchiveCommand extends BaseCommand {
     // ! Defer
     await this.interaction.deferReply()
 
-    await this.channel.setParent(discordIds.categories.archive, {
+    await this.channel.setParent(DISCORD_IDS.categories.archive, {
       // Sync permissions
       lockPermissions: true,
     })

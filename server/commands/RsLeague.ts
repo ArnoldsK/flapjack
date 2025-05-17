@@ -4,8 +4,8 @@ import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { checkUnreachable } from "../utils/error"
 import { RsLeagueModel } from "../db/model/RsLeague"
-import { Unicode } from "../constants"
-import { discordIds } from "../config"
+import { Unicode } from "../../constants"
+import { DISCORD_IDS } from "../../constants"
 
 enum SubcommandName {
   Set = "set",
@@ -38,7 +38,7 @@ export default class RsLeagueCommand extends BaseCommand {
     )
 
   async execute() {
-    if (this.channel.id !== discordIds.channels.runescape) {
+    if (this.channel.id !== DISCORD_IDS.channels.runescape) {
       this.fail("Not allowed in this channel")
       return
     }

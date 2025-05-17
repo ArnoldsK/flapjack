@@ -1,6 +1,5 @@
-import { Settings, SettingKey } from "../constants/setting"
-import { SettingModel } from "../db/model/Setting"
-import { BaseContext } from "../types"
+import { Settings, SettingKey, SettingModel } from "../db/model/Setting"
+import { BaseContext } from "../../types"
 
 export const requireSetting = async <K extends SettingKey>(
   context: BaseContext,

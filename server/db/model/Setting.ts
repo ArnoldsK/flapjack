@@ -1,10 +1,22 @@
 import { In, Repository } from "typeorm"
 import { db } from "../../database"
 import { SettingEntity } from "../entity/Setting"
-import { BaseContext } from "../../types"
+import { BaseContext } from "../../../types"
 import { CacheKey } from "../../cache"
-import { SettingKey, DEFAULT_SETTINGS, Settings } from "../../constants/setting"
 import { dedupe } from "../../utils/array"
+import { z } from "zod"
+
+export const settingsSchema = z.object({
+  "tasks.hourlyGifBanners.enabled": z.boolean(),
+})
+
+export type Settings = z.TypeOf<typeof settingsSchema>
+
+export type SettingKey = keyof Settings
+
+export const DEFAULT_SETTINGS: Settings = {
+  "tasks.hourlyGifBanners.enabled": false,
+}
 
 export class SettingModel {
   #context: BaseContext

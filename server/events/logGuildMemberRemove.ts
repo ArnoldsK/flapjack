@@ -1,10 +1,10 @@
 import { AuditLogEvent, Events, GuildMember } from "discord.js"
 
 import { createEvent } from "../utils/event"
-import { discordIds } from "../config"
+import { DISCORD_IDS } from "../../constants"
 import { isTextChannel } from "../utils/channel"
 import { joinAsLines } from "../utils/string"
-import { Color } from "../constants"
+import { Color } from "../../constants"
 import { d } from "../utils/date"
 import { embedAuthor } from "../utils/member"
 
@@ -53,7 +53,7 @@ export default createEvent(
   async (_context, member) => {
     if (member.partial) return
 
-    const channel = member.guild.channels.cache.get(discordIds.channels.logs)
+    const channel = member.guild.channels.cache.get(DISCORD_IDS.channels.logs)
     if (!isTextChannel(channel)) return
 
     const joinedAt = d(member.joinedAt).fromNow()

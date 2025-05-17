@@ -1,5 +1,5 @@
 import { Client, Guild } from "discord.js"
-import CacheManager from "../cache"
+import CacheManager from "../server/cache"
 
 export interface BaseContext {
   client: Client

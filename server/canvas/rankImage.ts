@@ -5,7 +5,7 @@ import colorPalette from "get-image-colors"
 import { getBackgroundTextColor } from "../utils/color"
 import { canvasFont, clipEllipse } from "../utils/canvas"
 import chroma from "chroma-js"
-import { Unicode } from "../constants"
+import { Unicode } from "../../constants"
 import { interpolate } from "../utils/number"
 import { ExperienceRankData } from "../db/model/Experience"
 

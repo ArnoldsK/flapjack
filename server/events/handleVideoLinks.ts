@@ -1,10 +1,10 @@
 import { Events, GuildMember, Message } from "discord.js"
 import { createEvent } from "../utils/event"
 import { z } from "zod"
-import { discordIds } from "../config"
+import { DISCORD_IDS } from "../../constants"
 import { VideoEntity } from "../db/entity/Video"
 import { isNonNullish } from "../utils/boolean"
-import { EntityFields } from "../types/entity"
+import { EntityFields } from "../../types/entity"
 import { CacheKey } from "../cache"
 import { In } from "typeorm"
 
@@ -21,7 +21,7 @@ export default createEvent(
       author.bot ||
       !member ||
       !content ||
-      message.channel.id !== discordIds.channels.videos
+      message.channel.id !== DISCORD_IDS.channels.videos
     ) {
       return
     }

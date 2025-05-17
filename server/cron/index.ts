@@ -1,8 +1,10 @@
 import { CronTask } from "../utils/cron"
+import { createWeekRecap } from "./tasks/createWeekRecap"
 import { endReminders } from "./tasks/endReminders"
 import { handleCreditsLotteries } from "./tasks/handleCreditsLotteries"
 import { mcStatus } from "./tasks/mcStatus"
 import { removeNonBoosterIcons } from "./tasks/removeNonBoosterIcons"
+import { removeOldStats } from "./tasks/removeOldStats"
 import { resetCredits } from "./tasks/resetCredits"
 import { updateBannerToGif } from "./tasks/updateBannerToGif"
 
@@ -49,5 +51,19 @@ export const cronTasks: CronTask[] = [
     isRawExpression: false,
     productionOnly: true,
     task: removeNonBoosterIcons,
+  },
+  {
+    description: "Remove old stats",
+    expression: "every hour",
+    isRawExpression: false,
+    productionOnly: false,
+    task: removeOldStats,
+  },
+  {
+    description: "Create week recap",
+    expression: "every monday",
+    isRawExpression: false,
+    productionOnly: true,
+    task: createWeekRecap,
   },
 ]

@@ -1,17 +1,19 @@
 import Head from "next/head"
 import { PropsWithChildren } from "react"
 
-import * as S from "./Page.styles"
+import * as S from "./styles"
 
 export interface PageProps {
   title?: string
   centered?: boolean
+  noWrap?: boolean
 }
 
 export const Page = function Page({
-  children,
   title,
+  children,
   centered,
+  noWrap,
 }: PropsWithChildren<PageProps>) {
   // #############################################################################
   // Render
@@ -25,7 +27,7 @@ export const Page = function Page({
         <link rel="icon" type="image/png" href="/favicon.png" />
         <title>{title ? `${title} · Pepsi Dog` : "Pepsi Dog"}</title>
       </Head>
-      <S.Main centered={centered}>{children}</S.Main>
+      {noWrap ? children : <S.Wrap $centered={centered}>{children}</S.Wrap>}
     </>
   )
 }

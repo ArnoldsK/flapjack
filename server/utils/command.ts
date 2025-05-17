@@ -9,14 +9,13 @@ import {
 } from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { getCommands } from "../commands"
-import { Unicode } from "../constants"
+import { DISCORD_IDS, Unicode } from "../../constants"
 import { assert } from "./error"
 import { getPermissionFlagName, memberHasPermission } from "./permission"
 import { dedupe } from "./array"
 import { appConfig } from "../config"
-import { BaseContext } from "../types"
+import { BaseContext } from "../../types"
 import { CommandExecuteModel } from "../db/model/CommandExecute"
-import { CacheKey } from "../cache"
 
 export type SetupCommand = RESTPostAPIChatInputApplicationCommandsJSONBody & {
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>
@@ -124,15 +123,13 @@ const handleCommandExecuteStatistics = async (
   context: BaseContext,
   interaction: ChatInputCommandInteraction,
 ) => {
-  const model = new CommandExecuteModel()
+  const model = new CommandExecuteModel(context)
   await model.create({
     input: interaction.toString(),
     commandName: interaction.commandName,
     userId: interaction.user.id,
     channelId: interaction.channelId,
   })
-
-  context.cache.set(CacheKey.StatsCommands, null)
 }
 
 export const removeApiCommands = async () => {
@@ -142,7 +139,7 @@ export const removeApiCommands = async () => {
   await rest.put(
     Routes.applicationGuildCommands(
       appConfig.discord.client,
-      appConfig.discord.ids.guild,
+      DISCORD_IDS.guild,
     ),
     {
       body: [],
@@ -158,7 +155,7 @@ export const handleApiCommands = async (commands: SetupCommand[]) => {
   const apiCommands = (await rest.get(
     Routes.applicationGuildCommands(
       appConfig.discord.client,
-      appConfig.discord.ids.guild,
+      DISCORD_IDS.guild,
     ),
   )) as APIApplicationCommand[]
 
@@ -200,7 +197,7 @@ export const handleApiCommands = async (commands: SetupCommand[]) => {
   await rest.put(
     Routes.applicationGuildCommands(
       appConfig.discord.client,
-      appConfig.discord.ids.guild,
+      DISCORD_IDS.guild,
     ),
     {
       body: updateCommands,
@@ -219,7 +216,7 @@ export const handleApiCommands = async (commands: SetupCommand[]) => {
       await rest.delete(
         Routes.applicationGuildCommand(
           appConfig.discord.client,
-          appConfig.discord.ids.guild,
+          DISCORD_IDS.guild,
           deleteCommand.id,
         ),
       )

@@ -1,15 +1,19 @@
 import { Repository } from "typeorm"
 import { db } from "../../database"
 import { CommandExecuteEntity } from "../entity/CommandExecute"
-import { EntityFields } from "../../types/entity"
-import { ApiStatsCommand } from "../../types/api"
+import { EntityFields } from "../../../types/entity"
+import { ApiStatsCommand } from "../../../types/api"
+import { BaseContext } from "../../../types"
+import { CacheKey } from "../../cache"
 
 type CreateInput = Omit<EntityFields<CommandExecuteEntity>, "id" | "createdAt">
 
 export class CommandExecuteModel {
+  #context: BaseContext
   #repository: Repository<CommandExecuteEntity>
 
-  constructor() {
+  constructor(context: BaseContext) {
+    this.#context = context
     this.#repository = db.getRepository(CommandExecuteEntity)
   }
 
@@ -20,14 +24,16 @@ export class CommandExecuteModel {
         createdAt: new Date(),
       })
       .save()
+
+    this.#context.cache.set(CacheKey.StatsCommands, null)
   }
 
-  async getApiCommands(): Promise<ApiStatsCommand[]> {
-    const commands = await this.#repository.find()
+  async getApiItems(): Promise<ApiStatsCommand[]> {
+    const entities = await this.#repository.find()
 
-    return Array.from(
-      commands.reduce((acc, command) => {
-        const name = command.commandName
+    const items: ApiStatsCommand[] = Array.from(
+      entities.reduce((acc, entity) => {
+        const name = entity.commandName
         const count = acc.get(name) ?? 0
 
         acc.set(name, count + 1)
@@ -40,5 +46,9 @@ export class CommandExecuteModel {
         count,
       }))
       .sort((a, b) => b.count - a.count)
+
+    this.#context.cache.set(CacheKey.StatsCommands, items)
+
+    return items
   }
 }

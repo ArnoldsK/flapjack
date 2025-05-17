@@ -1,18 +1,18 @@
 import { Events } from "discord.js"
 import { createEvent } from "../utils/event"
-import { discordIds } from "../config"
+import { DISCORD_IDS } from "../../constants"
 import { CreditsModel } from "../db/model/Credits"
-import { UPPER_CLASS_MESSAGE_CREDITS } from "../constants"
+import { UPPER_CLASS_MESSAGE_CREDITS } from "../../constants"
 
 export default createEvent(
   Events.MessageCreate,
   { productionOnly: true },
   async (_context, message) => {
-    if (message.channel.id !== discordIds.channels.upperClass) return
+    if (message.channel.id !== DISCORD_IDS.channels.upperClass) return
     if (message.author.bot) return
     if (!message.member) return
 
-    if (!message.member.roles.cache.has(discordIds.roles.upperClass)) {
+    if (!message.member.roles.cache.has(DISCORD_IDS.roles.upperClass)) {
       await message.delete()
       return
     }

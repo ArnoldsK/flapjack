@@ -8,10 +8,9 @@ import {
 } from "../utils/permission"
 import { checkUnreachable } from "../utils/error"
 import { d } from "../utils/date"
-import { Unicode } from "../constants"
+import { DISCORD_IDS, Unicode } from "../../constants"
 import { isTimedOut } from "../utils/member"
 import { getTimeoutAddedEmbed, getTimeoutRemovedEmbed } from "../utils/message"
-import { appConfig } from "../config"
 
 enum SubcommandName {
   List = "list",
@@ -189,7 +188,7 @@ export default class MuteCommand extends BaseCommand {
       embeds: [
         {
           ...getTimeoutAddedEmbed({ member, timeoutUntil }),
-          description: `See <#${appConfig.discord.ids.channels.logs}> for details`,
+          description: `See <#${DISCORD_IDS.channels.logs}> for details`,
         },
       ],
     })

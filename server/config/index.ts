@@ -19,6 +19,8 @@ const env = z
     LOCAL_COMMANDS: z.string().default("false"),
     GIPHY_API_KEY: z.string(),
     DEEPL_AUTH_KEY: z.string(),
+    HOSTING_AUTH_NAME: z.string(),
+    HOSTING_AUTH_TOKEN: z.string(),
   })
   .parse(process.env)
 
@@ -45,39 +47,6 @@ export const appConfig = {
     token: env.DISCORD_TOKEN,
     client: env.DISCORD_CLIENT,
     localCommands: env.LOCAL_COMMANDS === "true",
-
-    ids: {
-      guild: "411593263615836172",
-      roles: {
-        nitroBooster: "611953929835643024",
-        upperClass: "1159244242074468503",
-        activeMember: "669608043713003521",
-        poe: "1354946502589550673",
-      },
-      users: {
-        owner: "221755442513051649",
-      },
-      categories: {
-        archive: "525995353821151242",
-        moderation: "625639453867900938",
-      },
-      channels: {
-        general: "411593264211296258",
-        bepsi: "414516218767081474",
-        casino: "621834853696143360",
-        nsfw: "632985833414066176",
-        logs: "546830997983854592",
-        upperClass: "868434446502723625",
-        runescape: "717772755508002816",
-        copyPasta: "673897295598845952",
-        vTubers: "829428335288516619",
-        numbersGame: "831055945022963742",
-        minecraft: "584768527454568448",
-        poe: "701811325042688070",
-        videos: "581643451419066368",
-        garage: "743552656043409445",
-      },
-    },
   },
 
   giphy: {
@@ -87,6 +56,10 @@ export const appConfig = {
   deepl: {
     authKey: env.DEEPL_AUTH_KEY,
   },
-}
 
-export const discordIds = appConfig.discord.ids
+  hosting: {
+    url: "https://hosting.pepsidog.lv",
+    authName: env.HOSTING_AUTH_NAME,
+    authToken: env.HOSTING_AUTH_TOKEN,
+  },
+}

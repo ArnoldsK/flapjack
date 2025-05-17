@@ -1,17 +1,17 @@
 import {
+  Channel,
   ChannelType,
-  GuildBasedChannel,
   GuildTextBasedChannel,
   TextChannel,
 } from "discord.js"
-import { discordIds } from "../config"
+import { DISCORD_IDS } from "../../constants"
 
 export const isCasinoChannel = (channel: GuildTextBasedChannel): boolean => {
-  return channel.id === discordIds.channels.casino
+  return channel.id === DISCORD_IDS.channels.casino
 }
 
 export const isTextChannel = (
-  channel: GuildBasedChannel | null | undefined,
+  channel: Channel | null | undefined,
 ): channel is TextChannel => {
   return !!channel && channel.type === ChannelType.GuildText
 }

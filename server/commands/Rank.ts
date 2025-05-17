@@ -4,7 +4,7 @@ import { checkUnreachable } from "../utils/error"
 import { getRankImage } from "../canvas/rankImage"
 import { ExperienceModel, ExperienceRankData } from "../db/model/Experience"
 import { makeEqualLengths } from "../utils/string"
-import { Unicode } from "../constants"
+import { Unicode } from "../../constants"
 
 enum SubcommandName {
   Me = "me",

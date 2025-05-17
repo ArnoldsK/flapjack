@@ -20,7 +20,7 @@ import {
 import { BaseCommand } from "../base/Command"
 import { CreditsModel } from "../db/model/Credits"
 import { formatCredits, parseCreditsAmount } from "../utils/credits"
-import { OPTION_DESCRIPTION_AMOUNT, Unicode } from "../constants"
+import { OPTION_DESCRIPTION_AMOUNT, Unicode } from "../../constants"
 import { isCasinoChannel } from "../utils/channel"
 import { joinAsLines, ucFirst } from "../utils/string"
 import { isNonNullish } from "../utils/boolean"

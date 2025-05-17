@@ -6,12 +6,12 @@ import {
   GuildTextBasedChannel,
 } from "discord.js"
 
-import { discordIds } from "../../config"
+import { DISCORD_IDS } from "../../../constants"
 import { CreditsModel } from "../../db/model/Credits"
 import { formatCredits } from "../../utils/credits"
 import { randomBool, randomInt, randomValue } from "../../utils/random"
 import { dedupe } from "../../utils/array"
-import { Task } from "../../types/tasks"
+import { Task } from "../../../types/tasks"
 import { isNonNullish } from "../../utils/boolean"
 
 const getAmount = (): number => {
@@ -26,7 +26,7 @@ const getAmount = (): number => {
 export const handleCreditsLotteries: Task = async (context) => {
   const channel = context
     .guild()
-    .channels.cache.get(discordIds.channels.general) as GuildTextBasedChannel
+    .channels.cache.get(DISCORD_IDS.channels.general) as GuildTextBasedChannel
 
   // One in x minutes chance
   if (!randomBool(20)) return

@@ -1,7 +1,7 @@
-import { discordIds } from "../../config"
-import { Task } from "../../types/tasks"
+import { DISCORD_IDS } from "../../../constants"
+import { Task } from "../../../types/tasks"
 import { CreditsEntity } from "../../db/entity/Credits"
-import { Color } from "../../constants"
+import { Color } from "../../../constants"
 
 export const resetCredits: Task = async (context) => {
   await CreditsEntity.createQueryBuilder().delete().execute()
@@ -13,7 +13,7 @@ export const resetCredits: Task = async (context) => {
     },
   ]
 
-  const channelIds = [discordIds.channels.casino, discordIds.channels.logs]
+  const channelIds = [DISCORD_IDS.channels.casino, DISCORD_IDS.channels.logs]
 
   await Promise.all(
     channelIds.map(async (id) => {

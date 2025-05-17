@@ -1,11 +1,11 @@
 import { z } from "zod"
-import { discordIds } from "../../config"
-import { Task } from "../../types/tasks"
+import { DISCORD_IDS } from "../../../constants"
+import { Task } from "../../../types/tasks"
 import { isTextChannel } from "../../utils/channel"
 import { CacheKey } from "../../cache"
-import { McStatus } from "../../types/mc"
+import { McStatus } from "../../../types/mc"
 import { joinAsLines } from "../../utils/string"
-import { Color } from "../../constants"
+import { Color } from "../../../constants"
 
 const SERVER_IP = "mc.pepsidog.lv"
 
@@ -28,7 +28,7 @@ export const DATA_SCHEMA = z.object({
 export const mcStatus: Task = async (context) => {
   const channel = context
     .guild()
-    .channels.cache.get(discordIds.channels.minecraft)
+    .channels.cache.get(DISCORD_IDS.channels.minecraft)
   if (!isTextChannel(channel)) return
 
   // #############################################################################

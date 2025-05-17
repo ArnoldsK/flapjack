@@ -6,8 +6,8 @@ import {
   EXP_PER_MESSAGE,
   MIN_CREDITS_PER_MESSAGE,
   RANK_ACTIVE_ROLE_LEVEL,
-} from "../constants"
-import { discordIds } from "../config"
+} from "../../constants"
+import { DISCORD_IDS } from "../../constants"
 import { getExperienceLevelData } from "../utils/experience"
 import { isTextChannel } from "../utils/channel"
 import { embedAuthor } from "../utils/member"
@@ -34,7 +34,7 @@ export default createEvent(
 
     // Active role
     const activeRole = message.guild?.roles.cache.get(
-      discordIds.roles.activeMember,
+      DISCORD_IDS.roles.activeMember,
     )
 
     if (lvlNew >= RANK_ACTIVE_ROLE_LEVEL && activeRole) {
@@ -46,7 +46,7 @@ export default createEvent(
     // Level-up
     if (lvlNew > lvl && lvlNew >= RANK_ACTIVE_ROLE_LEVEL) {
       const channel = message.guild?.channels.cache.get(
-        discordIds.channels.bepsi,
+        DISCORD_IDS.channels.bepsi,
       )
 
       if (isTextChannel(channel)) {

@@ -1,6 +1,6 @@
 import { GuildPremiumTier } from "discord.js"
 import { appConfig } from "../../config"
-import { Task } from "../../types/tasks"
+import { Task } from "../../../types/tasks"
 import { requireSetting } from "../../utils/setting"
 
 const getGiphyImageUrl = async (apiKey: string) => {

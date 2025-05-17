@@ -1,7 +1,7 @@
 import { createCanvas, loadImage } from "@napi-rs/canvas"
 
 import { canvasFont, clipEllipse } from "../utils/canvas"
-import { DISCORD_BACKGROUND_COLOR_HEX } from "../constants"
+import { DISCORD_BACKGROUND_COLOR_HEX } from "../../constants"
 
 export const getUserColorPreviewImage = async ({
   avatarUrl,

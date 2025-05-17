@@ -1,8 +1,8 @@
-import { ChannelType, SlashCommandBuilder, codeBlock } from "discord.js"
+import { SlashCommandBuilder, codeBlock } from "discord.js"
 import { BaseCommand } from "../base/Command"
-import { appConfig } from "../config"
 import { joinAsLines } from "../utils/string"
 import { isTextChannel } from "../utils/channel"
+import { DISCORD_IDS } from "../../constants"
 
 export default class RsLootCommand extends BaseCommand {
   static version = 1
@@ -13,7 +13,7 @@ export default class RsLootCommand extends BaseCommand {
 
   async execute() {
     if (
-      this.channel.id !== appConfig.discord.ids.channels.runescape ||
+      this.channel.id !== DISCORD_IDS.channels.runescape ||
       !isTextChannel(this.channel)
     ) {
       this.fail("Not allowed in this channel")

@@ -1,8 +1,8 @@
 import cron from "node-cron"
 
 import { appConfig } from "../config"
-import { BaseContext } from "../types"
-import { Task } from "../types/tasks"
+import { BaseContext } from "../../types"
+import { Task } from "../../types/tasks"
 import { cronTasks } from "../cron"
 
 const cronTranslate = require("cron-translate")

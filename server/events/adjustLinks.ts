@@ -1,4 +1,4 @@
-import { Emoji } from "../constants"
+import { Emoji } from "../../constants"
 import { createEvent } from "../utils/event"
 
 export default createEvent(

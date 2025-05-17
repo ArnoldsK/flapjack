@@ -1,14 +1,14 @@
 import { codeBlock, SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { PermissionFlags, permission } from "../utils/permission"
+import { checkUnreachable } from "../utils/error"
 import {
   DEFAULT_SETTINGS,
   SettingKey,
   settingsSchema,
-} from "../constants/setting"
-import { checkUnreachable } from "../utils/error"
-import { SettingModel } from "../db/model/Setting"
-import { Unicode } from "../constants"
+  SettingModel,
+} from "../db/model/Setting"
+import { Unicode } from "../../constants"
 
 enum SubcommandName {
   Set = "set",

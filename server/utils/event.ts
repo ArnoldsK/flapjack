@@ -1,6 +1,6 @@
 import { ClientEvents } from "discord.js"
 import { appConfig } from "../config"
-import { BaseContext } from "../types"
+import { BaseContext } from "../../types"
 import { getEvents } from "../events"
 
 export interface EventOptions {

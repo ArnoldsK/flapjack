@@ -1,6 +1,6 @@
 import type { GuildMember } from "discord.js"
 import { PermissionFlagsBits } from "discord.js"
-import { discordIds } from "../config"
+import { DISCORD_IDS } from "../../constants"
 
 export type PermissionType = "allow" | "deny" | "either"
 
@@ -50,10 +50,10 @@ export const memberHasPermission = (
   const validateCustom = (permission: bigint): boolean => {
     switch (permission) {
       case PermissionFlags.ClientOwner:
-        return member.id === discordIds.users.owner
+        return member.id === DISCORD_IDS.users.owner
 
       case PermissionFlags.NitroBooster:
-        return member.roles.cache.has(discordIds.roles.nitroBooster)
+        return member.roles.cache.has(DISCORD_IDS.roles.nitroBooster)
 
       default:
         return true

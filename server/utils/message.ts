@@ -1,9 +1,8 @@
 import { APIEmbed, Guild, GuildMember, MessageCreateOptions } from "discord.js"
 
-import { Color, Unicode } from "../constants"
-import { BaseContext } from "../types"
+import { Color, DISCORD_IDS, Unicode } from "../../constants"
+import { BaseContext } from "../../types"
 import { isTextChannel } from "./channel"
-import { appConfig } from "../config"
 import { embedAuthor } from "./member"
 
 export const parseMentions = (content: string, guild: Guild) => {
@@ -34,9 +33,7 @@ export const sendLogMessage = async (
 ) => {
   const channel = context
     .guild()
-    .channels.cache.get(
-      overrideChannelId ?? appConfig.discord.ids.channels.logs,
-    )
+    .channels.cache.get(overrideChannelId ?? DISCORD_IDS.channels.logs)
 
   if (isTextChannel(channel)) {
     await channel.send(content)

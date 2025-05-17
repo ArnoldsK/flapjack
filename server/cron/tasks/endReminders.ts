@@ -1,5 +1,5 @@
 import { ReminderModel } from "../../db/model/Reminder"
-import { Task } from "../../types/tasks"
+import { Task } from "../../../types/tasks"
 import { isTextChannel } from "../../utils/channel"
 import { d } from "../../utils/date"
 

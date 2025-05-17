@@ -9,7 +9,7 @@ import {
 import { BaseCommand } from "../base/Command"
 import { PermissionFlags, permission } from "../utils/permission"
 import { checkUnreachable } from "../utils/error"
-import { BOOSTER_ICON_ROLE_PREFIX } from "../constants"
+import { BOOSTER_ICON_ROLE_PREFIX } from "../../constants"
 import {
   getMemberBoosterIconRoleName,
   getMemberBoosterIconRole,

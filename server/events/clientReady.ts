@@ -1,15 +1,17 @@
 import { Events } from "discord.js"
 
 import { createEvent } from "../utils/event"
-import { discordIds } from "../config"
+import { DISCORD_IDS } from "../../constants"
 import { isTextChannel } from "../utils/channel"
-import { Color } from "../constants"
+import { Color } from "../../constants"
 
 export default createEvent(
   Events.ClientReady,
   { productionOnly: true },
   async (context) => {
-    const channel = context.guild().channels.cache.get(discordIds.channels.logs)
+    const channel = context
+      .guild()
+      .channels.cache.get(DISCORD_IDS.channels.logs)
     if (!isTextChannel(channel)) return
 
     channel.send({

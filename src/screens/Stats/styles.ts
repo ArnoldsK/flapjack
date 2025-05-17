@@ -1,0 +1,144 @@
+import styled, { css } from "styled-components"
+
+export const Months = styled.div`
+  margin: 40px 0 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+`
+
+export const Month = styled.div<{ active?: boolean }>`
+  flex-shrink: 0;
+  cursor: ${({ active }) => (active ? "default" : "pointer")};
+  padding: 8px 12px;
+  border-bottom: 2px solid ${({ active }) => (active ? "#ddd" : "transparent")};
+
+  &:hover {
+    ${({ active }) =>
+      !active &&
+      css`
+        border-color: #444;
+      `};
+  }
+`
+
+export const Stats = styled.div`
+  margin: 20px 0 40px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+`
+
+export const StatColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`
+
+export const Stat = styled.div`
+  border-radius: 8px;
+  background: #2a2a2a;
+  width: 350px;
+`
+
+export const StatItemsWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+`
+
+export const StatItem = styled.div<{ $muted?: boolean }>`
+  cursor: default;
+  opacity: ${({ $muted }) => ($muted ? 0.5 : 1)};
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`
+
+export const StatText = styled.div`
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+`
+
+export const CountBadge = styled.div`
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
+  display: inline-block;
+  background: #b492d433;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+`
+
+export const CalendarWrap = styled.div`
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-gap: 4px;
+`
+
+export const Day = styled.div<{ $active?: boolean; $hover?: boolean }>`
+  cursor: ${({ $active }) => ($active ? "default" : "pointer")};
+  text-align: center;
+  border-radius: 4px;
+  padding: 8px;
+  border: 1px solid
+    ${({ $active, $hover }) =>
+      $active ? "#b492d4" : $hover ? "#b492d488" : "transparent"};
+
+  &:hover {
+    ${({ $active }) =>
+      !$active &&
+      css`
+        border-color: #b492d488;
+      `};
+  }
+`
+
+export const GraphWrap = styled.div`
+  display: flex;
+  height: 150px;
+  margin: 8px;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+`
+
+export const GraphBar = styled.div<{
+  $heightPrc: number
+  $active?: boolean
+  $hover?: boolean
+}>`
+  flex-grow: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  cursor: pointer;
+  background: #222;
+
+  &::after {
+    content: "";
+    width: 100%;
+    background: ${({ $hover }) => ($hover ? "#b492d488" : "#b492d433")};
+    height: ${({ $heightPrc }) => $heightPrc}%;
+  }
+
+  ${({ $active }) =>
+    $active
+      ? css`
+          &::after {
+            background: #b492d4;
+          }
+        `
+      : css`
+          &:hover {
+            &::after {
+              background: #b492d488;
+            }
+          }
+        `}
+`

@@ -13,7 +13,7 @@ import {
 } from "discord.js"
 
 import { Permission, permission } from "../utils/permission"
-import { BaseContext } from "../types"
+import { BaseContext } from "../../types"
 
 class BaseCommand {
   constructor(

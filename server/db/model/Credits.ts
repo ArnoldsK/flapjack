@@ -2,8 +2,8 @@ import { GuildMember } from "discord.js"
 import { Repository } from "typeorm"
 import { db } from "../../database"
 import { CreditsEntity } from "../entity/Credits"
-import { appConfig, discordIds } from "../../config"
-import { UPPER_CLASS_MESSAGE_CREDITS } from "../../constants"
+import { appConfig } from "../../config"
+import { DISCORD_IDS, UPPER_CLASS_MESSAGE_CREDITS } from "../../../constants"
 
 export interface Wallet {
   member: GuildMember
@@ -85,7 +85,9 @@ export class CreditsModel {
   async #handleUpperClassRole(wallet: Wallet) {
     if (appConfig.dev) return
 
-    const role = this.#member.guild.roles.cache.get(discordIds.roles.upperClass)
+    const role = this.#member.guild.roles.cache.get(
+      DISCORD_IDS.roles.upperClass,
+    )
     if (!role) return
 
     if (wallet.credits >= UPPER_CLASS_MESSAGE_CREDITS) {

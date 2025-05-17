@@ -1,6 +1,6 @@
 import { Events } from "discord.js"
 import { createEvent } from "../utils/event"
-import { PERSISTENT_THREAD_ARCHIVE_DURATION } from "../constants"
+import { PERSISTENT_THREAD_ARCHIVE_DURATION } from "../../constants"
 import { PersistentThreadModel } from "../db/model/PersistentThread"
 
 export default createEvent(

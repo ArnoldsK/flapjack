@@ -15,9 +15,10 @@ import { assert } from "./utils/error"
 import { db } from "./database"
 import { getGroupedEvents } from "./utils/event"
 import { handleCron } from "./utils/cron"
-import { BaseContext } from "./types"
+import { BaseContext } from "../types"
 import CacheManager from "./cache"
 import { handleCustomRoutes } from "./utils/routes"
+import { DISCORD_IDS } from "../constants"
 
 // Prepare next app
 const nextApp = next({ dev: appConfig.dev })
@@ -52,7 +53,7 @@ nextApp.prepare().then(async () => {
   // #############################################################################
   const context: BaseContext = {
     client,
-    guild: () => client.guilds.cache.get(appConfig.discord.ids.guild)!,
+    guild: () => client.guilds.cache.get(DISCORD_IDS.guild)!,
     cache: new CacheManager(),
   }
 
@@ -69,11 +70,9 @@ nextApp.prepare().then(async () => {
   client.once(Events.ClientReady, async () => {
     console.log(`> Discord client ready as ${client.user?.tag}`)
 
-    // Pre-fetch members on live builds
-    if (!appConfig.dev) {
-      const guild = client.guilds.cache.get(appConfig.discord.ids.guild)!
-      await guild.members.fetch()
-    }
+    // Pre-fetch members
+    const guild = client.guilds.cache.get(DISCORD_IDS.guild)!
+    await guild.members.fetch()
   })
 
   client.on(Events.InteractionCreate, async (interaction) => {

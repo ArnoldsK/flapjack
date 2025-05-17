@@ -1,4 +1,4 @@
-import { RANK_MAX_LEVEL } from "../constants"
+import { RANK_MAX_LEVEL } from "../../constants"
 import { ExperienceLevelData } from "../db/model/Experience"
 import { interpolate } from "./number"
 

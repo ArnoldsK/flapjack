@@ -4,7 +4,7 @@ import { checkUnreachable } from "../utils/error"
 import { formatCredits, parseCreditsAmount } from "../utils/credits"
 import { CreditsModel } from "../db/model/Credits"
 import { sortBigInt } from "../utils/array"
-import { OPTION_DESCRIPTION_AMOUNT } from "../constants"
+import { OPTION_DESCRIPTION_AMOUNT } from "../../constants"
 import { isCasinoChannel } from "../utils/channel"
 
 enum SubcommandName {

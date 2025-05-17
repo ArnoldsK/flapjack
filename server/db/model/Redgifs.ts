@@ -2,7 +2,7 @@ import { Repository } from "typeorm"
 import { db } from "../../database"
 import { RedgifsEntity } from "../entity/Redgifs"
 import { d } from "../../utils/date"
-import { RedGifsResponse } from "../../types/redgifs"
+import { RedGifsResponse } from "../../../types/redgifs"
 
 export class RedgifsModel {
   #repository: Repository<RedgifsEntity>

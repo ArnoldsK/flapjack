@@ -20,7 +20,7 @@ import {
   setColorInteractionId,
 } from "../utils/color"
 import { getUserColorPreviewImage } from "../canvas/userAutoColorPreview"
-import { DISCORD_BACKGROUND_COLOR_LAB } from "../constants"
+import { DISCORD_BACKGROUND_COLOR_LAB } from "../../constants"
 
 enum SubcommandName {
   Suggest = "suggest",

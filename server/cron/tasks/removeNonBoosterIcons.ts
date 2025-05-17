@@ -1,7 +1,7 @@
 import { Role } from "discord.js"
-import { discordIds } from "../../config"
-import { Task } from "../../types/tasks"
-import { BOOSTER_ICON_ROLE_PREFIX } from "../../constants"
+import { DISCORD_IDS } from "../../../constants"
+import { Task } from "../../../types/tasks"
+import { BOOSTER_ICON_ROLE_PREFIX } from "../../../constants"
 
 export const removeNonBoosterIcons: Task = async (context) => {
   const nonBoosterMembers = context
@@ -9,7 +9,7 @@ export const removeNonBoosterIcons: Task = async (context) => {
     .members.cache.filter(
       (member) =>
         !member.user.bot &&
-        !member.roles.cache.has(discordIds.roles.nitroBooster),
+        !member.roles.cache.has(DISCORD_IDS.roles.nitroBooster),
     )
 
   const rolesToRemove: Role[] = []

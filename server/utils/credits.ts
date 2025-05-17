@@ -1,4 +1,4 @@
-import { Unicode } from "../constants"
+import { Unicode } from "../../constants"
 
 export const getCreditsEmoji = (value: bigint | number): string => {
   const minValueMap = {
