@@ -7,7 +7,7 @@ export default class ForceStatsCommand extends BaseCommand {
   static version = 1
 
   static command = new SlashCommandBuilder()
-    .setName("force-states")
+    .setName("force-stats")
     .setDescription("Force stats creation")
 
   static permissions = permission({
