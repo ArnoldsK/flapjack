@@ -2,7 +2,6 @@ import { McStatus } from "../types/mc"
 import { RedGifsGif } from "../types/redgifs"
 import { Settings } from "./db/model/Setting"
 import { ApiStatsCommand, ApiStatsDay, ApiVideos } from "../types/api"
-import { WeekRecapData } from "../types/recap"
 
 export enum CacheKey {
   NsfwPosts = "nsfwPosts",
@@ -22,7 +21,6 @@ interface AppCache {
   [CacheKey.Videos]: ApiVideos | null
   [CacheKey.StatsMessagesPerDay]: ApiStatsDay[] | null
   [CacheKey.StatsCommands]: ApiStatsCommand[] | null
-  [CacheKey.WeekRecap]: WeekRecapData | null
 }
 
 export default class CacheManager {
@@ -34,7 +32,6 @@ export default class CacheManager {
     [CacheKey.Videos]: null,
     [CacheKey.StatsMessagesPerDay]: null,
     [CacheKey.StatsCommands]: null,
-    [CacheKey.WeekRecap]: null,
   }
 
   constructor() {}
