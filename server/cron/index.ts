@@ -69,7 +69,7 @@ export const cronTasks: CronTask[] = [
   },
   {
     description: "Create daily stats",
-    expression: "every midnight",
+    expression: "every hour",
     isRawExpression: false,
     productionOnly: true,
     task: createDailyStats,
