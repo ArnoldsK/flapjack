@@ -1,30 +1,50 @@
 import { loadEnvConfig } from "@next/env"
+import { z } from "zod"
 
 loadEnvConfig(process.cwd())
 
-const port = parseInt(process.env.WEB_PORT || "3000")
+const env = z
+  .object({
+    DEV: z.string(),
+    WEB_PORT: z.string(),
+    WEB_BASE_URL: z.string(),
+    DB_TYPE: z.string(),
+    DB_HOST: z.string(),
+    DB_PORT: z.string(),
+    DB_USERNAME: z.string(),
+    DB_PASSWORD: z.string(),
+    DB_DATABASE: z.string(),
+    DISCORD_TOKEN: z.string(),
+    DISCORD_CLIENT: z.string(),
+    LOCAL_COMMANDS: z.string().default("false"),
+    GIPHY_API_KEY: z.string(),
+    DEEPL_AUTH_KEY: z.string(),
+  })
+  .parse(process.env)
+
+const port = parseInt(env.WEB_PORT, 10)
 
 export const appConfig = {
-  dev: process.env.DEV === "true",
+  dev: env.DEV === "true",
 
   db: {
-    type: process.env.DB_TYPE || "mysql",
-    host: process.env.DB_HOST || "localhost",
-    port: parseInt(process.env.DB_PORT || "3306"),
-    username: process.env.DB_USERNAME || "root",
-    password: process.env.DB_PASSWORD || "root",
-    database: process.env.DB_DATABASE || "flapjack",
+    type: env.DB_TYPE,
+    host: env.DB_HOST,
+    port: parseInt(env.DB_PORT, 10),
+    username: env.DB_USERNAME,
+    password: env.DB_PASSWORD,
+    database: env.DB_DATABASE,
   },
 
   web: {
     port,
-    baseUrl: process.env.WEB_BASE_URL || `http://localhost:${port}`,
+    baseUrl: env.WEB_BASE_URL,
   },
 
   discord: {
-    token: process.env.DISCORD_TOKEN || "",
-    client: process.env.DISCORD_CLIENT || "",
-    localCommands: process.env.LOCAL_COMMANDS === "true",
+    token: env.DISCORD_TOKEN,
+    client: env.DISCORD_CLIENT,
+    localCommands: env.LOCAL_COMMANDS === "true",
 
     ids: {
       guild: "411593263615836172",
@@ -55,12 +75,17 @@ export const appConfig = {
         minecraft: "584768527454568448",
         poe: "701811325042688070",
         videos: "581643451419066368",
+        garage: "743552656043409445",
       },
     },
   },
 
   giphy: {
-    apiKey: process.env.GIPHY_API_KEY || "",
+    apiKey: env.GIPHY_API_KEY,
+  },
+
+  deepl: {
+    authKey: env.DEEPL_AUTH_KEY,
   },
 }
 

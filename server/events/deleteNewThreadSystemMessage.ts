@@ -1,0 +1,18 @@
+import { MessageType } from "discord.js"
+import { createEvent } from "../utils/event"
+import { setTimeout } from "timers/promises"
+
+export default createEvent(
+  "messageCreate",
+  { productionOnly: true },
+  async (_context, message) => {
+    if (!message.system) return
+
+    if (message.type !== MessageType.ThreadCreated) return
+    if (message.hasThread) return
+
+    await setTimeout(10_000)
+
+    message.delete()
+  },
+)

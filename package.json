@@ -17,6 +17,7 @@
     "chroma-js": "^3.1.2",
     "cron-translate": "^1.0.0",
     "dayjs": "^1.11.13",
+    "deepl": "^1.0.13",
     "delta-e": "^0.0.8",
     "discord.js": "14.14.1",
     "engine-blackjack-ts": "^0.9.11",

@@ -1,3 +1,5 @@
+import { ThreadAutoArchiveDuration } from "discord.js"
+
 export enum Unicode {
   /** @deprecated */
   credits = "❈",
@@ -17,6 +19,11 @@ export enum Color {
   gold = 0xffd700,
   orange = 0xffa500,
   purple = 0x771177,
+}
+
+export enum Emoji {
+  computer = "🖥️",
+  chick = "🐤",
 }
 
 export const DISCORD_BACKGROUND_COLOR_HEX = "#313338"
@@ -44,3 +51,6 @@ export const RANK_ACTIVE_ROLE_LEVEL = 20
 export const RANK_MAX_LEVEL = 99
 
 export const EXP_PER_MESSAGE = 1
+
+export const PERSISTENT_THREAD_ARCHIVE_DURATION =
+  ThreadAutoArchiveDuration.OneWeek
