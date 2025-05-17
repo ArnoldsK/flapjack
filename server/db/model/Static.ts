@@ -21,12 +21,27 @@ export class StaticModel<Type extends StaticDataType> {
   }
 
   async set(value: StaticData[Type]) {
-    await this.#repository.update(
-      { type: this.#dataType },
-      {
-        // HACK: TypeORM typing isn't the smartest
-        value: value as any,
-      },
+    const hasEntity = Boolean(
+      await this.#repository.count({
+        where: { type: this.#dataType },
+      }),
     )
+
+    if (hasEntity) {
+      await this.#repository.update(
+        { type: this.#dataType },
+        {
+          // HACK: TypeORM typing isn't the smartest
+          value: value as any,
+        },
+      )
+    } else {
+      await this.#repository
+        .create({
+          type: this.#dataType,
+          value,
+        })
+        .save()
+    }
   }
 }
