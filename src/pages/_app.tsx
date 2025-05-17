@@ -37,6 +37,17 @@ const GlobalStyle = createGlobalStyle`
     }
   }
 
+  @keyframes slide-in-up {
+    0%,
+    50% {
+      margin-bottom: -50px;
+    }
+
+    100% {
+      margin-bottom: 0;
+    }
+  }
+
   * {
     box-sizing: border-box;
   }

@@ -2,6 +2,7 @@ import Head from "next/head"
 import { PropsWithChildren } from "react"
 
 import * as S from "./styles"
+import { Navigation } from "./Navigation"
 
 export interface PageProps {
   title?: string
@@ -28,6 +29,7 @@ export const Page = function Page({
         <title>{title ? `${title} · Pepsi Dog` : "Pepsi Dog"}</title>
       </Head>
       {noWrap ? children : <S.Wrap $centered={centered}>{children}</S.Wrap>}
+      <Navigation />
     </>
   )
 }
