@@ -1,24 +1,19 @@
 import { createRoute } from "../utils/routes"
-import { CommandExecuteModel } from "../db/model/CommandExecute"
 import { ApiStats } from "../../types/api"
-import { StatsModel } from "../db/model/Stats"
+import { StaticModel } from "../db/model/Static"
+import { StaticDataType } from "../../types/entity"
 
 export default createRoute({
   path: "/api/stats",
-  handler: async (context, _req, res) => {
-    const stats: ApiStats = {
-      messagesPerDay: [],
-      commands: [],
-    }
+  handler: async (_context, _req, res) => {
+    const model = new StaticModel(StaticDataType.Stats)
+    const stats = await model.get()
 
-    // Messages
-    const statsModel = new StatsModel(context)
-    stats.messagesPerDay = await statsModel.getApiItems()
-
-    // Commands
-    const commandsModel = new CommandExecuteModel(context)
-    stats.commands = await commandsModel.getApiItems()
-
-    res.json(stats)
+    res.json(
+      (stats ?? {
+        messagesPerDay: [],
+        commands: [],
+      }) satisfies ApiStats,
+    )
   },
 })

@@ -1,4 +1,5 @@
 import { CronTask } from "../utils/cron"
+import { createDailyStats } from "./tasks/createDailyStats"
 import { createWeekRecap } from "./tasks/createWeekRecap"
 import { endReminders } from "./tasks/endReminders"
 import { handleCreditsLotteries } from "./tasks/handleCreditsLotteries"
@@ -65,5 +66,12 @@ export const cronTasks: CronTask[] = [
     isRawExpression: false,
     productionOnly: true,
     task: createWeekRecap,
+  },
+  {
+    description: "Create daily stats",
+    expression: "every midnight",
+    isRawExpression: false,
+    productionOnly: true,
+    task: createDailyStats,
   },
 ]

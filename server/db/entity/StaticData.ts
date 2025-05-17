@@ -1,5 +1,4 @@
 import { Entity, BaseEntity, Column, PrimaryColumn } from "typeorm"
-import type { WeekRecapData } from "../../../types/recap"
 import { StaticData, StaticDataType } from "../../../types/entity"
 
 @Entity()
