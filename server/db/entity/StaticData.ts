@@ -7,7 +7,7 @@ export class StaticDataEntity<Type extends StaticDataType> extends BaseEntity {
   type: StaticDataType
 
   @Column({
-    type: "text",
+    type: "longtext",
     transformer: {
       from: (value?: string) => {
         if (!value) {
