@@ -49,3 +49,11 @@ export const makeEqualLengths = (
     return type === "before" ? `${voidText}${value}` : `${value}${voidText}`
   })
 }
+
+export const stringToIntHash = (value: string, min = 0, max = 500) => {
+  const charAtSum = value
+    .split("")
+    .reduce((sum, char) => sum + char.charCodeAt(0), 0)
+
+  return (charAtSum % (max - min)) + min
+}

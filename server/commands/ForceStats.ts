@@ -1,14 +1,44 @@
-import { SlashCommandBuilder } from "discord.js"
+import {
+  APIApplicationCommandOptionChoice,
+  SlashCommandBuilder,
+} from "discord.js"
 import { BaseCommand } from "../base/Command"
 import { permission, PermissionFlags } from "../utils/permission"
-import { createDailyStats } from "../cron/tasks/createDailyStats"
+import { cronTasks } from "../cron"
+import { stringToIntHash } from "../utils/string"
+import { assert } from "../utils/error"
+
+const cronTaskNames = cronTasks
+  .map((task) => task.description)
+  .sort((a, b) => a.localeCompare(b))
+
+// HACK: Ensure the command is updated on cron task changes
+const version = stringToIntHash(cronTaskNames.join(""))
+
+const choices: APIApplicationCommandOptionChoice<string>[] = cronTaskNames.map(
+  (name) => ({
+    name: name,
+    value: name,
+  }),
+)
+
+enum OptionName {
+  Task = "task",
+}
 
 export default class ForceStatsCommand extends BaseCommand {
-  static version = 1
+  static version = version
 
   static command = new SlashCommandBuilder()
-    .setName("force-stats")
-    .setDescription("Force stats creation")
+    .setName("force-task")
+    .setDescription("Force run a task")
+    .addStringOption((option) =>
+      option
+        .setName(OptionName.Task)
+        .setDescription("Which task to run?")
+        .setChoices(...choices)
+        .setRequired(true),
+    )
 
   static permissions = permission({
     type: "allow",
@@ -16,17 +46,22 @@ export default class ForceStatsCommand extends BaseCommand {
   })
 
   async execute() {
+    const taskName = this.interaction.options.getString(OptionName.Task, true)
+
     await this.interaction.deferReply({
       ephemeral: true,
     })
 
     try {
-      await createDailyStats(this.context)
+      const cronTask = cronTasks.find((task) => task.description === taskName)
+      assert(!!cronTask, "Task not found")
 
-      this.editReply("Created stats")
+      await cronTask.task(this.context)
+
+      this.editReply("Task complete")
     } catch (error) {
-      this.editReply("Failed to create stats")
-      console.error("Failed to create stats", error)
+      this.editReply("Failed to run the task")
+      console.error(`Failed to force run "${taskName}" task`, error)
     }
   }
 }
