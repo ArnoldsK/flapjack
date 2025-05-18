@@ -115,7 +115,12 @@ export const CalendarWrap = styled.div`
   grid-gap: 4px;
 `
 
-export const Day = styled.div<{ $active?: boolean; $hover?: boolean }>`
+interface DayProps {
+  $active?: boolean
+  $hover?: boolean
+  $disabled?: boolean
+}
+export const Day = styled.div<DatProps>`
   cursor: ${({ $active }) => ($active ? "default" : "pointer")};
   text-align: center;
   border-radius: 8px;
@@ -124,9 +129,17 @@ export const Day = styled.div<{ $active?: boolean; $hover?: boolean }>`
     ${({ $active, $hover }) =>
       $active ? "#b492d4" : $hover ? "#b492d488" : "transparent"};
 
+  ${({ $disabled }) =>
+    $disabled &&
+    css`
+      cursor: default;
+      opacity: 0.33;
+    `}
+
   &:hover {
-    ${({ $active }) =>
+    ${({ $active, $disabled }) =>
       !$active &&
+      !$disabled &&
       css`
         border-color: #b492d488;
       `};

@@ -49,6 +49,21 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
     )
   }, [currentYearMonth, messagesPerDay])
 
+  const currentMonthFutureDates = useMemo((): number[] => {
+    const lastStat = currentMonthStats.at(-1)
+    if (!lastStat) {
+      return []
+    }
+
+    const lastDate = d(lastStat.dateString).date()
+    const daysInMonth = d(lastStat.dateString).daysInMonth()
+
+    return Array.from(
+      { length: daysInMonth - lastDate },
+      (_, i) => lastDate + i + 1,
+    )
+  }, [currentMonthStats])
+
   const dateStrings = useMemo(() => {
     return currentMonthStats.map((item) =>
       d(item.dateString).format(dateStringFormat),
@@ -126,6 +141,11 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
                     onMouseLeave={() => setCurrentHoverDateString(null)}
                   >
                     {d(dateString).format("D")}
+                  </S.Day>
+                ))}
+                {currentMonthFutureDates.map((date) => (
+                  <S.Day key={date} $disabled>
+                    {date}
                   </S.Day>
                 ))}
               </S.CalendarWrap>
