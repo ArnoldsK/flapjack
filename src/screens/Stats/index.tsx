@@ -14,6 +14,10 @@ interface StatsScreenProps {
 const yearMonthFormat = "YYYY MMMM"
 const dateStringFormat = "YYYY-MM-DD"
 
+const formatChannelName = (name: string) => {
+  return name.replace("╰", "")
+}
+
 export const StatsScreen = ({ stats }: StatsScreenProps) => {
   const { messagesPerDay, commands } = stats
 
@@ -156,7 +160,9 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
               {currentStats.topChannels.map((channel) => (
                 <S.StatItem key={channel.id} $muted={!channel.name}>
                   <S.CountBadge>{channel.messageCount}</S.CountBadge>
-                  <S.StatText>{channel.name || channel.id}</S.StatText>
+                  <S.StatText>
+                    {formatChannelName(channel.name) || channel.id}
+                  </S.StatText>
                 </S.StatItem>
               ))}
             </S.StatItemsWrap>
@@ -166,7 +172,7 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
               {currentStats.topUsers.map((user) => (
                 <S.StatItem key={user.id} $muted={!user.displayName}>
                   <S.CountBadge>{user.messageCount}</S.CountBadge>
-                  <S.StatText>{user.displayName || "Unknown"}</S.StatText>
+                  <S.StatText>{user.displayName || user.id}</S.StatText>
                 </S.StatItem>
               ))}
             </S.StatItemsWrap>
