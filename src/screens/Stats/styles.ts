@@ -120,7 +120,7 @@ interface DayProps {
   $hover?: boolean
   $disabled?: boolean
 }
-export const Day = styled.div<DatProps>`
+export const Day = styled.div<DayProps>`
   cursor: ${({ $active }) => ($active ? "default" : "pointer")};
   text-align: center;
   border-radius: 8px;
