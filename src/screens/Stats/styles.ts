@@ -121,7 +121,8 @@ interface DayProps {
   $disabled?: boolean
 }
 export const Day = styled.div<DayProps>`
-  cursor: ${({ $active }) => ($active ? "default" : "pointer")};
+  cursor: ${({ $active, onClick }) =>
+    onClick && !$active ? "pointer" : "default"};
   text-align: center;
   border-radius: 8px;
   padding: 8px;
@@ -132,7 +133,6 @@ export const Day = styled.div<DayProps>`
   ${({ $disabled }) =>
     $disabled &&
     css`
-      cursor: default;
       opacity: 0.33;
     `}
 
@@ -163,7 +163,7 @@ export const GraphBar = styled.div<{
   height: 100%;
   display: flex;
   align-items: flex-end;
-  cursor: pointer;
+  cursor: ${({ onClick }) => (onClick ? "pointer" : "default")};
   background: #222;
 
   &::after {

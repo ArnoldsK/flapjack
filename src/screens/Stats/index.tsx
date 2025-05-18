@@ -49,6 +49,17 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
     )
   }, [currentYearMonth, messagesPerDay])
 
+  const currentMonthPastDates = useMemo((): number[] => {
+    const firstStat = currentMonthStats.at(0)
+    if (!firstStat) {
+      return []
+    }
+
+    const firstDate = d(firstStat.dateString).date()
+
+    return Array.from({ length: firstDate - 1 }, (_, i) => i + 1)
+  }, [currentMonthStats])
+
   const currentMonthFutureDates = useMemo((): number[] => {
     const lastStat = currentMonthStats.at(-1)
     if (!lastStat) {
@@ -131,6 +142,11 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
           <S.StatColumn>
             <S.Stat>
               <S.CalendarWrap>
+                {currentMonthPastDates.map((date) => (
+                  <S.Day key={date} $disabled>
+                    {date}
+                  </S.Day>
+                ))}
                 {dateStrings.map((dateString) => (
                   <S.Day
                     key={dateString}
@@ -150,6 +166,9 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
                 ))}
               </S.CalendarWrap>
               <S.GraphWrap>
+                {currentMonthPastDates.map((date) => (
+                  <S.GraphBar key={date} $heightPrc={0} />
+                ))}
                 {currentMonthTotals.totals.map(({ total, dateString }) => (
                   <S.GraphBar
                     key={dateString}
@@ -160,6 +179,9 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
                     onMouseEnter={() => setCurrentHoverDateString(dateString)}
                     onMouseLeave={() => setCurrentHoverDateString(null)}
                   />
+                ))}
+                {currentMonthFutureDates.map((date) => (
+                  <S.GraphBar key={date} $heightPrc={0} />
                 ))}
               </S.GraphWrap>
             </S.Stat>
