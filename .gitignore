@@ -21,6 +21,7 @@
 # misc
 .DS_Store
 *.pem
+.last-commit-hash
 
 # debug
 npm-debug.log*
