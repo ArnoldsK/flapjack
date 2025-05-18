@@ -19,7 +19,6 @@ import { BaseContext } from "../types"
 import CacheManager from "./cache"
 import { handleCustomRoutes } from "./utils/routes"
 import { DISCORD_IDS } from "../constants"
-import { removeOldStats } from "./cron/tasks/removeOldStats"
 
 // Prepare next app
 const nextApp = next({ dev: appConfig.dev })
