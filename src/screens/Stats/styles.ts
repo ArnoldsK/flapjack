@@ -42,6 +42,8 @@ export const Stat = styled.div`
   border-radius: 8px;
   background: #2a2a2a;
   width: 350px;
+  position: relative;
+  overflow: hidden;
 `
 
 export const StatItemsWrap = styled.div`
@@ -49,6 +51,37 @@ export const StatItemsWrap = styled.div`
   flex-direction: column;
   gap: 8px;
   padding: 8px;
+`
+
+export const CollapseCheckbox = styled.input`
+  all: unset;
+  position: absolute;
+  inset: 0;
+  display: block;
+
+  &:checked {
+    display: none;
+  }
+
+  &:not(:checked) {
+    cursor: pointer;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(42 42 42 / 0),
+        rgba(42 42 42 / 1)
+      );
+    }
+  }
+
+  &:not(:checked) + ${StatItemsWrap} {
+    max-height: 120px;
+    overflow: hidden;
+  }
 `
 
 export const StatItem = styled.div<{ $muted?: boolean }>`

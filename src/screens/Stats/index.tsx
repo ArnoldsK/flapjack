@@ -140,6 +140,7 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
               </S.GraphWrap>
             </S.Stat>
             <S.Stat>
+              <S.CollapseCheckbox type="checkbox" />
               <S.StatItemsWrap>
                 {commands.map((command) => (
                   <S.StatItem key={command.name}>
