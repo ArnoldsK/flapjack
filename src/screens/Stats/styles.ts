@@ -154,11 +154,17 @@ export const GraphWrap = styled.div`
   overflow: hidden;
 `
 
-export const GraphBar = styled.div<{
+interface GraphBarProps {
   $heightPrc: number
   $active?: boolean
   $hover?: boolean
-}>`
+}
+export const GraphBar = styled.div.attrs<GraphBarProps>((props) => ({
+  style: {
+    "--bar-background": props.$hover ? "#b492d488" : "#b492d433",
+    "--bar-height": `${props.$heightPrc}%`,
+  },
+}))<GraphBarProps>`
   flex-grow: 1;
   height: 100%;
   display: flex;
@@ -169,8 +175,8 @@ export const GraphBar = styled.div<{
   &::after {
     content: "";
     width: 100%;
-    background: ${({ $hover }) => ($hover ? "#b492d488" : "#b492d433")};
-    height: ${({ $heightPrc }) => $heightPrc}%;
+    background: var(--bar-background);
+    height: var(--bar-height);
   }
 
   ${({ $active }) =>
