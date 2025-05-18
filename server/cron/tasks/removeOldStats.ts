@@ -10,7 +10,7 @@ export const removeOldStats: Task = async (context) => {
 
   const entities = await StatsEntity.createQueryBuilder()
     .where("`timestamp` < :ts", {
-      ts: minDate.format("X"),
+      ts: minDate.unix(),
     })
     .getRawMany()
 
