@@ -13,7 +13,7 @@ const LAST_COMMIT_HASH_PATH = path.join(process.cwd(), ".last-commit-hash")
 
 export const getNewCommits = async (): Promise<Commit[]> => {
   const { stdout: log } = await promisify(exec)(
-    "git log -n 10 --oneline --no-merges",
+    "git log -n 10 --oneline --no-merges --no-decorate",
   )
 
   if (!log) {
