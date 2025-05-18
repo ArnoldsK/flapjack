@@ -1,6 +1,6 @@
 {
   "editor.formatOnSave": true,
-  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
   "cSpell.words": [
     "bepsi",
     "deepl",

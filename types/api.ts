@@ -1,6 +1,6 @@
-import { VideoEntity } from "../server/db/entity/Video"
-import { EntityFields } from "./entity"
-import { WeekRecapData } from "./recap"
+import { VideoEntity } from "~/server/db/entity/Video"
+import { EntityFields } from "~/types/entity"
+import { WeekRecapData } from "~/types/recap"
 
 export interface ApiStatsDay {
   dateString: string

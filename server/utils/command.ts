@@ -7,15 +7,18 @@ import {
   RESTPostAPIChatInputApplicationCommandsJSONBody,
   Routes,
 } from "discord.js"
-import { BaseCommand } from "../base/Command"
-import { getCommands } from "../commands"
-import { DISCORD_IDS, Unicode } from "../../constants"
-import { assert } from "./error"
-import { getPermissionFlagName, memberHasPermission } from "./permission"
-import { dedupe } from "./array"
-import { appConfig } from "../config"
-import { BaseContext } from "../../types"
-import { CommandExecuteModel } from "../db/model/CommandExecute"
+import { BaseCommand } from "~/server/base/Command"
+import { getCommands } from "~/server/commands"
+import { DISCORD_IDS, Unicode } from "~/constants"
+import { assert } from "~/server/utils/error"
+import {
+  getPermissionFlagName,
+  memberHasPermission,
+} from "~/server/utils/permission"
+import { dedupe } from "~/server/utils/array"
+import { appConfig } from "~/server/config"
+import { BaseContext } from "~/types"
+import { CommandExecuteModel } from "~/server/db/model/CommandExecute"
 
 export type SetupCommand = RESTPostAPIChatInputApplicationCommandsJSONBody & {
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>

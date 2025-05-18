@@ -1,11 +1,11 @@
 import { SlashCommandBuilder } from "discord.js"
 
-import { BaseCommand } from "../base/Command"
-import { d } from "../utils/date"
-import { ReminderModel } from "../db/model/Reminder"
-import { embedAuthor } from "../utils/member"
-import { joinAsLines } from "../utils/string"
-import { contentRelativeTime, parseMentions } from "../utils/message"
+import { BaseCommand } from "~/server/base/Command"
+import { d } from "~/server/utils/date"
+import { ReminderModel } from "~/server/db/model/Reminder"
+import { embedAuthor } from "~/server/utils/member"
+import { joinAsLines } from "~/server/utils/string"
+import { contentRelativeTime, parseMentions } from "~/server/utils/message"
 
 enum OptionName {
   DurationType = "duration",

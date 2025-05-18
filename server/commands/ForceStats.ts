@@ -2,11 +2,11 @@ import {
   APIApplicationCommandOptionChoice,
   SlashCommandBuilder,
 } from "discord.js"
-import { BaseCommand } from "../base/Command"
-import { permission, PermissionFlags } from "../utils/permission"
-import { cronTasks } from "../cron"
-import { stringToIntHash } from "../utils/string"
-import { assert } from "../utils/error"
+import { BaseCommand } from "~/server/base/Command"
+import { permission, PermissionFlags } from "~/server/utils/permission"
+import { cronTasks } from "~/server/cron"
+import { stringToIntHash } from "~/server/utils/string"
+import { assert } from "~/server/utils/error"
 
 const cronTaskNames = cronTasks
   .map((task) => task.description)

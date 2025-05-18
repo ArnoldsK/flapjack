@@ -5,7 +5,7 @@ import {
   Role,
   RoleCreateOptions,
 } from "discord.js"
-import { BOOSTER_ICON_ROLE_PREFIX, COLOR_ROLE_PREFIX } from "../../constants"
+import { BOOSTER_ICON_ROLE_PREFIX, COLOR_ROLE_PREFIX } from "~/constants"
 
 export const getClientRole = (guild: Guild): Role => {
   return guild.members.me!.roles.cache.find((role) => role.managed)!

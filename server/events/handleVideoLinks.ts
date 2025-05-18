@@ -1,11 +1,11 @@
 import { Events, GuildMember, Message } from "discord.js"
-import { createEvent } from "../utils/event"
+import { createEvent } from "~/server/utils/event"
 import { z } from "zod"
-import { DISCORD_IDS } from "../../constants"
-import { VideoEntity } from "../db/entity/Video"
-import { isNonNullish } from "../utils/boolean"
-import { EntityFields } from "../../types/entity"
-import { CacheKey } from "../cache"
+import { DISCORD_IDS } from "~/constants"
+import { VideoEntity } from "~/server/db/entity/Video"
+import { isNonNullish } from "~/server/utils/boolean"
+import { EntityFields } from "~/types/entity"
+import { CacheKey } from "~/server/cache"
 import { In } from "typeorm"
 
 export default createEvent(

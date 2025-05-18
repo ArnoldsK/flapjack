@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "discord.js"
-import { BaseCommand } from "../base/Command"
+import { BaseCommand } from "~/server/base/Command"
 
 enum OptionName {
   User = "user",

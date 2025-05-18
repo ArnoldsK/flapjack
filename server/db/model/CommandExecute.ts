@@ -1,8 +1,8 @@
 import { Repository } from "typeorm"
-import { db } from "../../database"
-import { CommandExecuteEntity } from "../entity/CommandExecute"
-import { EntityFields } from "../../../types/entity"
-import { ApiStatsCommand } from "../../../types/api"
+import { db } from "~/server/database"
+import { CommandExecuteEntity } from "~/server/db/entity/CommandExecute"
+import { EntityFields } from "~/types/entity"
+import { ApiStatsCommand } from "~/types/api"
 
 type CreateInput = Omit<EntityFields<CommandExecuteEntity>, "id" | "createdAt">
 

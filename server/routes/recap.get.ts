@@ -1,8 +1,8 @@
-import { createRoute } from "../utils/routes"
-import { ApiRecap } from "../../types/api"
-import { StaticModel } from "../db/model/Static"
-import { dedupe } from "../utils/array"
-import { StaticDataType } from "../../types/entity"
+import { createRoute } from "~/server/utils/routes"
+import { ApiRecap } from "~/types/api"
+import { StaticModel } from "~/server/db/model/Static"
+import { dedupe } from "~/server/utils/array"
+import { StaticDataType } from "~/types/entity"
 
 export default createRoute({
   path: "/api/recap",

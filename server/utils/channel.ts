@@ -4,7 +4,7 @@ import {
   GuildTextBasedChannel,
   TextChannel,
 } from "discord.js"
-import { DISCORD_IDS } from "../../constants"
+import { DISCORD_IDS } from "~/constants"
 
 export const isCasinoChannel = (channel: GuildTextBasedChannel): boolean => {
   return channel.id === DISCORD_IDS.channels.casino

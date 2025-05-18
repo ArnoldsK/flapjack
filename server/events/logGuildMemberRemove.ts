@@ -1,12 +1,12 @@
 import { AuditLogEvent, Events, GuildMember } from "discord.js"
 
-import { createEvent } from "../utils/event"
-import { DISCORD_IDS } from "../../constants"
-import { isTextChannel } from "../utils/channel"
-import { joinAsLines } from "../utils/string"
-import { Color } from "../../constants"
-import { d } from "../utils/date"
-import { embedAuthor } from "../utils/member"
+import { createEvent } from "~/server/utils/event"
+import { DISCORD_IDS } from "~/constants"
+import { isTextChannel } from "~/server/utils/channel"
+import { joinAsLines } from "~/server/utils/string"
+import { Color } from "~/constants"
+import { d } from "~/server/utils/date"
+import { embedAuthor } from "~/server/utils/member"
 
 const getAuditLogsData = async (member: GuildMember) => {
   let auditLogs

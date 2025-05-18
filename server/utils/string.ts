@@ -1,4 +1,4 @@
-import { Unicode } from "../../constants"
+import { Unicode } from "~/constants"
 
 export const joinAsLines = (...values: string[]) => values.join("\n")
 

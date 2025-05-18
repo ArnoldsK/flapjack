@@ -1,11 +1,10 @@
 import { z } from "zod"
-import { DISCORD_IDS } from "../../../constants"
-import { Task } from "../../../types/tasks"
-import { isTextChannel } from "../../utils/channel"
-import { CacheKey } from "../../cache"
-import { McStatus } from "../../../types/mc"
-import { joinAsLines } from "../../utils/string"
-import { Color } from "../../../constants"
+import { Color, DISCORD_IDS } from "~/constants"
+import { Task } from "~/types/tasks"
+import { isTextChannel } from "~/server/utils/channel"
+import { CacheKey } from "~/server/cache"
+import { McStatus } from "~/types/mc"
+import { joinAsLines } from "~/server/utils/string"
 
 const SERVER_IP = "mc.pepsidog.lv"
 

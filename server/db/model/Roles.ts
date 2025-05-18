@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js"
 import { Repository } from "typeorm"
-import { db } from "../../database"
-import { RolesEntity } from "../entity/Roles"
+import { db } from "~/server/database"
+import { RolesEntity } from "~/server/db/entity/Roles"
 
 export class RolesModel {
   #member: GuildMember

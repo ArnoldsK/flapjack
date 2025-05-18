@@ -1,4 +1,4 @@
-import { createRoute } from "../utils/routes"
+import { createRoute } from "~/server/utils/routes"
 
 export default createRoute({
   path: "/ping",

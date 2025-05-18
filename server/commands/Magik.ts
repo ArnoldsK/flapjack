@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js"
-import { isUrl } from "../utils/web"
-import { BaseCommand } from "../base/Command"
-import { checkUnreachable } from "../utils/error"
+import { isUrl } from "~/server/utils/web"
+import { BaseCommand } from "~/server/base/Command"
+import { checkUnreachable } from "~/server/utils/error"
 
 const API_URL = "https://arnoldsk.lv/liquify-api/?url="
 

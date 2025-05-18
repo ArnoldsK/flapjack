@@ -6,13 +6,13 @@ import {
   GuildTextBasedChannel,
 } from "discord.js"
 
-import { DISCORD_IDS } from "../../../constants"
-import { CreditsModel } from "../../db/model/Credits"
-import { formatCredits } from "../../utils/credits"
-import { randomBool, randomInt, randomValue } from "../../utils/random"
-import { dedupe } from "../../utils/array"
-import { Task } from "../../../types/tasks"
-import { isNonNullish } from "../../utils/boolean"
+import { DISCORD_IDS } from "~/constants"
+import { CreditsModel } from "~/server/db/model/Credits"
+import { formatCredits } from "~/server/utils/credits"
+import { randomBool, randomInt, randomValue } from "~/server/utils/random"
+import { dedupe } from "~/server/utils/array"
+import { Task } from "~/types/tasks"
+import { isNonNullish } from "~/server/utils/boolean"
 
 const getAmount = (): number => {
   // One in 50 to get a mil

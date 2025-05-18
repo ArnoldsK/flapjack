@@ -1,8 +1,8 @@
 import { Events } from "discord.js"
-import { createEvent } from "../utils/event"
-import { DISCORD_IDS } from "../../constants"
-import { PERSISTENT_THREAD_ARCHIVE_DURATION } from "../../constants"
-import { PersistentThreadModel } from "../db/model/PersistentThread"
+import { createEvent } from "~/server/utils/event"
+import { DISCORD_IDS } from "~/constants"
+import { PERSISTENT_THREAD_ARCHIVE_DURATION } from "~/constants"
+import { PersistentThreadModel } from "~/server/db/model/PersistentThread"
 
 const PERSISTENT_THREAD_CHANNEL_IDS = [DISCORD_IDS.channels.garage]
 

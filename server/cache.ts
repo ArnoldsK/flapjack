@@ -1,7 +1,7 @@
-import { McStatus } from "../types/mc"
-import { RedGifsGif } from "../types/redgifs"
-import { Settings } from "./db/model/Setting"
-import { ApiStats, ApiVideos } from "../types/api"
+import { McStatus } from "~/types/mc"
+import { RedGifsGif } from "~/types/redgifs"
+import { Settings } from "~/server/db/model/Setting"
+import { ApiStats, ApiVideos } from "~/types/api"
 
 export enum CacheKey {
   NsfwPosts = "nsfwPosts",

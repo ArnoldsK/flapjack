@@ -1,8 +1,8 @@
-import { Task } from "../../../types/tasks"
-import { StaticModel } from "../../db/model/Static"
-import { StaticDataType } from "../../../types/entity"
-import { StatsModel } from "../../db/model/Stats"
-import { CommandExecuteModel } from "../../db/model/CommandExecute"
+import { Task } from "~/types/tasks"
+import { StaticModel } from "~/server/db/model/Static"
+import { StaticDataType } from "~/types/entity"
+import { StatsModel } from "~/server/db/model/Stats"
+import { CommandExecuteModel } from "~/server/db/model/CommandExecute"
 
 export const createDailyStats: Task = async (context) => {
   const guild = context.guild()

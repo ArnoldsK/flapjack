@@ -1,11 +1,11 @@
 import { SlashCommandBuilder } from "discord.js"
-import { BaseCommand } from "../base/Command"
-import { CreditsModel } from "../db/model/Credits"
-import { formatCredits, parseCreditsAmount } from "../utils/credits"
-import { Color, OPTION_DESCRIPTION_AMOUNT } from "../../constants"
-import { randomValue } from "../utils/random"
-import { isCasinoChannel } from "../utils/channel"
-import { joinAsLines } from "../utils/string"
+import { BaseCommand } from "~/server/base/Command"
+import { CreditsModel } from "~/server/db/model/Credits"
+import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
+import { Color, OPTION_DESCRIPTION_AMOUNT } from "~/constants"
+import { randomValue } from "~/server/utils/random"
+import { isCasinoChannel } from "~/server/utils/channel"
+import { joinAsLines } from "~/server/utils/string"
 
 enum OptionName {
   Color = "color",

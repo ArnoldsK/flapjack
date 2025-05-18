@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next"
-import { ApiAvatars } from "../../../types/api"
-import { AvatarGrid } from "../../components/AvatarGrid"
-import { Page } from "../../components/Page"
+import { ApiAvatars } from "~/types/api"
+import { AvatarGrid } from "~/src/components/AvatarGrid"
+import { Page } from "~/src/components/Page"
 
 import * as S from "./styles"
 import absoluteUrl from "next-absolute-url"

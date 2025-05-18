@@ -1,11 +1,11 @@
 import { SlashCommandBuilder } from "discord.js"
-import { BaseCommand } from "../base/Command"
-import { checkUnreachable } from "../utils/error"
-import { formatCredits, parseCreditsAmount } from "../utils/credits"
-import { CreditsModel } from "../db/model/Credits"
-import { sortBigInt } from "../utils/array"
-import { OPTION_DESCRIPTION_AMOUNT } from "../../constants"
-import { isCasinoChannel } from "../utils/channel"
+import { BaseCommand } from "~/server/base/Command"
+import { checkUnreachable } from "~/server/utils/error"
+import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
+import { CreditsModel } from "~/server/db/model/Credits"
+import { sortBigInt } from "~/server/utils/array"
+import { OPTION_DESCRIPTION_AMOUNT } from "~/constants"
+import { isCasinoChannel } from "~/server/utils/channel"
 
 enum SubcommandName {
   View = "view",

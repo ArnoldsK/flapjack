@@ -1,6 +1,6 @@
 import { join } from "path"
 import { DataSource } from "typeorm"
-import { appConfig } from "./config"
+import { appConfig } from "~/server/config"
 
 export const db = new DataSource({
   // @ts-expect-error yolo

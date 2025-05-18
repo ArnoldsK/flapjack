@@ -7,20 +7,20 @@ import {
 import deltaE from "delta-e"
 import colorPalette from "get-image-colors"
 
-import { BaseCommand } from "../base/Command"
-import { checkUnreachable } from "../utils/error"
+import { BaseCommand } from "~/server/base/Command"
+import { checkUnreachable } from "~/server/utils/error"
 import {
   getMemberColorRole,
   purgeRole,
   setMemberColorRole,
-} from "../utils/role"
+} from "~/server/utils/role"
 import {
   labArrayToObject,
   parseHexColor,
   setColorInteractionId,
-} from "../utils/color"
-import { getUserColorPreviewImage } from "../canvas/userAutoColorPreview"
-import { DISCORD_BACKGROUND_COLOR_LAB } from "../../constants"
+} from "~/server/utils/color"
+import { getUserColorPreviewImage } from "~/server/canvas/userAutoColorPreview"
+import { DISCORD_BACKGROUND_COLOR_LAB } from "~/constants"
 
 enum SubcommandName {
   Suggest = "suggest",

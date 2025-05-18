@@ -1,13 +1,13 @@
-import { CronTask } from "../utils/cron"
-import { createDailyStats } from "./tasks/createDailyStats"
-import { createWeekRecap } from "./tasks/createWeekRecap"
-import { endReminders } from "./tasks/endReminders"
-import { handleCreditsLotteries } from "./tasks/handleCreditsLotteries"
-import { mcStatus } from "./tasks/mcStatus"
-import { removeNonBoosterIcons } from "./tasks/removeNonBoosterIcons"
-import { removeOldStats } from "./tasks/removeOldStats"
-import { resetCredits } from "./tasks/resetCredits"
-import { updateBannerToGif } from "./tasks/updateBannerToGif"
+import { CronTask } from "~/server/utils/cron"
+import { createDailyStats } from "~/server/cron/tasks/createDailyStats"
+import { createWeekRecap } from "~/server/cron/tasks/createWeekRecap"
+import { endReminders } from "~/server/cron/tasks/endReminders"
+import { handleCreditsLotteries } from "~/server/cron/tasks/handleCreditsLotteries"
+import { mcStatus } from "~/server/cron/tasks/mcStatus"
+import { removeNonBoosterIcons } from "~/server/cron/tasks/removeNonBoosterIcons"
+import { removeOldStats } from "~/server/cron/tasks/removeOldStats"
+import { resetCredits } from "~/server/cron/tasks/resetCredits"
+import { updateBannerToGif } from "~/server/cron/tasks/updateBannerToGif"
 
 export const cronTasks: CronTask[] = [
   {

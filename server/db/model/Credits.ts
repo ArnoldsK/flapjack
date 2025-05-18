@@ -1,9 +1,9 @@
 import { GuildMember } from "discord.js"
 import { Repository } from "typeorm"
-import { db } from "../../database"
-import { CreditsEntity } from "../entity/Credits"
-import { appConfig } from "../../config"
-import { DISCORD_IDS, UPPER_CLASS_MESSAGE_CREDITS } from "../../../constants"
+import { db } from "~/server/database"
+import { CreditsEntity } from "~/server/db/entity/Credits"
+import { appConfig } from "~/server/config"
+import { DISCORD_IDS, UPPER_CLASS_MESSAGE_CREDITS } from "~/constants"
 
 export interface Wallet {
   member: GuildMember

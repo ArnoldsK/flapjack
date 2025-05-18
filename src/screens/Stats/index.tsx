@@ -1,11 +1,11 @@
 import { GetServerSideProps } from "next"
 
-import { ApiStats } from "../../../types/api"
-import { Page } from "../../components/Page"
+import { ApiStats } from "~/types/api"
+import { Page } from "~/src/components/Page"
 import * as S from "./styles"
 import absoluteUrl from "next-absolute-url"
 import { useEffect, useMemo, useState } from "react"
-import { d } from "../../../server/utils/date"
+import { d } from "~/server/utils/date"
 
 interface StatsScreenProps {
   stats: ApiStats

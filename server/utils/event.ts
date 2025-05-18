@@ -1,7 +1,7 @@
 import { ClientEvents } from "discord.js"
-import { appConfig } from "../config"
-import { BaseContext } from "../../types"
-import { getEvents } from "../events"
+import { appConfig } from "~/server/config"
+import { BaseContext } from "~/types"
+import { getEvents } from "~/server/events"
 
 export interface EventOptions {
   productionOnly: boolean

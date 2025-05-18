@@ -1,9 +1,9 @@
 import { In, Repository } from "typeorm"
-import { db } from "../../database"
-import { SettingEntity } from "../entity/Setting"
-import { BaseContext } from "../../../types"
-import { CacheKey } from "../../cache"
-import { dedupe } from "../../utils/array"
+import { db } from "~/server/database"
+import { SettingEntity } from "~/server/db/entity/Setting"
+import { BaseContext } from "~/types"
+import { CacheKey } from "~/server/cache"
+import { dedupe } from "~/server/utils/array"
 import { z } from "zod"
 
 export const settingsSchema = z.object({

@@ -1,7 +1,7 @@
 import { Role } from "discord.js"
-import { DISCORD_IDS } from "../../../constants"
-import { Task } from "../../../types/tasks"
-import { BOOSTER_ICON_ROLE_PREFIX } from "../../../constants"
+import { DISCORD_IDS } from "~/constants"
+import { Task } from "~/types/tasks"
+import { BOOSTER_ICON_ROLE_PREFIX } from "~/constants"
 
 export const removeNonBoosterIcons: Task = async (context) => {
   const nonBoosterMembers = context

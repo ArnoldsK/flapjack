@@ -1,7 +1,7 @@
 import { Events, GuildPremiumTier } from "discord.js"
 
-import { createEvent } from "../utils/event"
-import { requireSetting } from "../utils/setting"
+import { createEvent } from "~/server/utils/event"
+import { requireSetting } from "~/server/utils/setting"
 
 export default createEvent(
   Events.GuildUpdate,

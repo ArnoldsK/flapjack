@@ -1,5 +1,5 @@
 import axios from "axios"
-import { appConfig } from "../config"
+import { appConfig } from "~/server/config"
 
 interface FileResponse {
   filename: string

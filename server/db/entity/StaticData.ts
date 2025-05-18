@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, Column, PrimaryColumn } from "typeorm"
-import { StaticData, StaticDataType } from "../../../types/entity"
+import { StaticData, StaticDataType } from "~/types/entity"
 
 @Entity()
 export class StaticDataEntity<Type extends StaticDataType> extends BaseEntity {

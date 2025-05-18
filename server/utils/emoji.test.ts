@@ -1,4 +1,7 @@
-import { getEmojiIdFromString, getNativeEmojiFromString } from "./emoji"
+import {
+  getEmojiIdFromString,
+  getNativeEmojiFromString,
+} from "~/server/utils/emoji"
 
 test("getEmojiIdFromString", () => {
   expect(getEmojiIdFromString("blah")).toBe(undefined)

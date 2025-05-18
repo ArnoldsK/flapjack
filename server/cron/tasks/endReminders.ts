@@ -1,7 +1,7 @@
-import { ReminderModel } from "../../db/model/Reminder"
-import { Task } from "../../../types/tasks"
-import { isTextChannel } from "../../utils/channel"
-import { d } from "../../utils/date"
+import { ReminderModel } from "~/server/db/model/Reminder"
+import { Task } from "~/types/tasks"
+import { isTextChannel } from "~/server/utils/channel"
+import { d } from "~/server/utils/date"
 
 export const endReminders: Task = async (context) => {
   const model = new ReminderModel()

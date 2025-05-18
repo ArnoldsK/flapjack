@@ -1,7 +1,7 @@
 import { Events } from "discord.js"
 
-import { createEvent } from "../utils/event"
-import { RolesEntity } from "../db/entity/Roles"
+import { createEvent } from "~/server/utils/event"
+import { RolesEntity } from "~/server/db/entity/Roles"
 
 export default createEvent(
   Events.ClientReady,

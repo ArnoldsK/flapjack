@@ -1,13 +1,12 @@
 import { createCanvas, loadImage } from "@napi-rs/canvas"
-import { GuildMember } from "discord.js"
 import colorPalette from "get-image-colors"
 
-import { getBackgroundTextColor } from "../utils/color"
-import { canvasFont, clipEllipse } from "../utils/canvas"
+import { getBackgroundTextColor } from "~/server/utils/color"
+import { canvasFont, clipEllipse } from "~/server/utils/canvas"
 import chroma from "chroma-js"
-import { Unicode } from "../../constants"
-import { interpolate } from "../utils/number"
-import { ExperienceRankData } from "../db/model/Experience"
+import { Unicode } from "~/constants"
+import { interpolate } from "~/server/utils/number"
+import { ExperienceRankData } from "~/server/db/model/Experience"
 
 export const getRankImage = async (
   rankData: ExperienceRankData,

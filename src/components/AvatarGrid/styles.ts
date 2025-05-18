@@ -1,5 +1,5 @@
 import styled, { css } from "styled-components"
-import { randomInt } from "../../../server/utils/random"
+import { randomInt } from "~/server/utils/random"
 
 export const GRID_ITEM_CLASS_NAME = "grid-item"
 export const GRID_ITEM_SIZE = 250

@@ -1,5 +1,5 @@
-import { ApiRecap } from "../../../types/api"
-import { WeekRecapData } from "../../../types/recap"
+import { ApiRecap } from "~/types/api"
+import { WeekRecapData } from "~/types/recap"
 
 export interface RecapScreenProps {
   recap: ApiRecap["recap"]

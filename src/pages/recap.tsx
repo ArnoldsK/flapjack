@@ -1,1 +1,1 @@
-export { Recap as default, getServerSideProps } from "../screens/Recap"
+export { Recap as default, getServerSideProps } from "~/src/screens/Recap"

@@ -1,10 +1,10 @@
 import { MouseEvent, useCallback, useMemo, useState } from "react"
 import Image from "next/image"
 import { useDebounce, useTimeoutFn, useWindowSize } from "react-use"
+import { randomInt, randomValue } from "~/server/utils/random"
+import { interpolate } from "~/server/utils/number"
 
 import * as S from "./styles"
-import { randomInt, randomValue } from "../../../server/utils/random"
-import { interpolate } from "../../../server/utils/number"
 
 interface AvatarGridProps {
   avatarUrls: string[]

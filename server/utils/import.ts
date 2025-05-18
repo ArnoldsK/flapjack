@@ -1,6 +1,6 @@
 import { readdirSync } from "fs"
 import { join } from "path"
-import { isNonNullish } from "./boolean"
+import { isNonNullish } from "~/server/utils/boolean"
 
 const getImportableDirectoryFiles = (dir: string) => {
   return readdirSync(dir)
@@ -19,7 +19,7 @@ const getImportableDirectoryFiles = (dir: string) => {
  *
  * @example
  * ```ts
- * import { importDirectoryDefaults } from "./utils/import"
+ * import { importDirectoryDefaults } from "~/server/utils/utils/import"
  *
  * export const getRoutes = () => importDirectoryDefaults<Route>(__dirname)
  * ```

@@ -1,6 +1,6 @@
 import translate from "deepl"
-import { createEvent } from "../utils/event"
-import { appConfig } from "../config"
+import { createEvent } from "~/server/utils/event"
+import { appConfig } from "~/server/config"
 
 const parseContent = (text: string): string => {
   return text

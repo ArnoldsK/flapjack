@@ -1,7 +1,7 @@
 import { Express, Request, RequestHandler, Response } from "express"
 
-import { BaseContext } from "../../types"
-import { getRoutes } from "../routes"
+import { BaseContext } from "~/types"
+import { getRoutes } from "~/server/routes"
 
 type Method = "get" | "post" | "put" | "delete"
 

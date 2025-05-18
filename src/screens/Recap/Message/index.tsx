@@ -13,11 +13,11 @@ import { useWindowScroll } from "react-use"
 import * as S from "./styles"
 
 import { RecapMessage as RecapMessageGraph } from "../types"
-import { clamp, interpolate } from "../../../../server/utils/number"
-import { RECAP_PRIVATE_CHANNEL_IDS } from "../../../../constants"
+import { clamp, interpolate } from "~/server/utils/number"
+import { RECAP_PRIVATE_CHANNEL_IDS } from "~/constants"
 import { Pound } from "../styles"
-import { ApiRecapMember } from "../../../../types/api"
-import { d } from "../../../../server/utils/date"
+import { ApiRecapMember } from "~/types/api"
+import { d } from "~/server/utils/date"
 
 interface RecapMessageProps {
   message: RecapMessageGraph

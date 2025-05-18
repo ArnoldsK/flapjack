@@ -3,8 +3,8 @@ import Image from "next/image"
 import { useWindowSize } from "react-use"
 
 import * as S from "./styles"
-import { randomValue } from "../../../server/utils/random"
-import { interpolate } from "../../../server/utils/number"
+import { randomValue } from "~/server/utils/random"
+import { interpolate } from "~/server/utils/number"
 
 interface AvatarGridBannerProps {
   avatarUrls: string[]

@@ -1,8 +1,7 @@
 import { Repository } from "typeorm"
-import { db } from "../../database"
-import { PersistentThreadEntity } from "../entity/PersistentThread"
-import { EntityFields } from "../../../types/entity"
-import { GuildMember } from "discord.js"
+import { db } from "~/server/database"
+import { PersistentThreadEntity } from "~/server/db/entity/PersistentThread"
+import { EntityFields } from "~/types/entity"
 
 type CreateInput = Omit<EntityFields<PersistentThreadEntity>, "id">
 

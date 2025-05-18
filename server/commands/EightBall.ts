@@ -1,8 +1,8 @@
 import { SlashCommandBuilder } from "discord.js"
-import { BaseCommand } from "../base/Command"
-import { randomValue } from "../utils/random"
-import { joinAsLines } from "../utils/string"
-import { parseMentions } from "../utils/message"
+import { BaseCommand } from "~/server/base/Command"
+import { randomValue } from "~/server/utils/random"
+import { joinAsLines } from "~/server/utils/string"
+import { parseMentions } from "~/server/utils/message"
 
 enum OptionName {
   Question = "question",

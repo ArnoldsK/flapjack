@@ -1,6 +1,6 @@
 import type { GuildMember } from "discord.js"
 import { PermissionFlagsBits } from "discord.js"
-import { DISCORD_IDS } from "../../constants"
+import { DISCORD_IDS } from "~/constants"
 
 export type PermissionType = "allow" | "deny" | "either"
 

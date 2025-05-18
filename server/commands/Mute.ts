@@ -1,16 +1,19 @@
 import { SlashCommandBuilder } from "discord.js"
 
-import { BaseCommand } from "../base/Command"
+import { BaseCommand } from "~/server/base/Command"
 import {
   memberHasPermission,
   permission,
   PermissionFlags,
-} from "../utils/permission"
-import { checkUnreachable } from "../utils/error"
-import { d } from "../utils/date"
-import { DISCORD_IDS, Unicode } from "../../constants"
-import { isTimedOut } from "../utils/member"
-import { getTimeoutAddedEmbed, getTimeoutRemovedEmbed } from "../utils/message"
+} from "~/server/utils/permission"
+import { checkUnreachable } from "~/server/utils/error"
+import { d } from "~/server/utils/date"
+import { DISCORD_IDS, Unicode } from "~/constants"
+import { isTimedOut } from "~/server/utils/member"
+import {
+  getTimeoutAddedEmbed,
+  getTimeoutRemovedEmbed,
+} from "~/server/utils/message"
 
 enum SubcommandName {
   List = "list",

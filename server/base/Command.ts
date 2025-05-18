@@ -5,15 +5,14 @@ import {
   GuildMember,
   GuildTextBasedChannel,
   InteractionReplyOptions,
-  Message,
   MessagePayload,
   SlashCommandBuilder,
   SlashCommandSubcommandsOnlyBuilder,
   User,
 } from "discord.js"
 
-import { Permission, permission } from "../utils/permission"
-import { BaseContext } from "../../types"
+import { Permission, permission } from "~/server/utils/permission"
+import { BaseContext } from "~/types"
 
 class BaseCommand {
   constructor(

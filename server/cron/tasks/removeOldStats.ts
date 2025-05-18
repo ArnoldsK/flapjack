@@ -1,7 +1,7 @@
 import dayjs from "dayjs"
 
-import { Task } from "../../../types/tasks"
-import { StatsEntity } from "../../db/entity/Stats"
+import { Task } from "~/types/tasks"
+import { StatsEntity } from "~/server/db/entity/Stats"
 
 export const removeOldStats: Task = async (_context) => {
   const minDate = dayjs().subtract(6, "months")

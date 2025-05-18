@@ -1,9 +1,9 @@
 import { createCanvas, loadImage } from "@napi-rs/canvas"
 import type { GuildMember } from "discord.js"
 
-import { getBackgroundTextColor } from "../utils/color"
-import { canvasFont, clipEllipse } from "../utils/canvas"
-import { getMemberInfo } from "../utils/member"
+import { getBackgroundTextColor } from "~/server/utils/color"
+import { canvasFont, clipEllipse } from "~/server/utils/canvas"
+import { getMemberInfo } from "~/server/utils/member"
 import colorPalette from "get-image-colors"
 
 export const getUserInfoImage = async (

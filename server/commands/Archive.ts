@@ -1,8 +1,8 @@
 import { SlashCommandBuilder } from "discord.js"
-import { BaseCommand } from "../base/Command"
-import { PermissionFlags, permission } from "../utils/permission"
-import { Color, DISCORD_IDS } from "../../constants"
-import { isTextChannel } from "../utils/channel"
+import { BaseCommand } from "~/server/base/Command"
+import { PermissionFlags, permission } from "~/server/utils/permission"
+import { Color, DISCORD_IDS } from "~/constants"
+import { isTextChannel } from "~/server/utils/channel"
 
 export default class ArchiveCommand extends BaseCommand {
   static version = 1

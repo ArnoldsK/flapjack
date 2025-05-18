@@ -1,6 +1,6 @@
-import { createRoute } from "../utils/routes"
-import { ApiAvatars } from "../../types/api"
-import { isNonNullish } from "../utils/boolean"
+import { createRoute } from "~/server/utils/routes"
+import { ApiAvatars } from "~/types/api"
+import { isNonNullish } from "~/server/utils/boolean"
 
 export default createRoute({
   path: "/api/avatars",

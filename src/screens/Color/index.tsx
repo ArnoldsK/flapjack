@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Page } from "../../components/Page"
+import { Page } from "~/src/components/Page"
 import { SketchPicker } from "react-color"
 
 import * as S from "./styles"

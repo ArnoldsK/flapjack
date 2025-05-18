@@ -1,6 +1,6 @@
-import { RANK_MAX_LEVEL } from "../../constants"
-import { ExperienceLevelData } from "../db/model/Experience"
-import { interpolate } from "./number"
+import { RANK_MAX_LEVEL } from "~/constants"
+import { ExperienceLevelData } from "~/server/db/model/Experience"
+import { interpolate } from "~/server/utils/number"
 
 export const getExperienceForLevel = (lvl: number): number => {
   // RuneScape uses factor of 4

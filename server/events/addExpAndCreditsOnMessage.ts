@@ -1,16 +1,16 @@
 import { Events } from "discord.js"
-import { createEvent } from "../utils/event"
-import { ExperienceModel } from "../db/model/Experience"
-import { CreditsModel } from "../db/model/Credits"
+import { createEvent } from "~/server/utils/event"
+import { ExperienceModel } from "~/server/db/model/Experience"
+import { CreditsModel } from "~/server/db/model/Credits"
 import {
   EXP_PER_MESSAGE,
   MIN_CREDITS_PER_MESSAGE,
   RANK_ACTIVE_ROLE_LEVEL,
-} from "../../constants"
-import { DISCORD_IDS } from "../../constants"
-import { getExperienceLevelData } from "../utils/experience"
-import { isTextChannel } from "../utils/channel"
-import { embedAuthor } from "../utils/member"
+} from "~/constants"
+import { DISCORD_IDS } from "~/constants"
+import { getExperienceLevelData } from "~/server/utils/experience"
+import { isTextChannel } from "~/server/utils/channel"
+import { embedAuthor } from "~/server/utils/member"
 
 export default createEvent(
   Events.MessageCreate,

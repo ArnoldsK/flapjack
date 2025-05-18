@@ -1,8 +1,8 @@
 import { GuildMember, SlashCommandBuilder } from "discord.js"
-import { BaseCommand } from "../base/Command"
-import { checkUnreachable } from "../utils/error"
-import { getMemberByJoinPosition } from "../utils/member"
-import { getUserInfoImage } from "../canvas/userInfoImage"
+import { BaseCommand } from "~/server/base/Command"
+import { checkUnreachable } from "~/server/utils/error"
+import { getMemberByJoinPosition } from "~/server/utils/member"
+import { getUserInfoImage } from "~/server/canvas/userInfoImage"
 
 enum SubcommandName {
   Me = "me",

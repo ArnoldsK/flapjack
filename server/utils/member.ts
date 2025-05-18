@@ -1,6 +1,6 @@
 import { APIEmbedAuthor, Guild, GuildMember } from "discord.js"
-import { collectionToArray } from "./array"
-import { d } from "./date"
+import { collectionToArray } from "~/server/utils/array"
+import { d } from "~/server/utils/date"
 
 export const getMemberByJoinPosition = async (
   guild: Guild,

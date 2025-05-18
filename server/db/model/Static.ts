@@ -1,7 +1,7 @@
 import { Repository } from "typeorm"
-import { db } from "../../database"
-import { StaticDataEntity } from "../entity/StaticData"
-import { StaticData, StaticDataType } from "../../../types/entity"
+import { db } from "~/server/database"
+import { StaticDataEntity } from "~/server/db/entity/StaticData"
+import { StaticData, StaticDataType } from "~/types/entity"
 
 export class StaticModel<Type extends StaticDataType> {
   #dataType: Type

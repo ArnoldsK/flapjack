@@ -1,7 +1,7 @@
-import { createRoute } from "../utils/routes"
-import { ApiStats } from "../../types/api"
-import { StaticModel } from "../db/model/Static"
-import { StaticDataType } from "../../types/entity"
+import { createRoute } from "~/server/utils/routes"
+import { ApiStats } from "~/types/api"
+import { StaticModel } from "~/server/db/model/Static"
+import { StaticDataType } from "~/types/entity"
 
 export default createRoute({
   path: "/api/stats",

@@ -1,11 +1,11 @@
 import hiscores from "osrs-json-hiscores"
 
 import { SlashCommandBuilder } from "discord.js"
-import { BaseCommand } from "../base/Command"
-import { checkUnreachable } from "../utils/error"
-import { RsLeagueModel } from "../db/model/RsLeague"
-import { Unicode } from "../../constants"
-import { DISCORD_IDS } from "../../constants"
+import { BaseCommand } from "~/server/base/Command"
+import { checkUnreachable } from "~/server/utils/error"
+import { RsLeagueModel } from "~/server/db/model/RsLeague"
+import { Unicode } from "~/constants"
+import { DISCORD_IDS } from "~/constants"
 
 enum SubcommandName {
   Set = "set",

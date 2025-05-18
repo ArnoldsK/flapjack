@@ -3,21 +3,21 @@ import {
   DISCORD_IDS,
   RECAP_CHANNEL_IDS,
   RECAP_PRIVATE_CHANNEL_IDS,
-} from "../../../constants"
-import { Task } from "../../../types/tasks"
-import { StaticModel } from "../../db/model/Static"
-import { d } from "../../utils/date"
-import { isTextChannel } from "../../utils/channel"
-import { WeekRecapData } from "../../../types/recap"
+} from "~/constants"
+import { Task } from "~/types/tasks"
+import { StaticModel } from "~/server/db/model/Static"
+import { d } from "~/server/utils/date"
+import { isTextChannel } from "~/server/utils/channel"
+import { WeekRecapData } from "~/types/recap"
 import {
   hostingDeleteAllFiles,
   hostingUploadUrlFile,
-} from "../../utils/hosting"
-import { isDiscordAttachmentUrl } from "../../utils/web"
+} from "~/server/utils/hosting"
+import { isDiscordAttachmentUrl } from "~/server/utils/web"
 import path from "path"
-import { appConfig } from "../../config"
-import { assert } from "../../utils/error"
-import { StaticDataType } from "../../../types/entity"
+import { appConfig } from "~/server/config"
+import { assert } from "~/server/utils/error"
+import { StaticDataType } from "~/types/entity"
 
 type RecapMessageData = WeekRecapData["messages"][number]
 

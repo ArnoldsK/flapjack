@@ -2,7 +2,7 @@ import type { NextPage } from "next"
 import Link from "next/link"
 import styled from "styled-components"
 
-import { Page } from "../components/Page"
+import { Page } from "~/src/components/Page"
 
 const Paragraph = styled.p`
   font-size: 24px;

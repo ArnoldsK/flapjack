@@ -1,1 +1,1 @@
-export { StatsScreen as default, getServerSideProps } from "../screens/Stats"
+export { StatsScreen as default, getServerSideProps } from "~/src/screens/Stats"

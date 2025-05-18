@@ -1,10 +1,10 @@
 import { GuildMember } from "discord.js"
 import { Repository } from "typeorm"
-import { db } from "../../database"
-import { ExperienceEntity } from "../entity/Experience"
-import { isNonNullish } from "../../utils/boolean"
-import { getExperienceLevelData } from "../../utils/experience"
-import { EXP_PER_MESSAGE } from "../../../constants"
+import { db } from "~/server/database"
+import { ExperienceEntity } from "~/server/db/entity/Experience"
+import { isNonNullish } from "~/server/utils/boolean"
+import { getExperienceLevelData } from "~/server/utils/experience"
+import { EXP_PER_MESSAGE } from "~/constants"
 
 export interface ExperienceLevelData {
   exp: number

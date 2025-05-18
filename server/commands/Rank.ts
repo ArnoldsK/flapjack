@@ -1,10 +1,13 @@
 import { Attachment, GuildMember, SlashCommandBuilder } from "discord.js"
-import { BaseCommand } from "../base/Command"
-import { checkUnreachable } from "../utils/error"
-import { getRankImage } from "../canvas/rankImage"
-import { ExperienceModel, ExperienceRankData } from "../db/model/Experience"
-import { makeEqualLengths } from "../utils/string"
-import { Unicode } from "../../constants"
+import { BaseCommand } from "~/server/base/Command"
+import { checkUnreachable } from "~/server/utils/error"
+import { getRankImage } from "~/server/canvas/rankImage"
+import {
+  ExperienceModel,
+  ExperienceRankData,
+} from "~/server/db/model/Experience"
+import { makeEqualLengths } from "~/server/utils/string"
+import { Unicode } from "~/constants"
 
 enum SubcommandName {
   Me = "me",

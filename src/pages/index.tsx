@@ -1,1 +1,1 @@
-export { HomeScreen as default, getServerSideProps } from "../screens/Home"
+export { HomeScreen as default, getServerSideProps } from "~/src/screens/Home"

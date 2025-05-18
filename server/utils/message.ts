@@ -1,9 +1,9 @@
 import { APIEmbed, Guild, GuildMember, MessageCreateOptions } from "discord.js"
 
-import { Color, DISCORD_IDS, Unicode } from "../../constants"
-import { BaseContext } from "../../types"
-import { isTextChannel } from "./channel"
-import { embedAuthor } from "./member"
+import { Color, DISCORD_IDS, Unicode } from "~/constants"
+import { BaseContext } from "~/types"
+import { isTextChannel } from "~/server/utils/channel"
+import { embedAuthor } from "~/server/utils/member"
 
 export const parseMentions = (content: string, guild: Guild) => {
   return content

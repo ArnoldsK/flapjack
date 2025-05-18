@@ -1,5 +1,5 @@
 import styled, { css } from "styled-components"
-import { BREAKPOINTS } from "../../../constants/layout"
+import { BREAKPOINTS } from "~/constants/layout"
 
 export const NAV_ITEM_HEIGHT = 33
 

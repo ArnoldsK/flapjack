@@ -1,6 +1,6 @@
 import { Events } from "discord.js"
-import { createEvent } from "../utils/event"
-import { DISCORD_IDS } from "../../constants"
+import { createEvent } from "~/server/utils/event"
+import { DISCORD_IDS } from "~/constants"
 
 export default createEvent(
   Events.MessageCreate,

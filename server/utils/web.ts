@@ -1,4 +1,4 @@
-import { appConfig } from "../config"
+import { appConfig } from "~/server/config"
 
 export const getUrl = (path: string = ""): string => {
   let baseUrl = appConfig.web.baseUrl

@@ -1,4 +1,4 @@
-import { getCreditsEmoji, parseCreditsAmount } from "./credits"
+import { getCreditsEmoji, parseCreditsAmount } from "~/server/utils/credits"
 
 test("getCreditsEmoji", () => {
   expect(getCreditsEmoji(0)).toContain("")

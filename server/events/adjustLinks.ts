@@ -1,5 +1,5 @@
-import { Emoji } from "../../constants"
-import { createEvent } from "../utils/event"
+import { Emoji } from "~/constants"
+import { createEvent } from "~/server/utils/event"
 
 export default createEvent(
   "messageCreate",

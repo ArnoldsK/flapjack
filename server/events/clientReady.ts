@@ -1,11 +1,11 @@
 import { Events } from "discord.js"
 
-import { createEvent } from "../utils/event"
-import { DISCORD_IDS } from "../../constants"
-import { isTextChannel } from "../utils/channel"
-import { Color } from "../../constants"
-import { getNewCommits } from "../utils/git"
-import { joinAsLines } from "../utils/string"
+import { createEvent } from "~/server/utils/event"
+import { DISCORD_IDS } from "~/constants"
+import { isTextChannel } from "~/server/utils/channel"
+import { Color } from "~/constants"
+import { getNewCommits } from "~/server/utils/git"
+import { joinAsLines } from "~/server/utils/string"
 
 export default createEvent(
   Events.ClientReady,

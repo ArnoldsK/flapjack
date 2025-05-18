@@ -2,23 +2,23 @@ import "reflect-metadata"
 import next from "next"
 import express from "express"
 import http from "http"
-
-import { getUrl } from "./utils/web"
-import { appConfig } from "./config"
 import { Client, Events, GatewayIntentBits } from "discord.js"
+
+import { getUrl } from "~/server/utils/web"
+import { appConfig } from "~/server/config"
 import {
   getSetupCommands,
   handleApiCommands,
   removeApiCommands,
-} from "./utils/command"
-import { assert } from "./utils/error"
-import { db } from "./database"
-import { getGroupedEvents } from "./utils/event"
-import { handleCron } from "./utils/cron"
-import { BaseContext } from "../types"
-import CacheManager from "./cache"
-import { handleCustomRoutes } from "./utils/routes"
-import { DISCORD_IDS } from "../constants"
+} from "~/server/utils/command"
+import { assert } from "~/server/utils/error"
+import { db } from "~/server/database"
+import { getGroupedEvents } from "~/server/utils/event"
+import { handleCron } from "~/server/utils/cron"
+import { BaseContext } from "~/types"
+import CacheManager from "~/server/cache"
+import { handleCustomRoutes } from "~/server/utils/routes"
+import { DISCORD_IDS } from "~/constants"
 
 // Prepare next app
 const nextApp = next({ dev: appConfig.dev })

@@ -1,6 +1,6 @@
 import fs from "fs"
 import path from "path"
-import { assert } from "./error"
+import { assert } from "~/server/utils/error"
 import { promisify } from "util"
 import { exec } from "child_process"
 
