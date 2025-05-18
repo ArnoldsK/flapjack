@@ -118,7 +118,7 @@ export const CalendarWrap = styled.div`
 export const Day = styled.div<{ $active?: boolean; $hover?: boolean }>`
   cursor: ${({ $active }) => ($active ? "default" : "pointer")};
   text-align: center;
-  border-radius: 4px;
+  border-radius: 8px;
   padding: 8px;
   border: 1px solid
     ${({ $active, $hover }) =>
