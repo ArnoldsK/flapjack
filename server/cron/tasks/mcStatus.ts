@@ -32,6 +32,13 @@ export const mcStatus: Task = async (context) => {
   if (!isTextChannel(channel)) return
 
   // #############################################################################
+  // Return early if no topic requirement
+  // #############################################################################
+  const topicLines = (channel.topic ?? "").split("\n")
+
+  if (!topicLines[0]?.includes(SERVER_IP)) return
+
+  // #############################################################################
   // Get status
   // #############################################################################
   const apiUrl = new URL(`https://api.mcsrvstat.us/3/${SERVER_IP}`)
@@ -54,19 +61,15 @@ export const mcStatus: Task = async (context) => {
   // #############################################################################
   // Update topic
   // #############################################################################
-  const topicLines = (channel.topic ?? "").split("\n")
+  const ipString = `[${SERVER_IP}](https://mcsrvstat.us/server/${SERVER_IP})`
+  const statusString =
+    status.isOnline && data.players
+      ? `${data.players.online}/${data.players.max}`
+      : "off"
 
-  if (topicLines[0]?.includes(SERVER_IP)) {
-    const ipString = `[${SERVER_IP}](https://mcsrvstat.us/server/${SERVER_IP})`
-    const statusString =
-      status.isOnline && data.players
-        ? `${data.players.online}/${data.players.max}`
-        : "off"
-
-    await channel.setTopic(
-      joinAsLines(`${ipString} (${statusString})`, ...topicLines.slice(1)),
-    )
-  }
+  await channel.setTopic(
+    joinAsLines(`${ipString} (${statusString})`, ...topicLines.slice(1)),
+  )
 
   // #############################################################################
   // Alert status change
