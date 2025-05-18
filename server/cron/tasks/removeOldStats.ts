@@ -1,7 +1,7 @@
-import { DISCORD_IDS } from "../../../constants"
+import dayjs from "dayjs"
+
 import { Task } from "../../../types/tasks"
 import { StatsEntity } from "../../db/entity/Stats"
-import dayjs from "dayjs"
 
 export const removeOldStats: Task = async (context) => {
   await StatsEntity.createQueryBuilder().delete().execute()
@@ -9,7 +9,6 @@ export const removeOldStats: Task = async (context) => {
   const minDate = dayjs().subtract(6, "months")
 
   const entities = await StatsEntity.createQueryBuilder()
-    .select("id")
     .where("`timestamp` < :ts", {
       ts: minDate.format("X"),
     })
