@@ -128,7 +128,7 @@ export const Day = styled.div<DayProps>`
   padding: 8px;
   border: 1px solid
     ${({ $active, $hover }) =>
-      $active ? "#b492d4" : $hover ? "#b492d488" : "transparent"};
+      $active ? "#b492d4" : ($hover ? "#b492d488" : "transparent")};
 
   ${({ $disabled }) =>
     $disabled &&

@@ -1,4 +1,3 @@
-import { CronTask } from "~/server/utils/cron"
 import { createDailyStats } from "~/server/cron/tasks/createDailyStats"
 import { createWeekRecap } from "~/server/cron/tasks/createWeekRecap"
 import { endReminders } from "~/server/cron/tasks/endReminders"
@@ -8,6 +7,7 @@ import { removeNonBoosterIcons } from "~/server/cron/tasks/removeNonBoosterIcons
 import { removeOldStats } from "~/server/cron/tasks/removeOldStats"
 import { resetCredits } from "~/server/cron/tasks/resetCredits"
 import { updateBannerToGif } from "~/server/cron/tasks/updateBannerToGif"
+import { CronTask } from "~/server/utils/cron"
 
 export const cronTasks: CronTask[] = [
   {

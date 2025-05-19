@@ -1,4 +1,5 @@
 import { Repository } from "typeorm"
+
 import { db } from "~/server/database"
 import { StaticDataEntity } from "~/server/db/entity/StaticData"
 import { StaticData, StaticDataType } from "~/types/entity"
@@ -32,6 +33,7 @@ export class StaticModel<Type extends StaticDataType> {
         { type: this.#dataType },
         {
           // HACK: TypeORM typing isn't the smartest
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           value: value as any,
         },
       )

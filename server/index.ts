@@ -1,29 +1,31 @@
 import "reflect-metadata"
-import next from "next"
-import express from "express"
-import http from "http"
-import { Client, Events, GatewayIntentBits } from "discord.js"
+import http from "node:http"
 
-import { getUrl } from "~/server/utils/web"
+import { Client, Events, GatewayIntentBits } from "discord.js"
+import express from "express"
+import next from "next"
+
+import { DISCORD_IDS } from "~/constants"
+import CacheManager from "~/server/cache"
 import { appConfig } from "~/server/config"
+import { db } from "~/server/database"
 import {
   getSetupCommands,
   handleApiCommands,
   removeApiCommands,
 } from "~/server/utils/command"
-import { assert } from "~/server/utils/error"
-import { db } from "~/server/database"
-import { getGroupedEvents } from "~/server/utils/event"
 import { handleCron } from "~/server/utils/cron"
-import { BaseContext } from "~/types"
-import CacheManager from "~/server/cache"
+import { assert } from "~/server/utils/error"
+import { getGroupedEvents } from "~/server/utils/event"
 import { handleCustomRoutes } from "~/server/utils/routes"
-import { DISCORD_IDS } from "~/constants"
+import { getUrl } from "~/server/utils/web"
+import { BaseContext } from "~/types"
 
 // Prepare next app
 const nextApp = next({ dev: appConfig.dev })
 const handle = nextApp.getRequestHandler()
 
+// eslint-disable-next-line unicorn/prefer-top-level-await
 nextApp.prepare().then(async () => {
   assert(!!appConfig.discord.token, "Discord token missing")
   assert(!!appConfig.discord.client, "Discord client missing")
@@ -81,9 +83,9 @@ nextApp.prepare().then(async () => {
 
       try {
         await command?.execute(interaction)
-      } catch (err) {
+      } catch (error) {
         interaction[interaction.deferred ? "editReply" : "reply"]({
-          content: (err as Error).message,
+          content: (error as Error).message,
           ephemeral: true,
         })
       }
@@ -100,11 +102,11 @@ nextApp.prepare().then(async () => {
       try {
         await Promise.all(
           event.callbacks.map((callback) => {
-            return callback.apply(null, [context, ...args])
+            return Reflect.apply(callback, null, [context, ...args])
           }),
         )
-      } catch (err) {
-        console.error(err)
+      } catch (error) {
+        console.error(error)
       }
     })
   }

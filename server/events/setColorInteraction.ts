@@ -1,7 +1,7 @@
 import { Events } from "discord.js"
 
-import { createEvent } from "~/server/utils/event"
 import { setColorInteractionId } from "~/server/utils/color"
+import { createEvent } from "~/server/utils/event"
 import { setMemberColorRole } from "~/server/utils/role"
 
 export default createEvent(

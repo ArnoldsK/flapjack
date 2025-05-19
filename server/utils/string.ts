@@ -44,16 +44,17 @@ export const makeEqualLengths = (
 
   return values.map((value) => {
     const voidCount = longestValue.length - value.length
-    const voidText = voidValue.repeat(voidCount >= 0 ? voidCount : 0)
+    const voidText = voidValue.repeat(Math.max(voidCount, 0))
 
     return type === "before" ? `${voidText}${value}` : `${value}${voidText}`
   })
 }
 
 export const stringToIntHash = (value: string, min = 0, max = 500) => {
-  const charAtSum = value
-    .split("")
-    .reduce((sum, char) => sum + char.charCodeAt(0), 0)
+  const charAtSum = [...value].reduce(
+    (sum, char) => sum + (char.codePointAt(0) ?? 0),
+    0,
+  )
 
   return (charAtSum % (max - min)) + min
 }

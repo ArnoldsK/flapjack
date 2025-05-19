@@ -1,11 +1,12 @@
 import { SlashCommandBuilder } from "discord.js"
+
+import { OPTION_DESCRIPTION_AMOUNT } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
-import { checkUnreachable } from "~/server/utils/error"
-import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
 import { CreditsModel } from "~/server/db/model/Credits"
 import { sortBigInt } from "~/server/utils/array"
-import { OPTION_DESCRIPTION_AMOUNT } from "~/constants"
 import { isCasinoChannel } from "~/server/utils/channel"
+import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
+import { checkUnreachable } from "~/server/utils/error"
 
 enum SubcommandName {
   View = "view",
@@ -61,20 +62,24 @@ export default class CreditsCommand extends BaseCommand {
     const subcommand = this.getSubcommand<SubcommandName>()
 
     switch (subcommand) {
-      case SubcommandName.View:
+      case SubcommandName.View: {
         await this.#handleView()
         break
+      }
 
-      case SubcommandName.Give:
+      case SubcommandName.Give: {
         await this.#handleGive()
         break
+      }
 
-      case SubcommandName.Top:
+      case SubcommandName.Top: {
         await this.#handleTop()
         break
+      }
 
-      default:
+      default: {
         checkUnreachable(subcommand)
+      }
     }
   }
 

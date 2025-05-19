@@ -1,11 +1,12 @@
 import { GetServerSideProps } from "next"
-
-import { ApiStats } from "~/types/api"
-import { Page } from "~/src/components/Page"
-import * as S from "./styles"
 import absoluteUrl from "next-absolute-url"
 import { useEffect, useMemo, useState } from "react"
+
+import * as S from "./styles"
+
 import { d } from "~/server/utils/date"
+import { Page } from "~/src/components/Page"
+import { ApiStats } from "~/types/api"
 
 interface StatsScreenProps {
   stats: ApiStats
@@ -37,7 +38,7 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
 
   // Set as latest
   useEffect(() => {
-    setCurrentYearMonth(yearMonths[yearMonths.length - 1])
+    setCurrentYearMonth(yearMonths.at(-1))
   }, [yearMonths])
 
   // #############################################################################
@@ -88,7 +89,7 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
     const nowDateString = d().format(dateStringFormat)
     const dateString = dateStrings.find((el) => el === nowDateString)
 
-    setCurrentDateString(dateString ?? dateStrings[dateStrings.length - 1])
+    setCurrentDateString(dateString ?? dateStrings.at(-1))
   }, [dateStrings])
 
   // #############################################################################

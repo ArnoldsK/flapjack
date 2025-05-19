@@ -1,13 +1,14 @@
-import { Attachment, GuildMember, SlashCommandBuilder } from "discord.js"
+import { GuildMember, SlashCommandBuilder } from "discord.js"
+
+import { Unicode } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
-import { checkUnreachable } from "~/server/utils/error"
 import { getRankImage } from "~/server/canvas/rankImage"
 import {
   ExperienceModel,
   ExperienceRankData,
 } from "~/server/db/model/Experience"
+import { checkUnreachable } from "~/server/utils/error"
 import { makeEqualLengths } from "~/server/utils/string"
-import { Unicode } from "~/constants"
 
 enum SubcommandName {
   Me = "me",
@@ -47,20 +48,24 @@ export default class RankCommand extends BaseCommand {
     const subcommand = this.getSubcommand<SubcommandName>()
 
     switch (subcommand) {
-      case SubcommandName.Me:
+      case SubcommandName.Me: {
         await this.#handleMe()
         return
+      }
 
-      case SubcommandName.User:
+      case SubcommandName.User: {
         await this.#handleUser()
         return
+      }
 
-      case SubcommandName.Top:
+      case SubcommandName.Top: {
         await this.#handleTop()
         return
+      }
 
-      default:
+      default: {
         checkUnreachable(subcommand)
+      }
     }
   }
 

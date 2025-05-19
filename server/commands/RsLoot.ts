@@ -1,8 +1,9 @@
 import { SlashCommandBuilder, codeBlock } from "discord.js"
-import { BaseCommand } from "~/server/base/Command"
-import { joinAsLines } from "~/server/utils/string"
-import { isTextChannel } from "~/server/utils/channel"
+
 import { DISCORD_IDS } from "~/constants"
+import { BaseCommand } from "~/server/base/Command"
+import { isTextChannel } from "~/server/utils/channel"
+import { joinAsLines } from "~/server/utils/string"
 
 export default class RsLootCommand extends BaseCommand {
   static version = 1
@@ -29,13 +30,13 @@ export default class RsLootCommand extends BaseCommand {
     })
 
     let userWebhook = webhooks.find((el) => el.name === this.user.username)
-    if (!userWebhook) {
+    if (userWebhook) {
+      await userWebhook.edit({ avatar })
+    } else {
       userWebhook = await this.channel.createWebhook({
         name: this.user.username,
         avatar,
       })
-    } else {
-      await userWebhook.edit({ avatar })
     }
 
     this.reply({

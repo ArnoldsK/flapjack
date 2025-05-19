@@ -17,9 +17,7 @@ export class CreditsEntity extends BaseEntity {
     type: "bigint",
     unsigned: true,
     transformer: {
-      from(value: string): bigint {
-        return BigInt(value)
-      },
+      from: BigInt,
       to(value?: bigint): string {
         return value?.toString() ?? "0"
       },

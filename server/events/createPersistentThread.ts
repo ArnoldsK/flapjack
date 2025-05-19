@@ -1,10 +1,11 @@
 import { Events } from "discord.js"
-import { createEvent } from "~/server/utils/event"
+
 import { DISCORD_IDS } from "~/constants"
 import { PERSISTENT_THREAD_ARCHIVE_DURATION } from "~/constants"
 import { PersistentThreadModel } from "~/server/db/model/PersistentThread"
+import { createEvent } from "~/server/utils/event"
 
-const PERSISTENT_THREAD_CHANNEL_IDS = [DISCORD_IDS.channels.garage]
+const PERSISTENT_THREAD_CHANNEL_IDS = new Set([DISCORD_IDS.channels.garage])
 
 export default createEvent(
   Events.MessageCreate,
@@ -15,18 +16,16 @@ export default createEvent(
 
     // Verify channel
     const channel = message.channel
-    if (!PERSISTENT_THREAD_CHANNEL_IDS.includes(channel.id)) return
+    if (!PERSISTENT_THREAD_CHANNEL_IDS.has(channel.id)) return
 
     // Channel specific requirements
-    if (channel.id === DISCORD_IDS.channels.garage) {
-      // Require image in garage
-      if (!message.attachments.size) return
-    }
+    if (channel.id === DISCORD_IDS.channels.garage && // Require image in garage
+      message.attachments.size === 0) return
 
     // Create thread
     const mentioned = message.mentions.members?.first()?.displayName
     const threadName =
-      mentioned || message.content.substring(0, 30) || "Discussion"
+      mentioned || message.content.slice(0, 30) || "Discussion"
 
     const thread =
       message.thread ??

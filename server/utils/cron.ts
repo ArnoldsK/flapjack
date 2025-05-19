@@ -1,10 +1,11 @@
 import cron from "node-cron"
 
 import { appConfig } from "~/server/config"
+import { cronTasks } from "~/server/cron"
 import { BaseContext } from "~/types"
 import { Task } from "~/types/tasks"
-import { cronTasks } from "~/server/cron"
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const cronTranslate = require("cron-translate")
 
 export interface CronTask {
@@ -27,8 +28,8 @@ export const handleCron = async (context: BaseContext) => {
       cron.schedule(expression, async () => {
         try {
           await task.task(context)
-        } catch (err) {
-          console.error("> Cron error >", task.description, err)
+        } catch (error) {
+          console.error("> Cron error >", task.description, error)
         }
       })
     }),

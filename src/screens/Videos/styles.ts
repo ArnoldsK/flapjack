@@ -1,4 +1,5 @@
 import styled from "styled-components"
+
 import { PAGE_PADDING } from "~/src/components/Page/styles"
 
 const VIDEOS_GAP = 32

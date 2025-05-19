@@ -4,8 +4,8 @@ export const getCreditsEmoji = (value: bigint | number): string => {
   const minValueMap = {
     "<:Coins10000:1204533924559065099>": 100_000,
     "<:Coins1000:1204533922923548753>": 10_000,
-    "<:Coins250:1204533921652412487>": 2_500,
-    "<:Coins100:1204533919073042432>": 1_00,
+    "<:Coins250:1204533921652412487>": 2500,
+    "<:Coins100:1204533919073042432>": 100,
     "<:Coins25:1204533917361643630>": 250,
     "<:Coins5:1204533915113496717>": 50,
     "<:Coins4:1204533896092450856>": 40,
@@ -95,18 +95,18 @@ export const parseCreditsAmount = (
   if (value === "all") {
     amount = Number(max)
   } else if (value.endsWith("k")) {
-    amount = parseFloat(value) * 1_000
+    amount = Number.parseFloat(value) * 1000
   } else if (value.endsWith("m")) {
-    amount = parseFloat(value) * 1_000_000
+    amount = Number.parseFloat(value) * 1_000_000
   } else {
-    amount = parseInt(value)
+    amount = Number.parseInt(value)
   }
 
   amount = Math.floor(amount)
   amount = Math.max(0, Math.min(Math.floor(amount), Number(max)))
 
   if (Number.isNaN(amount)) {
-    throw new Error("Invalid amount format")
+    throw new TypeError("Invalid amount format")
   }
 
   if (amount <= 0) {

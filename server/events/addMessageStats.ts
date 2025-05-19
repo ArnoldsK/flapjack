@@ -1,7 +1,7 @@
 import { Events } from "discord.js"
 
-import { createEvent } from "~/server/utils/event"
 import { StatsModel } from "~/server/db/model/Stats"
+import { createEvent } from "~/server/utils/event"
 
 export default createEvent(
   Events.MessageCreate,

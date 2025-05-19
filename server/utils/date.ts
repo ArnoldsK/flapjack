@@ -1,8 +1,10 @@
 import dayjs from "dayjs"
-import relativeTime from "dayjs/plugin/relativeTime"
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter"
+import relativeTime from "dayjs/plugin/relativeTime"
 
 dayjs.extend(relativeTime)
 dayjs.extend(isSameOrAfter)
 
-export { dayjs as d }
+
+
+export {default as d} from "dayjs"

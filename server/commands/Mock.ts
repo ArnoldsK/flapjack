@@ -1,4 +1,5 @@
 import { SlashCommandBuilder } from "discord.js"
+
 import { BaseCommand } from "~/server/base/Command"
 import { parseMentions } from "~/server/utils/message"
 
@@ -24,8 +25,7 @@ export default class MockCommand extends BaseCommand {
     const result = parseMentions(input, this.guild)
       .split(" ")
       .map((word) =>
-        word
-          .split("")
+        [...word]
           .map((letter, i) =>
             i % 2 === 0 ? letter.toLowerCase() : letter.toUpperCase(),
           )

@@ -17,7 +17,7 @@ export default createEvent(
       )
       const urls = [...new Set(matches)].map((url) => url.replace("m.", "www."))
 
-      if (urls.length) {
+      if (urls.length > 0) {
         message.channel.send(
           `${Emoji.computer} ` + urls.map((url) => `<${url}>`).join("\n"),
         )
@@ -56,11 +56,9 @@ export default createEvent(
     // #############################################################################
     // Square spam embeds (word guessing games)
     // #############################################################################
-    const emojiCount = Array.from(
-      message.content.matchAll(
+    const emojiCount = [...message.content.matchAll(
         /[\uD800-\uDBFF]|[\u2702-\u27B0]|[\uF680-\uF6C0]|[\u24C2-\uF251]/g,
-      ),
-    ).length
+      )].length
 
     if (emojiCount >= 5) {
       message.suppressEmbeds(true)

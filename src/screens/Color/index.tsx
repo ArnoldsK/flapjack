@@ -1,10 +1,11 @@
 import { useState } from "react"
-import { Page } from "~/src/components/Page"
 import { SketchPicker } from "react-color"
-
-import * as S from "./styles"
 import { SketchPickerStylesProps } from "react-color/lib/components/sketch/Sketch"
 import { useCopyToClipboard } from "react-use"
+
+import * as S from "./styles"
+
+import { Page } from "~/src/components/Page"
 
 const TEXT = "Pepsi Dog"
 

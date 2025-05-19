@@ -1,4 +1,5 @@
 import { Entity, BaseEntity, Column, PrimaryColumn } from "typeorm"
+
 import { StaticData, StaticDataType } from "~/types/entity"
 
 @Entity()

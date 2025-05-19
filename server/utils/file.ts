@@ -1,5 +1,6 @@
-import { readdirSync } from "fs"
-import { join } from "path"
+import { readdirSync } from "node:fs"
+import path from "node:path"
+
 import { isNonNullish } from "~/server/utils/boolean"
 
 const getImportableDirectoryFiles = (dir: string) => {
@@ -9,7 +10,7 @@ const getImportableDirectoryFiles = (dir: string) => {
         (file.endsWith(".ts") || file.endsWith(".js")) &&
         !file.startsWith("index"),
     )
-    .map((file) => join(dir, file.replace(/\.(t|s)s$/, "")))
+    .map((file) => path.join(dir, file.replace(/\.(t|s)s$/, "")))
 }
 
 /**
@@ -19,7 +20,7 @@ const getImportableDirectoryFiles = (dir: string) => {
  *
  * @example
  * ```ts
- * import { importDirectoryDefaults } from "~/server/utils/utils/import"
+ * import { importDirectoryDefaults } from "~/server/utils/utils/file"
  *
  * export const getRoutes = () => importDirectoryDefaults<Route>(__dirname)
  * ```
@@ -31,9 +32,10 @@ export const importDirectoryDefaults = async <TDefault>(
   const imports = await Promise.all(
     files.map(async (file) => {
       try {
-        return (await import(file)).default
-      } catch (err) {
-        console.error(`Error importing file ${file}:`, err)
+        const imported = await import(file)
+        return imported.default
+      } catch (error) {
+        console.error(`Error importing file ${file}:`, error)
         return null
       }
     }),

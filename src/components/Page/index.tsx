@@ -1,8 +1,8 @@
 import Head from "next/head"
 import { PropsWithChildren } from "react"
 
-import * as S from "./styles"
 import { Navigation } from "./Navigation"
+import * as S from "./styles"
 
 export interface PageProps {
   title?: string
@@ -22,7 +22,7 @@ export const Page = function Page({
   return (
     <>
       <Head>
-        <meta charSet="UTF-8" />
+        <meta charSet="utf8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" type="image/png" href="/favicon.png" />

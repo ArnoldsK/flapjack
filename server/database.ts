@@ -1,5 +1,7 @@
-import { join } from "path"
+import path from "node:path"
+
 import { DataSource } from "typeorm"
+
 import { appConfig } from "~/server/config"
 
 export const db = new DataSource({
@@ -11,9 +13,9 @@ export const db = new DataSource({
   password: appConfig.db.password,
   database: appConfig.db.database,
   logging: false,
-  entities: [join(__dirname, "db", "entity", "*.{ts,js}")],
+  entities: [path.join(__dirname, "db", "entity", "*.{ts,js}")],
   subscribers: [],
-  migrations: [join(__dirname, "db", "migration", "*.{ts,js}")],
+  migrations: [path.join(__dirname, "db", "migration", "*.{ts,js}")],
   // Auto-update tables
   synchronize: true,
   // Screw migrations... I tried, it's a pain with MySQL

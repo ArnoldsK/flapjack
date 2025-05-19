@@ -1,5 +1,5 @@
-import { EventTask } from "~/server/utils/event"
-import { importDirectoryDefaults } from "~/server/utils/import"
+import { AnyEvent, EventTask } from "~/server/utils/event"
+import { importDirectoryDefaults } from "~/server/utils/file"
 
 export const getEvents = () =>
-  importDirectoryDefaults<EventTask<any>>(__dirname)
+  importDirectoryDefaults<EventTask<AnyEvent>>(__dirname)

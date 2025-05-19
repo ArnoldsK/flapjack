@@ -1,7 +1,8 @@
 import { Role } from "discord.js"
+
 import { DISCORD_IDS } from "~/constants"
-import { Task } from "~/types/tasks"
 import { BOOSTER_ICON_ROLE_PREFIX } from "~/constants"
+import { Task } from "~/types/tasks"
 
 export const removeNonBoosterIcons: Task = async (context) => {
   const nonBoosterMembers = context
@@ -23,7 +24,7 @@ export const removeNonBoosterIcons: Task = async (context) => {
     }
   }
 
-  if (rolesToRemove.length) {
+  if (rolesToRemove.length > 0) {
     await Promise.all(rolesToRemove.map((role) => role.delete()))
   }
 }

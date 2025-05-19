@@ -1,7 +1,7 @@
 import { Events } from "discord.js"
 
-import { createEvent } from "~/server/utils/event"
 import { RolesEntity } from "~/server/db/entity/Roles"
+import { createEvent } from "~/server/utils/event"
 
 export default createEvent(
   Events.ClientReady,
@@ -18,7 +18,7 @@ export default createEvent(
           // Exclude @everyone role
           .filter((id) => id !== guild.id),
       }))
-    if (!memberRoleIds.length) return
+    if (memberRoleIds.length === 0) return
 
     await RolesEntity.createQueryBuilder()
       .insert()

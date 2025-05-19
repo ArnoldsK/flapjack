@@ -1,4 +1,4 @@
-import { CacheObjectManager } from "~/server/cache"
+import { CacheObjectManager } from "./cache"
 
 describe("CacheObjectManager", () => {
   test("set", () => {

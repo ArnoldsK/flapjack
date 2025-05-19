@@ -1,10 +1,11 @@
 import { SlashCommandBuilder } from "discord.js"
+
+import { Color, OPTION_DESCRIPTION_AMOUNT } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { CreditsModel } from "~/server/db/model/Credits"
-import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
-import { Color, OPTION_DESCRIPTION_AMOUNT } from "~/constants"
-import { randomValue } from "~/server/utils/random"
 import { isCasinoChannel } from "~/server/utils/channel"
+import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
+import { randomValue } from "~/server/utils/random"
 import { joinAsLines } from "~/server/utils/string"
 
 enum OptionName {

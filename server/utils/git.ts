@@ -1,8 +1,9 @@
-import fs from "fs"
-import path from "path"
+import { exec } from "node:child_process"
+import fs from "node:fs"
+import path from "node:path"
+import { promisify } from "node:util"
+
 import { assert } from "~/server/utils/error"
-import { promisify } from "util"
-import { exec } from "child_process"
 
 interface Commit {
   hash: string
@@ -23,7 +24,7 @@ export const getNewCommits = async (): Promise<Commit[]> => {
   // ! Newest first
   const commits = getLogCommits(log)
 
-  if (!commits.length) {
+  if (commits.length === 0) {
     return []
   }
 

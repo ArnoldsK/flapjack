@@ -1,11 +1,12 @@
 import translate from "deepl"
-import { createEvent } from "~/server/utils/event"
+
 import { appConfig } from "~/server/config"
+import { createEvent } from "~/server/utils/event"
 
 const parseContent = (text: string): string => {
   return text
-    .replace(/\s+/g, " ")
-    .replace(/(?:https?|ftp):\/\/[\n\S]+/g, "")
+    .replaceAll(/\s+/g, " ")
+    .replaceAll(/(?:https?|ftp):\/\/[\n\S]+/g, "")
     .trim()
 }
 
@@ -36,7 +37,7 @@ export default createEvent(
     // Determine content
     let content = parseContent(message.content)
 
-    if (!content.length && message.embeds.length) {
+    if (content.length === 0 && message.embeds.length > 0) {
       const embed = message.embeds[0]
 
       if (embed.description && !embed.url?.includes("youtube.com")) {
@@ -57,11 +58,11 @@ export default createEvent(
 
       const lines = data.translations.map((item) => item.text)
 
-      if (!lines.length) return
+      if (lines.length === 0) return
 
       message.reply(">>> " + lines.join("\n"))
-    } catch (e) {
-      console.error(e)
+    } catch (error) {
+      console.error(error)
     }
   },
 )

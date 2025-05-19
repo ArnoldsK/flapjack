@@ -1,4 +1,5 @@
 import { SlashCommandBuilder } from "discord.js"
+
 import { BaseCommand } from "~/server/base/Command"
 
 enum OptionName {
@@ -40,8 +41,8 @@ export default class AvatarCommand extends BaseCommand {
         ephemeral: !!spying,
         files: [avatarUrl],
       })
-    } catch (err) {
-      this.fail((err as Error).message)
+    } catch (error) {
+      this.fail((error as Error).message)
     }
   }
 }

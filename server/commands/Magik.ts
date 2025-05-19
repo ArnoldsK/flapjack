@@ -1,7 +1,8 @@
 import { SlashCommandBuilder } from "discord.js"
-import { isUrl } from "~/server/utils/web"
+
 import { BaseCommand } from "~/server/base/Command"
 import { checkUnreachable } from "~/server/utils/error"
+import { isUrl } from "~/server/utils/web"
 
 const API_URL = "https://arnoldsk.lv/liquify-api/?url="
 
@@ -84,12 +85,14 @@ export default class MagikCommand extends BaseCommand {
         })
       }
 
-      case SubcommandName.Url:
+      case SubcommandName.Url: {
         return this.interaction.options.getString(OptionName.Url, true).trim()
+      }
 
-      default:
+      default: {
         checkUnreachable(subcommand)
         return null
+      }
     }
   }
 }

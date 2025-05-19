@@ -3,8 +3,8 @@ export interface RedGifsResponse {
   pages: number
   total: number
   gifs: RedGifsGif[]
-  feed_id: any
-  cursor: any
+  feed_id: unknown
+  cursor: unknown
 }
 
 export interface RedGifsGif {
@@ -12,7 +12,7 @@ export interface RedGifsGif {
   createDate: number
   description: string
   duration: number
-  gallery: any
+  gallery: unknown
   hasAudio: boolean
   height: number
   hideHome: boolean

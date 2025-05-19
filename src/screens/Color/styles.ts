@@ -1,4 +1,5 @@
 import styled, { css, keyframes } from "styled-components"
+
 import { PAGE_PADDING } from "~/src/components/Page/styles"
 
 export const Wrap = styled.div`

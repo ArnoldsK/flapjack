@@ -1,8 +1,9 @@
 import { Events } from "discord.js"
-import { createEvent } from "~/server/utils/event"
+
 import { DISCORD_IDS } from "~/constants"
-import { CreditsModel } from "~/server/db/model/Credits"
 import { UPPER_CLASS_MESSAGE_CREDITS } from "~/constants"
+import { CreditsModel } from "~/server/db/model/Credits"
+import { createEvent } from "~/server/utils/event"
 
 export default createEvent(
   Events.MessageCreate,

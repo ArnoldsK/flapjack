@@ -1,11 +1,11 @@
+import { SlashCommandBuilder } from "discord.js"
 import hiscores from "osrs-json-hiscores"
 
-import { SlashCommandBuilder } from "discord.js"
-import { BaseCommand } from "~/server/base/Command"
-import { checkUnreachable } from "~/server/utils/error"
-import { RsLeagueModel } from "~/server/db/model/RsLeague"
 import { Unicode } from "~/constants"
 import { DISCORD_IDS } from "~/constants"
+import { BaseCommand } from "~/server/base/Command"
+import { RsLeagueModel } from "~/server/db/model/RsLeague"
+import { checkUnreachable } from "~/server/utils/error"
 
 enum SubcommandName {
   Set = "set",
@@ -46,16 +46,19 @@ export default class RsLeagueCommand extends BaseCommand {
     const subcommand = this.getSubcommand<SubcommandName>()
 
     switch (subcommand) {
-      case SubcommandName.Set:
+      case SubcommandName.Set: {
         await this.#handleSet()
         break
+      }
 
-      case SubcommandName.Ranks:
+      case SubcommandName.Ranks: {
         await this.#handleRanks()
         break
+      }
 
-      default:
+      default: {
         checkUnreachable(subcommand)
+      }
     }
   }
 
@@ -101,7 +104,7 @@ export default class RsLeagueCommand extends BaseCommand {
     // Remove no rank players
     players = players.filter((player) => !!player.rank)
 
-    if (!players.length) {
+    if (players.length === 0) {
       this.fail("No ranks")
       return
     }

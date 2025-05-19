@@ -1,10 +1,13 @@
 import { GetServerSideProps } from "next"
-import { ApiAvatars } from "~/types/api"
-import { AvatarGrid } from "~/src/components/AvatarGrid"
-import { Page } from "~/src/components/Page"
+import absoluteUrl from "next-absolute-url"
 
 import * as S from "./styles"
-import absoluteUrl from "next-absolute-url"
+
+import { AvatarGrid } from "~/src/components/AvatarGrid"
+import { Page } from "~/src/components/Page"
+import { ApiAvatars } from "~/types/api"
+
+
 
 const DISCORD_INVITE_URL = "https://discord.gg/j6wSTnukKn"
 

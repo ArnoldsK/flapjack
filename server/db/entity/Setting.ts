@@ -1,4 +1,5 @@
 import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm"
+
 import type { SettingKey } from "~/server/db/model/Setting"
 
 @Entity()

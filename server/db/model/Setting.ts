@@ -1,10 +1,12 @@
 import { In, Repository } from "typeorm"
+import { z } from "zod"
+
+import { CacheKey } from "~/server/cache"
 import { db } from "~/server/database"
 import { SettingEntity } from "~/server/db/entity/Setting"
-import { BaseContext } from "~/types"
-import { CacheKey } from "~/server/cache"
 import { dedupe } from "~/server/utils/array"
-import { z } from "zod"
+import { BaseContext } from "~/types"
+
 
 export const settingsSchema = z.object({
   "tasks.hourlyGifBanners.enabled": z.boolean(),
@@ -69,7 +71,7 @@ export class SettingModel {
       .map((el) => el.key)
       .filter((key) => !defaultKeys.includes(key))
 
-    if (oldKeys.length) {
+    if (oldKeys.length > 0) {
       await this.#repository.delete({
         key: In(oldKeys),
       })

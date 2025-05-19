@@ -1,4 +1,5 @@
 import { SlashCommandBuilder } from "discord.js"
+
 import { BaseCommand } from "~/server/base/Command"
 import { PermissionFlags, permission } from "~/server/utils/permission"
 

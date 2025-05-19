@@ -1,12 +1,13 @@
 import { Events, GuildMember, Message } from "discord.js"
-import { createEvent } from "~/server/utils/event"
+import { In } from "typeorm"
 import { z } from "zod"
+
 import { DISCORD_IDS } from "~/constants"
+import { CacheKey } from "~/server/cache"
 import { VideoEntity } from "~/server/db/entity/Video"
 import { isNonNullish } from "~/server/utils/boolean"
+import { createEvent } from "~/server/utils/event"
 import { EntityFields } from "~/types/entity"
-import { CacheKey } from "~/server/cache"
-import { In } from "typeorm"
 
 export default createEvent(
   Events.MessageCreate,
@@ -30,7 +31,7 @@ export default createEvent(
     // Extract video IDs
     // #############################################################################
     const messageVideoIds = getVideoIds(content)
-    if (!messageVideoIds.length) return
+    if (messageVideoIds.length === 0) return
 
     // #############################################################################
     // Remove videos that have already been saved
@@ -41,11 +42,13 @@ export default createEvent(
       })
       .getMany()
 
-    const existingVideoIds = existingVideos.map((video) => video.videoId)
-    const videoIds = messageVideoIds.filter(
-      (videoId) => !existingVideoIds.includes(videoId),
+    const existingVideoIds = new Set(
+      existingVideos.map((video) => video.videoId),
     )
-    if (!videoIds.length) return
+    const videoIds = messageVideoIds.filter(
+      (videoId) => !existingVideoIds.has(videoId),
+    )
+    if (videoIds.length === 0) return
 
     // #############################################################################
     // Get video data
@@ -61,7 +64,7 @@ export default createEvent(
         ),
       )
     ).filter(isNonNullish)
-    if (!videoData.length) return
+    if (videoData.length === 0) return
 
     // #############################################################################
     // Save video data and clear cache
@@ -77,7 +80,7 @@ export default createEvent(
       .map((video) => video.deArrowTitle)
       .filter(isNonNullish)
 
-    if (deArrowTitles.length) {
+    if (deArrowTitles.length > 0) {
       message.reply({
         embeds: deArrowTitles.map((title) => ({
           description: title,
@@ -93,14 +96,14 @@ export default createEvent(
 
 const getVideoIds = (content: string): string[] => {
   const regex =
-    /((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(?:-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|live\/|v\/)?)([\w\-]+)(\S+)?/g
+    /((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(?:-nocookie)?\.com|youtu.be))(\/(?:[\w-]+\?v=|embed\/|live\/|v\/)?)([\w-]+)(\S+)?/g
 
   const matches = content.matchAll(regex)
   if (!matches) {
     return []
   }
 
-  const videoIds = Array.from(matches).map((match) => {
+  const videoIds = [...matches].map((match) => {
     const videoId = match[5]
     return videoId
   })

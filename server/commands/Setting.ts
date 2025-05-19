@@ -1,14 +1,15 @@
 import { codeBlock, SlashCommandBuilder } from "discord.js"
+
+import { Unicode } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
-import { PermissionFlags, permission } from "~/server/utils/permission"
-import { checkUnreachable } from "~/server/utils/error"
 import {
   DEFAULT_SETTINGS,
   SettingKey,
   settingsSchema,
   SettingModel,
 } from "~/server/db/model/Setting"
-import { Unicode } from "~/constants"
+import { checkUnreachable } from "~/server/utils/error"
+import { PermissionFlags, permission } from "~/server/utils/permission"
 
 enum SubcommandName {
   Set = "set",
@@ -69,16 +70,19 @@ export default class SettingCommand extends BaseCommand {
     const subcommand = this.getSubcommand<SubcommandName>()
 
     switch (subcommand) {
-      case SubcommandName.Set:
+      case SubcommandName.Set: {
         await this.#handleSet()
         break
+      }
 
-      case SubcommandName.List:
+      case SubcommandName.List: {
         await this.#handleList()
         break
+      }
 
-      default:
+      default: {
         checkUnreachable(subcommand)
+      }
     }
   }
 
@@ -101,7 +105,7 @@ export default class SettingCommand extends BaseCommand {
       await model.set(key, value)
 
       this.success()
-    } catch (err) {
+    } catch {
       this.fail("Unable to set the setting... incorrect value type?")
     }
   }

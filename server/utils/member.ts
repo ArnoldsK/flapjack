@@ -1,4 +1,5 @@
 import { APIEmbedAuthor, Guild, GuildMember } from "discord.js"
+
 import { collectionToArray } from "~/server/utils/array"
 import { d } from "~/server/utils/date"
 
@@ -29,8 +30,8 @@ export const getMemberJoinPosition = async (
     members.sort((a, b) => a.joinedTimestamp! - b.joinedTimestamp!),
   )
 
-  for (let i = 0; i < sortedMembers.length; i++) {
-    if (sortedMembers[i].id === member.id) {
+  for (const [i, sortedMember] of sortedMembers.entries()) {
+    if (sortedMember.id === member.id) {
       return i + 1
     }
   }

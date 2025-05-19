@@ -1,5 +1,6 @@
 import type { GuildMember } from "discord.js"
 import { PermissionFlagsBits } from "discord.js"
+
 import { DISCORD_IDS } from "~/constants"
 
 export type PermissionType = "allow" | "deny" | "either"
@@ -21,12 +22,15 @@ export const PermissionFlags = {
 
 export const getPermissionFlagName = (permission: bigint): string | null => {
   switch (permission) {
-    case PermissionFlags.Administrator:
+    case PermissionFlags.Administrator: {
       return "Admin"
-    case PermissionFlags.NitroBooster:
+    }
+    case PermissionFlags.NitroBooster: {
       return "Booster"
-    default:
+    }
+    default: {
       return "Moderator"
+    }
   }
 }
 
@@ -39,24 +43,26 @@ export const memberHasPermission = (
   member: GuildMember,
   { type, permissions }: Permission,
 ): boolean => {
-  const customPermissions: bigint[] = [
+  const customPermissions = new Set<bigint>([
     PermissionFlags.ClientOwner,
     PermissionFlags.NitroBooster,
-  ]
+  ])
 
-  const isCustom = (permission: bigint) =>
-    customPermissions.includes(permission)
+  const isCustom = (permission: bigint) => customPermissions.has(permission)
 
   const validateCustom = (permission: bigint): boolean => {
     switch (permission) {
-      case PermissionFlags.ClientOwner:
+      case PermissionFlags.ClientOwner: {
         return member.id === DISCORD_IDS.users.owner
+      }
 
-      case PermissionFlags.NitroBooster:
+      case PermissionFlags.NitroBooster: {
         return member.roles.cache.has(DISCORD_IDS.roles.nitroBooster)
+      }
 
-      default:
+      default: {
         return true
+      }
     }
   }
 
@@ -72,8 +78,8 @@ export const memberHasPermission = (
 
   // Check given permissions
   switch (type) {
-    case "allow":
-      if (!permissions.length) {
+    case "allow": {
+      if (permissions.length === 0) {
         // Always deny
         return false
       } else {
@@ -91,9 +97,10 @@ export const memberHasPermission = (
         // Otherwise allow
         return true
       }
+    }
 
-    case "deny":
-      if (!permissions.length) {
+    case "deny": {
+      if (permissions.length === 0) {
         // Always allow
         return true
       } else {
@@ -111,8 +118,9 @@ export const memberHasPermission = (
         // Otherwise allow
         return true
       }
+    }
 
-    case "either":
+    case "either": {
       // Check if has either
       for (const permission of permissions) {
         if (isCustom(permission)) {
@@ -126,5 +134,6 @@ export const memberHasPermission = (
 
       // Otherwise deny
       return false
+    }
   }
 }

@@ -9,14 +9,14 @@ export enum Unicode {
 }
 
 export enum Color {
-  white = 0xffffff,
-  black = 0x000000,
-  red = 0xf04747,
-  green = 0x43b581,
-  blue = 0x6495ed,
-  gold = 0xffd700,
-  orange = 0xffa500,
-  purple = 0x771177,
+  white = 0xFF_FF_FF,
+  black = 0x00_00_00,
+  red = 0xF0_47_47,
+  green = 0x43_B5_81,
+  blue = 0x64_95_ED,
+  gold = 0xFF_D7_00,
+  orange = 0xFF_A5_00,
+  purple = 0x77_11_77,
 }
 
 export enum Emoji {
@@ -50,7 +50,7 @@ export const RANK_MAX_LEVEL = 99
 
 export const EXP_PER_MESSAGE = 1
 
-export const PERSISTENT_THREAD_ARCHIVE_DURATION = 10080 // 7 days in minutes
+export const PERSISTENT_THREAD_ARCHIVE_DURATION = 10_080 // 7 days in minutes
 
 export const DISCORD_IDS = {
   guild: "411593263615836172",

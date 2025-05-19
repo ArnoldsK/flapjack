@@ -1,19 +1,19 @@
 import { SlashCommandBuilder } from "discord.js"
 
-import { BaseCommand } from "~/server/base/Command"
-import {
-  memberHasPermission,
-  permission,
-  PermissionFlags,
-} from "~/server/utils/permission"
-import { checkUnreachable } from "~/server/utils/error"
-import { d } from "~/server/utils/date"
 import { DISCORD_IDS, Unicode } from "~/constants"
+import { BaseCommand } from "~/server/base/Command"
+import { d } from "~/server/utils/date"
+import { checkUnreachable } from "~/server/utils/error"
 import { isTimedOut } from "~/server/utils/member"
 import {
   getTimeoutAddedEmbed,
   getTimeoutRemovedEmbed,
 } from "~/server/utils/message"
+import {
+  memberHasPermission,
+  permission,
+  PermissionFlags,
+} from "~/server/utils/permission"
 
 enum SubcommandName {
   List = "list",
@@ -105,28 +105,32 @@ export default class MuteCommand extends BaseCommand {
     const subcommand = this.getSubcommand<SubcommandName>()
 
     switch (subcommand) {
-      case SubcommandName.List:
+      case SubcommandName.List: {
         await this.#handleList()
         break
+      }
 
-      case SubcommandName.Add:
+      case SubcommandName.Add: {
         if (!this.#canModerate()) {
           this.deny()
           return
         }
         await this.#handleAdd()
         break
+      }
 
-      case SubcommandName.Remove:
+      case SubcommandName.Remove: {
         if (!this.#canModerate()) {
           this.deny()
           return
         }
         await this.#handleRemove()
         break
+      }
 
-      default:
+      default: {
         checkUnreachable(subcommand)
+      }
     }
   }
 
@@ -135,8 +139,8 @@ export default class MuteCommand extends BaseCommand {
 
     this.reply({
       ephemeral: true,
-      content: !timedOutMembers.size ? "No one is timed out" : undefined,
-      embeds: timedOutMembers.size
+      content: timedOutMembers.size === 0 ? "No one is timed out" : undefined,
+      embeds: timedOutMembers.size > 0
         ? [
             {
               description: timedOutMembers

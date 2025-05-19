@@ -1,8 +1,9 @@
 import { Repository } from "typeorm"
+
 import { db } from "~/server/database"
 import { CommandExecuteEntity } from "~/server/db/entity/CommandExecute"
-import { EntityFields } from "~/types/entity"
 import { ApiStatsCommand } from "~/types/api"
+import { EntityFields } from "~/types/entity"
 
 type CreateInput = Omit<EntityFields<CommandExecuteEntity>, "id" | "createdAt">
 
@@ -25,16 +26,14 @@ export class CommandExecuteModel {
   async getApiItems(): Promise<ApiStatsCommand[]> {
     const entities = await this.#repository.find()
 
-    return Array.from(
-      entities.reduce((acc, entity) => {
+    return [...entities.reduce((acc, entity) => {
         const name = entity.commandName
         const count = acc.get(name) ?? 0
 
         acc.set(name, count + 1)
 
         return acc
-      }, new Map<string, number>()),
-    )
+      }, new Map<string, number>())]
       .map(([name, count]) => ({
         name,
         count,

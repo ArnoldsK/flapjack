@@ -1,13 +1,14 @@
-import absoluteUrl from "next-absolute-url"
 import type { GetServerSideProps } from "next"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import absoluteUrl from "next-absolute-url"
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react"
 import { useWindowScroll } from "react-use"
 
-import { Page } from "~/src/components/Page"
-import { RECAP_CHANNEL_IDS } from "~/constants"
 import { RecapMessage } from "./Message"
-import { MessagesByChannel, RecapScreenProps } from "./types"
 import * as S from "./styles"
+import { MessagesByChannel, RecapScreenProps } from "./types"
+
+import { RECAP_CHANNEL_IDS } from "~/constants"
+import { Page } from "~/src/components/Page"
 
 const CHANNEL_CLASS_NAME = "recap-channel"
 
@@ -24,7 +25,6 @@ export const Recap = ({ recap, membersData }: RecapScreenProps) => {
       RECAP_CHANNEL_IDS.map((channelId): MessagesByChannel | null => {
         const messages = recap.messages
           .filter((el) => el.channel.id === channelId)
-          .slice(0)
           .sort(
             (a, b) =>
               // More reactions first
@@ -35,7 +35,7 @@ export const Recap = ({ recap, membersData }: RecapScreenProps) => {
           )
           .slice(0, 5)
 
-        return messages.length
+        return messages.length > 0
           ? {
               channel: messages[0].channel,
               messages,
@@ -79,23 +79,20 @@ export const Recap = ({ recap, membersData }: RecapScreenProps) => {
     if (activeChannelEl) {
       setActiveChannelId(activeChannelEl.id)
     }
-
-    // Keep in the effect
-    scrollY
   }, [scrollY])
 
   const onChannelClick = useCallback(
-    (e: React.MouseEvent, channelId: string) => {
+    (e: MouseEvent, channelId: string) => {
       e.preventDefault()
 
-      const channelEl = document.getElementById(channelId)
+      const channelEl = document.querySelector(`#${channelId}`)
       if (!channelEl) return
 
       window.scrollTo({
         top:
           channels[0]?.id === channelId
             ? 0
-            : channelEl.offsetTop - window.innerHeight / 4,
+            : (channelEl as HTMLElement).offsetTop - window.innerHeight / 4,
         behavior: "smooth",
       })
     },
@@ -115,7 +112,7 @@ export const Recap = ({ recap, membersData }: RecapScreenProps) => {
                 translate: `0 -${S.NAV_ITEM_HEIGHT * activeChannelIndex}px`,
               }}
             >
-              {channels.map((channel, i) => (
+              {channels.map((channel) => (
                 <S.NavItem
                   key={channel.id}
                   href={`#${channel.id}`}

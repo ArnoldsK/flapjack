@@ -1,7 +1,7 @@
 import { Collection, Events, Role } from "discord.js"
 
-import { createEvent } from "~/server/utils/event"
 import { RolesModel } from "~/server/db/model/Roles"
+import { createEvent } from "~/server/utils/event"
 
 export default createEvent(
   Events.GuildMemberUpdate,

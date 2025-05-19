@@ -1,26 +1,26 @@
+import deltaE from "delta-e"
 import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   SlashCommandBuilder,
 } from "discord.js"
-import deltaE from "delta-e"
 import colorPalette from "get-image-colors"
 
+import { DISCORD_BACKGROUND_COLOR_LAB } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
+import { getUserColorPreviewImage } from "~/server/canvas/userAutoColorPreview"
+import {
+  labArrayToObject,
+  parseHexColor,
+  setColorInteractionId,
+} from "~/server/utils/color"
 import { checkUnreachable } from "~/server/utils/error"
 import {
   getMemberColorRole,
   purgeRole,
   setMemberColorRole,
 } from "~/server/utils/role"
-import {
-  labArrayToObject,
-  parseHexColor,
-  setColorInteractionId,
-} from "~/server/utils/color"
-import { getUserColorPreviewImage } from "~/server/canvas/userAutoColorPreview"
-import { DISCORD_BACKGROUND_COLOR_LAB } from "~/constants"
 
 enum SubcommandName {
   Suggest = "suggest",
@@ -66,20 +66,24 @@ export default class ColorCommand extends BaseCommand {
     const subcommand = this.getSubcommand<SubcommandName>()
 
     switch (subcommand) {
-      case SubcommandName.Suggest:
+      case SubcommandName.Suggest: {
         await this.#handleSuggest()
         return
+      }
 
-      case SubcommandName.Custom:
+      case SubcommandName.Custom: {
         await this.#handleCustom()
         return
+      }
 
-      case SubcommandName.None:
+      case SubcommandName.None: {
         await this.#handleNone()
         return
+      }
 
-      default:
+      default: {
         checkUnreachable(subcommand)
+      }
     }
   }
 
@@ -111,7 +115,7 @@ export default class ColorCommand extends BaseCommand {
       .slice(0, 4)
       .map((el) => el.hex)
 
-    if (!hexColors.length) {
+    if (hexColors.length === 0) {
       this.fail("Not enough colors with a good name visibility")
       return
     }

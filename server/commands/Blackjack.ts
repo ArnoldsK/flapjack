@@ -1,3 +1,5 @@
+import assert from "node:assert"
+
 import {
   APIEmbed,
   ActionRowBuilder,
@@ -17,15 +19,14 @@ import {
   HandValue,
 } from "engine-blackjack-ts"
 
-import { BaseCommand } from "~/server/base/Command"
-import { CreditsModel } from "~/server/db/model/Credits"
-import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
 import { OPTION_DESCRIPTION_AMOUNT, Unicode } from "~/constants"
-import { isCasinoChannel } from "~/server/utils/channel"
-import { joinAsLines, ucFirst } from "~/server/utils/string"
-import { isNonNullish } from "~/server/utils/boolean"
-import assert from "assert"
+import { BaseCommand } from "~/server/base/Command"
 import { CacheKey } from "~/server/cache"
+import { CreditsModel } from "~/server/db/model/Credits"
+import { isNonNullish } from "~/server/utils/boolean"
+import { isCasinoChannel } from "~/server/utils/channel"
+import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
+import { joinAsLines, ucFirst } from "~/server/utils/string"
 
 type Action = keyof typeof actions
 type HandSide = keyof HandInfo
@@ -80,10 +81,7 @@ export default class BlackjackCommand extends BaseCommand {
     return manager.get(this.user.id)
   }
 
-  #updateCache(
-    game: Game,
-    response: InteractionResponse | Message | undefined,
-  ) {
+  #updateCache(game: Game, response: InteractionResponse | Message | null) {
     const manager = this.context.cache.get(CacheKey.Blackjack)
 
     if (response && game.getState().stage !== "done") {
@@ -149,7 +147,7 @@ export default class BlackjackCommand extends BaseCommand {
       components,
     })
 
-    this.#updateCache(game, response)
+    this.#updateCache(game, response ?? null)
 
     if (response && !gameOver) {
       // Begin the rabbit hole...
@@ -178,24 +176,30 @@ export default class BlackjackCommand extends BaseCommand {
       )
 
       switch (action) {
-        case "stand":
+        case "stand": {
           game.dispatch(actions.stand({ position: handSide }))
           break
-        case "hit":
+        }
+        case "hit": {
           game.dispatch(actions.hit({ position: handSide }))
           break
-        case "surrender":
+        }
+        case "surrender": {
           game.dispatch(actions.surrender())
           break
-        case "double":
+        }
+        case "double": {
           game.dispatch(actions.double({ position: handSide }))
           break
-        case "split":
+        }
+        case "split": {
           game.dispatch(actions.split())
           break
-        default:
+        }
+        default: {
           console.log("ACTION NOT IMPLEMENTED", action)
           break
+        }
       }
 
       const state = game.getState()
@@ -234,7 +238,7 @@ export default class BlackjackCommand extends BaseCommand {
         // Continue the rabbit hole...
         await this.#handleAwaitResponse(nextResponse, game)
       }
-    } catch (err) {
+    } catch {
       const wallet = await this.#creditsModel.getWallet()
       const state = game.getState()
       const lostAmount = state.finalBet || state.initialBet
@@ -254,7 +258,7 @@ export default class BlackjackCommand extends BaseCommand {
         components: [],
       })
 
-      this.#updateCache(game, undefined)
+      this.#updateCache(game, null)
     }
   }
 
@@ -372,7 +376,7 @@ export default class BlackjackCommand extends BaseCommand {
     const leftHand: Hand | undefined = _leftHand.cards ? _leftHand : undefined
 
     const currentHand = currentHandSide === "right" ? rightHand : leftHand
-    assert(!!currentHand)
+    assert.ok(!!currentHand)
 
     const actions: Action[] = []
     for (const [action, available] of Object.entries(
@@ -386,7 +390,7 @@ export default class BlackjackCommand extends BaseCommand {
     }
 
     let actionRow: ParsedGameHands["actionRow"]
-    if (isPlayerTurn && actions.length) {
+    if (isPlayerTurn && actions.length > 0) {
       actionRow = new ActionRowBuilder<ButtonBuilder>()
       actionRow.addComponents(
         ...actions.map((action) =>

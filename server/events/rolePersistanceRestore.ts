@@ -1,7 +1,7 @@
 import { Events } from "discord.js"
 
-import { createEvent } from "~/server/utils/event"
 import { RolesModel } from "~/server/db/model/Roles"
+import { createEvent } from "~/server/utils/event"
 
 export default createEvent(
   Events.GuildMemberAdd,
@@ -12,12 +12,12 @@ export default createEvent(
     const model = new RolesModel(member)
 
     const savedRoleIds = await model.getRoleIds()
-    if (!savedRoleIds.length) return
+    if (savedRoleIds.length === 0) return
 
     const roles = member.guild.roles.cache.filter(({ id }) =>
       savedRoleIds.includes(id),
     )
-    if (!roles.size) return
+    if (roles.size === 0) return
 
     try {
       await member.roles.add(roles)

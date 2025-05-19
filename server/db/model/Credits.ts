@@ -1,9 +1,10 @@
 import { GuildMember } from "discord.js"
 import { Repository } from "typeorm"
+
+import { DISCORD_IDS, UPPER_CLASS_MESSAGE_CREDITS } from "~/constants"
+import { appConfig } from "~/server/config"
 import { db } from "~/server/database"
 import { CreditsEntity } from "~/server/db/entity/Credits"
-import { appConfig } from "~/server/config"
-import { DISCORD_IDS, UPPER_CLASS_MESSAGE_CREDITS } from "~/constants"
 
 export interface Wallet {
   member: GuildMember
@@ -90,10 +91,6 @@ export class CreditsModel {
     )
     if (!role) return
 
-    if (wallet.credits >= UPPER_CLASS_MESSAGE_CREDITS) {
-      await this.#member.roles.add(role)
-    } else {
-      await this.#member.roles.remove(role)
-    }
+    await (wallet.credits >= UPPER_CLASS_MESSAGE_CREDITS ? this.#member.roles.add(role) : this.#member.roles.remove(role));
   }
 }

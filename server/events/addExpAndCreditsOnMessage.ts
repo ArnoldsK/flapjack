@@ -1,15 +1,16 @@
 import { Events } from "discord.js"
-import { createEvent } from "~/server/utils/event"
-import { ExperienceModel } from "~/server/db/model/Experience"
-import { CreditsModel } from "~/server/db/model/Credits"
+
 import {
   EXP_PER_MESSAGE,
   MIN_CREDITS_PER_MESSAGE,
   RANK_ACTIVE_ROLE_LEVEL,
 } from "~/constants"
 import { DISCORD_IDS } from "~/constants"
-import { getExperienceLevelData } from "~/server/utils/experience"
+import { CreditsModel } from "~/server/db/model/Credits"
+import { ExperienceModel } from "~/server/db/model/Experience"
 import { isTextChannel } from "~/server/utils/channel"
+import { createEvent } from "~/server/utils/event"
+import { getExperienceLevelData } from "~/server/utils/experience"
 import { embedAuthor } from "~/server/utils/member"
 
 export default createEvent(
@@ -37,11 +38,9 @@ export default createEvent(
       DISCORD_IDS.roles.activeMember,
     )
 
-    if (lvlNew >= RANK_ACTIVE_ROLE_LEVEL && activeRole) {
-      if (!message.member.roles.cache.get(activeRole.id)) {
+    if (lvlNew >= RANK_ACTIVE_ROLE_LEVEL && activeRole && !message.member.roles.cache.get(activeRole.id)) {
         message.member.roles.add(activeRole)
       }
-    }
 
     // Level-up
     if (lvlNew > lvl && lvlNew >= RANK_ACTIVE_ROLE_LEVEL) {

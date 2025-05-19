@@ -1,12 +1,12 @@
 import { ReminderModel } from "~/server/db/model/Reminder"
-import { Task } from "~/types/tasks"
 import { isTextChannel } from "~/server/utils/channel"
 import { d } from "~/server/utils/date"
+import { Task } from "~/types/tasks"
 
 export const endReminders: Task = async (context) => {
   const model = new ReminderModel()
   const reminders = await model.getAllExpired()
-  if (!reminders.length) return
+  if (reminders.length === 0) return
 
   await Promise.all(
     reminders.map(async (reminder) => {

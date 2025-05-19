@@ -7,18 +7,19 @@ import {
   RESTPostAPIChatInputApplicationCommandsJSONBody,
   Routes,
 } from "discord.js"
+
+import { DISCORD_IDS, Unicode } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { getCommands } from "~/server/commands"
-import { DISCORD_IDS, Unicode } from "~/constants"
+import { appConfig } from "~/server/config"
+import { CommandExecuteModel } from "~/server/db/model/CommandExecute"
+import { dedupe } from "~/server/utils/array"
 import { assert } from "~/server/utils/error"
 import {
   getPermissionFlagName,
   memberHasPermission,
 } from "~/server/utils/permission"
-import { dedupe } from "~/server/utils/array"
-import { appConfig } from "~/server/config"
 import { BaseContext } from "~/types"
-import { CommandExecuteModel } from "~/server/db/model/CommandExecute"
 
 export type SetupCommand = RESTPostAPIChatInputApplicationCommandsJSONBody & {
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>
@@ -32,7 +33,7 @@ const getCommandVersion = (command: {
   const versionString = matches?.[1]
   assert(!!versionString, `${command.name} has no version specified`)
 
-  const version = parseInt(versionString)
+  const version = Number.parseInt(versionString)
   assert(!Number.isNaN(version), `${command.name} has no valid version`)
 
   return version
@@ -42,12 +43,12 @@ const parseDescription = (Command: typeof BaseCommand): string => {
   const { type, permissions } = Command.permissions
   const elements = [Command.command.description]
 
-  if ((type === "allow" || type === "either") && permissions.length) {
+  if ((type === "allow" || type === "either") && permissions.length > 0) {
     const names = permissions
       .map(getPermissionFlagName)
       .filter((name): name is string => !!name)
 
-    if (names.length) {
+    if (names.length > 0) {
       elements.push(...names)
     }
   }
@@ -101,7 +102,7 @@ export const getSetupCommands = async (
         // Channel
         // #############################################################################
         if (
-          Command.channels.length &&
+          Command.channels.length > 0 &&
           !Command.channels.includes(interaction.channelId)
         ) {
           await command.fail("Can't use in this channel")
@@ -212,7 +213,7 @@ export const handleApiCommands = async (commands: SetupCommand[]) => {
       !commands.some((command) => command.name === apiCommand.name),
   )
 
-  if (deleteCommands.length) {
+  if (deleteCommands.length > 0) {
     for (const deleteCommand of deleteCommands) {
       console.log("> Commands > Delete >", deleteCommand.name)
       await rest.delete(

@@ -5,6 +5,7 @@ import {
   Role,
   RoleCreateOptions,
 } from "discord.js"
+
 import { BOOSTER_ICON_ROLE_PREFIX, COLOR_ROLE_PREFIX } from "~/constants"
 
 export const getClientRole = (guild: Guild): Role => {
@@ -40,13 +41,13 @@ export const getMemberBoosterIconRole = (
   )
 
 export const getMemberBoosterIconRoleName = (member: GuildMember): string =>
-  `${BOOSTER_ICON_ROLE_PREFIX}${member.id.substring(0, 4)}`
+  `${BOOSTER_ICON_ROLE_PREFIX}${member.id.slice(0, 4)}`
 
 /**
  * Delete the role if it has no members
  */
 export const purgeRole = async (role: Role) => {
-  if (role.members.size) return
+  if (role.members.size > 0) return
   await role.delete()
 }
 

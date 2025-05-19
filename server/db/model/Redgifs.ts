@@ -1,4 +1,5 @@
 import { Repository } from "typeorm"
+
 import { db } from "~/server/database"
 import { RedgifsEntity } from "~/server/db/entity/Redgifs"
 import { d } from "~/server/utils/date"
@@ -38,7 +39,7 @@ export class RedgifsModel {
     return d(createdAt).add(1, "day").isBefore(d())
   }
 
-  #url(path: string, auth = false) {
+  #url(path: string) {
     return new URL(path, "https://api.redgifs.com")
   }
 

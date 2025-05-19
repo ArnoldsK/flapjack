@@ -1,10 +1,11 @@
-import { MouseEvent, useCallback, useMemo, useState } from "react"
 import Image from "next/image"
+import { MouseEvent, useCallback, useMemo, useState } from "react"
 import { useDebounce, useTimeoutFn, useWindowSize } from "react-use"
-import { randomInt, randomValue } from "~/server/utils/random"
-import { interpolate } from "~/server/utils/number"
 
 import * as S from "./styles"
+
+import { interpolate } from "~/server/utils/number"
+import { randomInt, randomValue } from "~/server/utils/random"
 
 interface AvatarGridProps {
   avatarUrls: string[]
@@ -185,14 +186,17 @@ export const AvatarGrid = ({ avatarUrls }: AvatarGridProps) => {
   // #############################################################################
   const [avatarsInit, setAvatarsInit] = useState(true)
 
-  useTimeoutFn(() => {
-    setAvatarsInit(false)
-  }, S.AVATAR_INITIAL_SPEED + S.AVATAR_INITIAL_DELAY + 1)
+  useTimeoutFn(
+    () => {
+      setAvatarsInit(false)
+    },
+    S.AVATAR_INITIAL_SPEED + S.AVATAR_INITIAL_DELAY + 1,
+  )
 
   // #############################################################################
   // Render
   // #############################################################################
-  if (!avatarUrls.length) {
+  if (avatarUrls.length === 0) {
     return null
   }
 

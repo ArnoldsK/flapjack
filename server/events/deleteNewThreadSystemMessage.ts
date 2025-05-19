@@ -1,6 +1,8 @@
+import { setTimeout } from "node:timers/promises"
+
 import { MessageType } from "discord.js"
+
 import { createEvent } from "~/server/utils/event"
-import { setTimeout } from "timers/promises"
 
 export default createEvent(
   "messageCreate",

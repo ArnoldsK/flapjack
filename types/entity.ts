@@ -1,6 +1,7 @@
 import { BaseEntity } from "typeorm"
-import { WeekRecapData } from "~/types/recap"
+
 import { ApiStats } from "~/types/api"
+import { WeekRecapData } from "~/types/recap"
 
 /**
  * Returns TypeORM entity types without functions

@@ -1,7 +1,11 @@
 import { ClientEvents } from "discord.js"
+
 import { appConfig } from "~/server/config"
-import { BaseContext } from "~/types"
 import { getEvents } from "~/server/events"
+import { BaseContext } from "~/types"
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyEvent = any
 
 export interface EventOptions {
   productionOnly: boolean
@@ -37,7 +41,7 @@ export function createEvent<K extends keyof ClientEvents>(
 }
 
 export const getGroupedEvents = async () => {
-  const group: EventsGroup<any> = {}
+  const group: EventsGroup<AnyEvent> = {}
   const events = await getEvents()
 
   for (const { event, callback, options } of events) {
@@ -61,7 +65,7 @@ export const getGroupedEvents = async () => {
     },
     [] as Array<{
       name: string
-      callbacks: Array<(...args: any[]) => Promise<void>>
+      callbacks: Array<(...args: AnyEvent[]) => Promise<void>>
     }>,
   )
 }

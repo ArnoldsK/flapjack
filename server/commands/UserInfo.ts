@@ -1,8 +1,9 @@
 import { GuildMember, SlashCommandBuilder } from "discord.js"
+
 import { BaseCommand } from "~/server/base/Command"
+import { getUserInfoImage } from "~/server/canvas/userInfoImage"
 import { checkUnreachable } from "~/server/utils/error"
 import { getMemberByJoinPosition } from "~/server/utils/member"
-import { getUserInfoImage } from "~/server/canvas/userInfoImage"
 
 enum SubcommandName {
   Me = "me",
@@ -67,13 +68,15 @@ export default class UserInfoCommand extends BaseCommand {
     const subcommand = this.getSubcommand<SubcommandName>()
 
     switch (subcommand) {
-      case SubcommandName.Me:
+      case SubcommandName.Me: {
         return this.member
+      }
 
-      case SubcommandName.User:
+      case SubcommandName.User: {
         return this.guild.members.cache.get(
           this.interaction.options.getUser(OptionName.User, true).id,
         )
+      }
 
       case SubcommandName.Position: {
         const position = this.interaction.options.getInteger(
@@ -83,8 +86,9 @@ export default class UserInfoCommand extends BaseCommand {
         return getMemberByJoinPosition(this.guild, position)
       }
 
-      default:
+      default: {
         checkUnreachable(subcommand)
+      }
     }
   }
 }

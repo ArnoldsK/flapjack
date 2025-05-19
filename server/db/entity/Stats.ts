@@ -20,7 +20,7 @@ export class StatsEntity extends BaseEntity {
   @CreateDateColumn({
     type: "int",
     precision: 10,
-    default: Math.floor(new Date().getTime() / 1000),
+    default: Math.floor(Date.now() / 1000),
     transformer: {
       from: (value?: number) => {
         if (!value) return
@@ -32,7 +32,7 @@ export class StatsEntity extends BaseEntity {
         return date
       },
       to: () => {
-        return Math.floor(new Date().getTime() / 1000)
+        return Math.floor(Date.now() / 1000)
       },
     },
   })

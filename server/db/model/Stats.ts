@@ -1,10 +1,11 @@
+import { Guild } from "discord.js"
 import { Repository } from "typeorm"
+
 import { db } from "~/server/database"
 import { StatsEntity } from "~/server/db/entity/Stats"
-import { EntityFields } from "~/types/entity"
-import { ApiStatsDay } from "~/types/api"
 import { d } from "~/server/utils/date"
-import { Guild } from "discord.js"
+import { ApiStatsDay } from "~/types/api"
+import { EntityFields } from "~/types/entity"
 
 type CreateInput = Omit<EntityFields<StatsEntity>, "id" | "timestamp">
 

@@ -1,10 +1,11 @@
-import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react"
 import Image from "next/image"
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react"
 import { useWindowSize } from "react-use"
 
 import * as S from "./styles"
-import { randomValue } from "~/server/utils/random"
+
 import { interpolate } from "~/server/utils/number"
+import { randomValue } from "~/server/utils/random"
 
 interface AvatarGridBannerProps {
   avatarUrls: string[]
@@ -91,7 +92,7 @@ export const AvatarGridBanner = ({ avatarUrls }: AvatarGridBannerProps) => {
   // #############################################################################
   // Render
   // #############################################################################
-  if (!avatarUrls.length) {
+  if (avatarUrls.length === 0) {
     return null
   }
 

@@ -1,16 +1,17 @@
 import { RoleCreateOptions, SlashCommandBuilder } from "discord.js"
+
 import { BaseCommand } from "~/server/base/Command"
-import { PermissionFlags, permission } from "~/server/utils/permission"
+import {
+  getEmojiIdFromString,
+  getNativeEmojiFromString,
+} from "~/server/utils/emoji"
 import { checkUnreachable } from "~/server/utils/error"
+import { PermissionFlags, permission } from "~/server/utils/permission"
 import {
   getMemberBoosterIconRoleName,
   getMemberBoosterIconRole,
   getOrCreateRole,
 } from "~/server/utils/role"
-import {
-  getEmojiIdFromString,
-  getNativeEmojiFromString,
-} from "~/server/utils/emoji"
 
 enum SubcommandName {
   Emoji = "emoji",
@@ -69,20 +70,24 @@ export default class BoosterIconCommand extends BaseCommand {
     const subcommand = this.getSubcommand<SubcommandName>()
 
     switch (subcommand) {
-      case SubcommandName.Emoji:
+      case SubcommandName.Emoji: {
         await this.#handleEmoji()
         return
+      }
 
-      case SubcommandName.Custom:
+      case SubcommandName.Custom: {
         await this.#handleCustom()
         return
+      }
 
-      case SubcommandName.Remove:
+      case SubcommandName.Remove: {
         await this.#handleRemove()
         return
+      }
 
-      default:
+      default: {
         checkUnreachable(subcommand)
+      }
     }
   }
 
@@ -135,11 +140,7 @@ export default class BoosterIconCommand extends BaseCommand {
         ...emojiOption,
       })
 
-      if (this.member.roles.cache.has(role.id)) {
-        await role.edit(emojiOption)
-      } else {
-        await this.member.roles.add(role)
-      }
+      await (this.member.roles.cache.has(role.id) ? role.edit(emojiOption) : this.member.roles.add(role));
 
       this.success()
     } catch {
@@ -162,13 +163,9 @@ export default class BoosterIconCommand extends BaseCommand {
         icon: value.url,
       })
 
-      if (this.member.roles.cache.has(role.id)) {
-        await role.edit({
+      await (this.member.roles.cache.has(role.id) ? role.edit({
           icon: value.url,
-        })
-      } else {
-        await this.member.roles.add(role)
-      }
+        }) : this.member.roles.add(role));
 
       this.success()
     } catch {

@@ -1,10 +1,11 @@
 import { z } from "zod"
+
 import { Color, DISCORD_IDS } from "~/constants"
-import { Task } from "~/types/tasks"
-import { isTextChannel } from "~/server/utils/channel"
 import { CacheKey } from "~/server/cache"
-import { McStatus } from "~/types/mc"
+import { isTextChannel } from "~/server/utils/channel"
 import { joinAsLines } from "~/server/utils/string"
+import { McStatus } from "~/types/mc"
+import { Task } from "~/types/tasks"
 
 const SERVER_IP = "mc.pepsidog.lv"
 
@@ -46,7 +47,7 @@ export const mcStatus: Task = async (context) => {
   try {
     const res = await fetch(apiUrl)
     data = DATA_SCHEMA.parse(await res.json())
-  } catch (err) {
+  } catch {
     // Shrug
     return
   }
@@ -73,7 +74,7 @@ export const mcStatus: Task = async (context) => {
   // #############################################################################
   // Alert status change
   // #############################################################################
-  if (prevStatus != null && status.isOnline !== prevStatus.isOnline) {
+  if (prevStatus != undefined && status.isOnline !== prevStatus.isOnline) {
     await channel.send({
       embeds: [
         {

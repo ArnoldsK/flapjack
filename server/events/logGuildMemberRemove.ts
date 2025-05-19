@@ -1,12 +1,12 @@
 import { AuditLogEvent, Events, GuildMember } from "discord.js"
 
-import { createEvent } from "~/server/utils/event"
 import { DISCORD_IDS } from "~/constants"
-import { isTextChannel } from "~/server/utils/channel"
-import { joinAsLines } from "~/server/utils/string"
 import { Color } from "~/constants"
+import { isTextChannel } from "~/server/utils/channel"
 import { d } from "~/server/utils/date"
+import { createEvent } from "~/server/utils/event"
 import { embedAuthor } from "~/server/utils/member"
+import { joinAsLines } from "~/server/utils/string"
 
 const getAuditLogsData = async (member: GuildMember) => {
   let auditLogs
@@ -80,7 +80,7 @@ export default createEvent(
             ...[
               reason ? `Reason: ${reason}` : "",
               `Joined: ${joinedAt}`,
-              roles.length ? `Roles: ${roles.join(", ")}` : "",
+              roles.length > 0 ? `Roles: ${roles.join(", ")}` : "",
             ].filter(Boolean),
           ),
         },

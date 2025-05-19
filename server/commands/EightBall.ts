@@ -1,8 +1,9 @@
 import { SlashCommandBuilder } from "discord.js"
+
 import { BaseCommand } from "~/server/base/Command"
+import { parseMentions } from "~/server/utils/message"
 import { randomValue } from "~/server/utils/random"
 import { joinAsLines } from "~/server/utils/string"
-import { parseMentions } from "~/server/utils/message"
 
 enum OptionName {
   Question = "question",
@@ -23,10 +24,7 @@ export default class EightBallCommand extends BaseCommand {
 
   async execute() {
     const input = this.interaction.options.getString(OptionName.Question, true)
-    const question = parseMentions(
-      input.replace(/\?$/, "").concat("?"),
-      this.guild,
-    )
+    const question = parseMentions(`${input.replace(/\?$/, "")}?`, this.guild)
 
     this.reply(joinAsLines(`> ${question}`, this.#getAnswer()))
   }

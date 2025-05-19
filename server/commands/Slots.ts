@@ -1,10 +1,11 @@
 import { SlashCommandBuilder } from "discord.js"
+
+import { OPTION_DESCRIPTION_AMOUNT } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { CreditsModel } from "~/server/db/model/Credits"
-import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
-import { OPTION_DESCRIPTION_AMOUNT } from "~/constants"
-import { randomValue } from "~/server/utils/random"
 import { isCasinoChannel } from "~/server/utils/channel"
+import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
+import { randomValue } from "~/server/utils/random"
 import { joinAsLines } from "~/server/utils/string"
 
 type ItemName =
@@ -55,7 +56,7 @@ export default class SlotsCommand extends BaseCommand {
     )
     const amount = parseCreditsAmount(rawAmount, wallet.credits)
 
-    const winningEmojis = [...Array(3).keys()].map(() => {
+    const winningEmojis = [...Array.from({length: 3}).keys()].map(() => {
       const item = randomValue(this.#distribution)!
       return item.emoji
     })
@@ -85,7 +86,7 @@ export default class SlotsCommand extends BaseCommand {
 
   #getReward(emojis: string[]): SlotsReward | null {
     // Reverse is used to validate e.g. 3 cherries before 2 cherries roll
-    const rewards = this.#rewards.slice().reverse()
+    const rewards = [...this.#rewards].reverse()
 
     // Find the reward
     for (const reward of rewards) {

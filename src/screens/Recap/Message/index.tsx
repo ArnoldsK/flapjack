@@ -1,6 +1,6 @@
 import Image from "next/image"
-import reactStringReplace from "react-string-replace"
 import {
+  MouseEvent,
   ReactNode,
   useCallback,
   useEffect,
@@ -8,16 +8,18 @@ import {
   useRef,
   useState,
 } from "react"
+import reactStringReplace from "react-string-replace"
 import { useWindowScroll } from "react-use"
+
+import { Pound } from "../styles"
+import { RecapMessage as RecapMessageGraph } from "../types"
 
 import * as S from "./styles"
 
-import { RecapMessage as RecapMessageGraph } from "../types"
-import { clamp, interpolate } from "~/server/utils/number"
 import { RECAP_PRIVATE_CHANNEL_IDS } from "~/constants"
-import { Pound } from "../styles"
-import { ApiRecapMember } from "~/types/api"
 import { d } from "~/server/utils/date"
+import { clamp, interpolate } from "~/server/utils/number"
+import { ApiRecapMember } from "~/types/api"
 
 interface RecapMessageProps {
   message: RecapMessageGraph
@@ -102,9 +104,6 @@ export const RecapMessage = ({ message, membersData }: RecapMessageProps) => {
 
     msgEl.style.translate = `0 ${translateY}%`
     msgEl.style.scale = String(scale)
-
-    // Keep scroll in effect
-    scrollY
   }, [scrollY])
 
   // #############################################################################
@@ -140,20 +139,20 @@ export const RecapMessage = ({ message, membersData }: RecapMessageProps) => {
 
   /** @see https://stackoverflow.com/a/66242322/3893356 */
   const handleNavigate = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    (e: MouseEvent<HTMLAnchorElement>) => {
       e.preventDefault()
 
       let blurred = false
 
-      window.onblur = () => {
+      window.addEventListener("blur", () => {
         blurred = true
-      }
+      })
 
-      window.location.replace(url.intent)
+      globalThis.location.replace(url.intent)
 
       setTimeout(() => {
         if (!blurred) {
-          window.location.assign(url.https)
+          globalThis.location.assign(url.https)
         }
       }, 1000)
     },

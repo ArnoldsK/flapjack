@@ -2,4 +2,6 @@ xD
 
 TODO
 
-- improve linter as it currently doesn't find all issues... gotta rely on build errors
+- try drizzle cuz typeorm is ass
+  - take inspiration from https://github.com/jordanahaines/historio/tree/main
+  - update eslint

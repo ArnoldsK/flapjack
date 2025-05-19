@@ -8,11 +8,11 @@ import {
 
 import { DISCORD_IDS } from "~/constants"
 import { CreditsModel } from "~/server/db/model/Credits"
+import { dedupe } from "~/server/utils/array"
+import { isNonNullish } from "~/server/utils/boolean"
 import { formatCredits } from "~/server/utils/credits"
 import { randomBool, randomInt, randomValue } from "~/server/utils/random"
-import { dedupe } from "~/server/utils/array"
 import { Task } from "~/types/tasks"
-import { isNonNullish } from "~/server/utils/boolean"
 
 const getAmount = (): number => {
   // One in 50 to get a mil
@@ -20,7 +20,7 @@ const getAmount = (): number => {
     return 1_000_000
   }
 
-  return (randomInt(2, 20) / 2) * randomValue([1_000, 10_000])!
+  return (randomInt(2, 20) / 2) * randomValue([1000, 10_000])!
 }
 
 export const handleCreditsLotteries: Task = async (context) => {
@@ -47,7 +47,7 @@ export const handleCreditsLotteries: Task = async (context) => {
 
   const collector = message.createMessageComponentCollector({
     componentType: ComponentType.Button,
-    time: 8_000,
+    time: 8000,
   })
 
   collector.on("collect", (interaction) => {

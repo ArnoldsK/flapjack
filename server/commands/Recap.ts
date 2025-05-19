@@ -1,4 +1,5 @@
 import { SlashCommandBuilder } from "discord.js"
+
 import { BaseCommand } from "~/server/base/Command"
 
 const RECAP_YEAR = 2024

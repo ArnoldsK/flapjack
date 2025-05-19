@@ -1,9 +1,10 @@
-import absoluteUrl from "next-absolute-url"
 import { GetServerSideProps } from "next"
+import absoluteUrl from "next-absolute-url"
 
 import * as S from "./styles"
-import { ApiVideos } from "~/types/api"
+
 import { Page } from "~/src/components/Page"
+import { ApiVideos } from "~/types/api"
 
 interface VideoSCreenProps {
   videos: ApiVideos

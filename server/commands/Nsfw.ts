@@ -1,4 +1,5 @@
 import { SlashCommandBuilder } from "discord.js"
+
 import { BaseCommand } from "~/server/base/Command"
 import { CacheKey } from "~/server/cache"
 import { RedgifsModel } from "~/server/db/model/Redgifs"

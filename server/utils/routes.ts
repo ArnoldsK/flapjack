@@ -1,7 +1,7 @@
 import { Express, Request, RequestHandler, Response } from "express"
 
-import { BaseContext } from "~/types"
 import { getRoutes } from "~/server/routes"
+import { BaseContext } from "~/types"
 
 type Method = "get" | "post" | "put" | "delete"
 
@@ -20,19 +20,19 @@ export const handleCustomRoutes = async (
 ) => {
   const routes = await getRoutes()
 
-  routes.forEach((route) => {
+  for (const route of routes) {
     const method = route.method ?? "get"
     const middlewares = route.middlewares ?? []
 
     server[method](route.path, ...middlewares, async (req, res) => {
       try {
         await route.handler(context, req, res)
-      } catch (err) {
-        console.error("> Route error >", route, err)
+      } catch (error) {
+        console.error("> Route error >", route, error)
         res.status(500).json({
           error: "Internal Server Error",
         })
       }
     })
-  })
+  }
 }

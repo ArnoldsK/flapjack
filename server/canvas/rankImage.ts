@@ -1,12 +1,12 @@
 import { createCanvas, loadImage } from "@napi-rs/canvas"
+import chroma from "chroma-js"
 import colorPalette from "get-image-colors"
 
-import { getBackgroundTextColor } from "~/server/utils/color"
-import { canvasFont, clipEllipse } from "~/server/utils/canvas"
-import chroma from "chroma-js"
 import { Unicode } from "~/constants"
-import { interpolate } from "~/server/utils/number"
 import { ExperienceRankData } from "~/server/db/model/Experience"
+import { canvasFont, clipEllipse } from "~/server/utils/canvas"
+import { getBackgroundTextColor } from "~/server/utils/color"
+import { interpolate } from "~/server/utils/number"
 
 export const getRankImage = async (
   rankData: ExperienceRankData,

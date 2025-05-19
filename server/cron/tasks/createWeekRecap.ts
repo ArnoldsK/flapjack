@@ -1,23 +1,25 @@
+import path from "node:path"
+
 import { Attachment, Guild, Message, TextChannel } from "discord.js"
+
 import {
   DISCORD_IDS,
   RECAP_CHANNEL_IDS,
   RECAP_PRIVATE_CHANNEL_IDS,
 } from "~/constants"
-import { Task } from "~/types/tasks"
+import { appConfig } from "~/server/config"
 import { StaticModel } from "~/server/db/model/Static"
-import { d } from "~/server/utils/date"
 import { isTextChannel } from "~/server/utils/channel"
-import { WeekRecapData } from "~/types/recap"
+import { d } from "~/server/utils/date"
+import { assert } from "~/server/utils/error"
 import {
   hostingDeleteAllFiles,
   hostingUploadUrlFile,
 } from "~/server/utils/hosting"
 import { isDiscordAttachmentUrl } from "~/server/utils/web"
-import path from "path"
-import { appConfig } from "~/server/config"
-import { assert } from "~/server/utils/error"
 import { StaticDataType } from "~/types/entity"
+import { WeekRecapData } from "~/types/recap"
+import { Task } from "~/types/tasks"
 
 type RecapMessageData = WeekRecapData["messages"][number]
 
@@ -25,7 +27,7 @@ export const createWeekRecap: Task = async (context) => {
   const guild = context.guild()
 
   const weekMessages = await getWeekMessages(guild)
-  if (!weekMessages.length) {
+  if (weekMessages.length === 0) {
     console.log("> Recap > No messages found")
     return
   }
@@ -33,7 +35,7 @@ export const createWeekRecap: Task = async (context) => {
   let recapMessages = await Promise.all(weekMessages.map(parseRecapMessage))
   recapMessages = parseMessageDataReactions(recapMessages)
   recapMessages = await uploadMessageDataAttachments(recapMessages)
-  if (!recapMessages.length) {
+  if (recapMessages.length === 0) {
     console.log("> Recap > No messages found after filtering")
     return
   }
@@ -52,7 +54,7 @@ const fetchMessagesUntil = async (
   endDate: Date,
   lastId?: string,
 ): Promise<Message[]> => {
-  let messages: Message[] = [
+  const messages: Message[] = [
     ...(await channel.messages.fetch({ limit: 100, before: lastId })).values(),
   ]
 
@@ -66,13 +68,10 @@ const fetchMessagesUntil = async (
     return messages
   }
 
-  return messages.concat(
-    await fetchMessagesUntil(
-      channel,
-      endDate,
-      messages[messages.length - 1].id,
-    ),
-  )
+  return [
+    ...messages,
+    ...(await fetchMessagesUntil(channel, endDate, messages.at(-1)?.id)),
+  ]
 }
 
 const getWeekMessages = async (guild: Guild): Promise<Message[]> => {
@@ -140,10 +139,10 @@ const parseRecapMessage = async (
   return {
     id: message.id,
     createdAt: message.createdAt,
-    content: !isPrivate ? message.cleanContent.trim() : "",
-    firstAttachment: !isPrivate
-      ? parseAttachment(message.attachments.first())
-      : null,
+    content: isPrivate ? "" : message.cleanContent.trim(),
+    firstAttachment: isPrivate
+      ? null
+      : parseAttachment(message.attachments.first()),
     guild: {
       id: guild.id,
     },
@@ -234,8 +233,8 @@ const uploadMessageDataAttachments = async (
         return message
       }),
     )
-  } catch (err) {
-    console.error("> Failed to upload images to CDN", err)
+  } catch (error) {
+    console.error("> Failed to upload images to CDN", error)
     return messages
   }
 }
