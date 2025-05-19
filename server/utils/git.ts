@@ -21,14 +21,13 @@ export const getNewCommits = async (): Promise<Commit[]> => {
     return []
   }
 
-  // ! Newest first
   const commits = getLogCommits(log)
 
   if (commits.length === 0) {
     return []
   }
 
-  const latestHash = commits.at(0)?.hash
+  const latestHash = commits.at(-1)?.hash
   assert(!!latestHash, "Latest hash not found")
 
   const savedHash = await getFileContents(LAST_COMMIT_HASH_PATH)
@@ -46,20 +45,27 @@ export const getNewCommits = async (): Promise<Commit[]> => {
     return []
   }
 
-  return commits.slice(0, savedHashCommitsIndex)
+  return commits.slice(savedHashCommitsIndex)
 }
 
+/**
+ * Returns parsed commit data.
+ *
+ * ! Oldest first
+ */
 const getLogCommits = (log: string): Commit[] => {
   const logs = log.split("\n")
 
-  return logs.map((line) => {
-    const [hash, ...words] = line.split(" ")
+  return logs
+    .map((line) => {
+      const [hash, ...words] = line.split(" ")
 
-    return {
-      hash,
-      message: words.join(" "),
-    }
-  })
+      return {
+        hash,
+        message: words.join(" "),
+      }
+    })
+    .reverse()
 }
 
 const saveLatestCommitHash = async (hash: string) => {
