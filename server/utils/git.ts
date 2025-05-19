@@ -45,7 +45,7 @@ export const getNewCommits = async (): Promise<Commit[]> => {
     return []
   }
 
-  return commits.slice(savedHashCommitsIndex)
+  return commits.slice(savedHashCommitsIndex + 1)
 }
 
 /**
