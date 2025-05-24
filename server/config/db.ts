@@ -1,4 +1,3 @@
-import { Migrator } from "@mikro-orm/migrations"
 import { defineConfig } from "@mikro-orm/mysql"
 
 import { appConfig } from "~/server/config"
@@ -12,13 +11,6 @@ export default defineConfig({
   name: appConfig.db.username,
   password: appConfig.db.password,
   dbName: appConfig.db.database,
-
-  extensions: [Migrator],
-  migrations: {
-    tableName: "migrations",
-    path: "./dist/server/db/migration",
-    pathTs: "./server/db/migration",
-  },
 
   debug: appConfig.dev,
 })

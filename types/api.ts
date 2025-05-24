@@ -1,5 +1,4 @@
 import { VideoEntity } from "~/server/db/entity/Video"
-import { EntityFields } from "~/types/entity"
 import { WeekRecapData } from "~/types/recap"
 
 export interface ApiStatsDay {
@@ -31,7 +30,7 @@ export interface ApiAvatars {
   urls: string[]
 }
 
-export type ApiVideos = EntityFields<VideoEntity>[]
+export type ApiVideos = VideoEntity[]
 
 export interface ApiRecapMember {
   memberId: string
