@@ -1,7 +1,3 @@
-xD
+# xD
 
-TODO
-
-- try drizzle cuz typeorm is ass
-  - take inspiration from https://github.com/jordanahaines/historio/tree/main
-  - update eslint
+Migrations must be ran manually: `npm run migrations:latest`

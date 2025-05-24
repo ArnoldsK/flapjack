@@ -4,7 +4,7 @@ import { d } from "~/server/utils/date"
 import { Task } from "~/types/tasks"
 
 export const endReminders: Task = async (context) => {
-  const model = new ReminderModel()
+  const model = new ReminderModel(context)
   const reminders = await model.getAllExpired()
   if (reminders.length === 0) return
 
@@ -27,5 +27,5 @@ export const endReminders: Task = async (context) => {
     }),
   )
 
-  await Promise.all(reminders.map((reminder) => reminder.remove()))
+  await model.remove(reminders.map((el) => el.id))
 }

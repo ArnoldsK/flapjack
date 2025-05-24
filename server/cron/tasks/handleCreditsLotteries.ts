@@ -71,8 +71,8 @@ export const handleCreditsLotteries: Task = async (context) => {
     // Get random member
     const member = randomValue(members)!
 
-    const creditsModel = new CreditsModel(member)
-    await creditsModel.addCredits(amount)
+    const creditsModel = new CreditsModel(context)
+    await creditsModel.addCredits(member.id, amount)
 
     // Send a new message
     await channel.send({

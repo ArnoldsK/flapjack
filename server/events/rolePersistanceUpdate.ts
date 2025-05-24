@@ -6,7 +6,7 @@ import { createEvent } from "~/server/utils/event"
 export default createEvent(
   Events.GuildMemberUpdate,
   { productionOnly: true },
-  async (_context, oldMember, member) => {
+  async (context, oldMember, member) => {
     if (member.user.bot) return
 
     const oldRoleIds = mapRoleIds(oldMember.roles.cache)
@@ -16,8 +16,8 @@ export default createEvent(
     if (oldRoleIds === newRoleIds) return
 
     // Upsert
-    const model = new RolesModel(member)
-    await model.setRoleIds(newRoleIds)
+    const model = new RolesModel(context)
+    await model.setRoleIds(member.id, newRoleIds)
   },
 )
 

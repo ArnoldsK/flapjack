@@ -64,10 +64,10 @@ export default class RsLeagueCommand extends BaseCommand {
 
   async #handleSet() {
     const name = this.interaction.options.getString(OptionName.Name, true)
-    const model = new RsLeagueModel(this.member)
+    const model = new RsLeagueModel(this.context)
 
     try {
-      await model.setName(name)
+      await model.setName(this.member.id, name)
       this.success()
     } catch {
       this.fail()
@@ -78,7 +78,7 @@ export default class RsLeagueCommand extends BaseCommand {
     // ! Defer
     await this.interaction.deferReply()
 
-    const model = new RsLeagueModel(this.member)
+    const model = new RsLeagueModel(this.context)
     const entities = await model.getAll()
 
     let players = entities.map((entity) => ({
@@ -97,7 +97,7 @@ export default class RsLeagueCommand extends BaseCommand {
         players[i].score = score
       } catch {
         // Remove on fail
-        await model.removeByUserId(player.member.id)
+        await model.remove(player.member.id)
       }
     }
 

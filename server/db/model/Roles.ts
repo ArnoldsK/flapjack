@@ -1,28 +1,16 @@
 import { GuildMember } from "discord.js"
-import { Repository } from "typeorm"
 
-import { db } from "~/server/database"
+import { BaseModel } from "~/server/base/Model"
 import { RolesEntity } from "~/server/db/entity/Roles"
 
-export class RolesModel {
-  #member: GuildMember
-  #repository: Repository<RolesEntity>
-
-  constructor(member: GuildMember) {
-    if (member.user.bot) {
-      throw new Error("Not allowed for bots")
-    }
-
-    this.#member = member
-    this.#repository = db.getRepository(RolesEntity)
-  }
-
+export class RolesModel extends BaseModel {
   async getAll() {
-    const entities = await this.#repository.find()
+    const entities = await this.em.findAll(RolesEntity)
+    const members = this.context.guild().members.cache
 
     return entities
       .map((entity) => ({
-        member: this.#member.guild.members.cache.get(entity.userId),
+        member: members.get(entity.userId),
         roleIds: entity.roleIds,
       }))
       .filter(
@@ -35,10 +23,8 @@ export class RolesModel {
       )
   }
 
-  async getRoleIds(): Promise<string[]> {
-    const entity = await this.#repository.findOneBy({
-      userId: this.#member.id,
-    })
+  async getRoleIds(userId: string): Promise<string[]> {
+    const entity = await this.em.findOne(RolesEntity, { userId })
 
     if (!entity) {
       return []
@@ -47,21 +33,10 @@ export class RolesModel {
     return entity.roleIds
   }
 
-  async setRoleIds(roleIds: string[]) {
-    await this.#repository.upsert(
-      [
-        {
-          userId: this.#member.id,
-          roleIds,
-        },
-      ],
-      ["userId"],
-    )
-  }
-
-  async remove() {
-    await this.#repository.delete({
-      userId: this.#member.id,
+  async setRoleIds(userId: string, roleIds: string[]) {
+    await this.em.upsert({
+      userId,
+      roleIds,
     })
   }
 }

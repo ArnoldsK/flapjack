@@ -7,11 +7,11 @@ import { createEvent } from "~/server/utils/event"
 export default createEvent(
   Events.ThreadUpdate,
   { productionOnly: true },
-  async (_context, _oldThread, newThread) => {
+  async (context, _oldThread, newThread) => {
     if (!newThread.archived) return
 
     // Check if the thread is persistent
-    const model = new PersistentThreadModel()
+    const model = new PersistentThreadModel(context)
     const entity = await model.getByThreadId(newThread.id)
     if (!entity) return
 

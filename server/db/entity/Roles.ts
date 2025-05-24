@@ -1,25 +1,23 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm"
+import {
+  ArrayType,
+  Entity,
+  PrimaryKey,
+  Property,
+  Unique,
+} from "@mikro-orm/core"
 
 @Entity()
-export class RolesEntity extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id!: number
+export class RolesEntity {
+  @PrimaryKey()
+  id: number
 
-  @Column({ unique: true })
-  userId!: string
+  @Property()
+  @Unique()
+  userId: string
 
-  @Column({
-    type: "text",
-    transformer: {
-      from: (value?: string) => {
-        if (!value) return
-
-        return value.split(",")
-      },
-      to: (value: string[]) => {
-        return value.join(",")
-      },
-    },
+  @Property({
+    type: ArrayType,
+    columnType: "text",
   })
-  roleIds!: string[]
+  roleIds: string[]
 }

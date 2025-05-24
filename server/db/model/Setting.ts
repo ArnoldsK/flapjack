@@ -1,12 +1,9 @@
-import { In, Repository } from "typeorm"
 import { z } from "zod"
 
+import { BaseModel } from "~/server/base/Model"
 import { CacheKey } from "~/server/cache"
-import { db } from "~/server/database"
 import { SettingEntity } from "~/server/db/entity/Setting"
 import { dedupe } from "~/server/utils/array"
-import { BaseContext } from "~/types"
-
 
 export const settingsSchema = z.object({
   "tasks.hourlyGifBanners.enabled": z.boolean(),
@@ -20,15 +17,7 @@ export const DEFAULT_SETTINGS: Settings = {
   "tasks.hourlyGifBanners.enabled": false,
 }
 
-export class SettingModel {
-  #context: BaseContext
-  #repository: Repository<SettingEntity>
-
-  constructor(context: BaseContext) {
-    this.#repository = db.getRepository(SettingEntity)
-    this.#context = context
-  }
-
+export class SettingModel extends BaseModel {
   // #############################################################################
   // Cache
   // #############################################################################
@@ -48,13 +37,13 @@ export class SettingModel {
   // #############################################################################
   async getAll(): Promise<Settings> {
     // Return cached early
-    const cached = this.#context.cache.get(CacheKey.Setting)
+    const cached = this.context.cache.get(CacheKey.Setting)
     if (this.#validateCache(cached)) {
       return cached
     }
 
     // Get saved
-    const entities = await this.#repository.find()
+    const entities = await this.em.findAll(SettingEntity)
     const settings = { ...DEFAULT_SETTINGS }
 
     for (const [key, defaultValue] of Object.entries(settings)) {
@@ -72,13 +61,15 @@ export class SettingModel {
       .filter((key) => !defaultKeys.includes(key))
 
     if (oldKeys.length > 0) {
-      await this.#repository.delete({
-        key: In(oldKeys),
+      await this.em.nativeDelete(SettingEntity, {
+        key: {
+          $in: oldKeys,
+        },
       })
     }
 
     // Update cache
-    this.#context.cache.set(CacheKey.Setting, settings)
+    this.context.cache.set(CacheKey.Setting, settings)
 
     return settings
   }
@@ -94,20 +85,15 @@ export class SettingModel {
   // Setter
   // #############################################################################
   async set<K extends SettingKey>(key: K, value: (typeof DEFAULT_SETTINGS)[K]) {
-    await this.#repository.upsert(
-      [
-        {
-          key,
-          value: JSON.stringify(value),
-        },
-      ],
-      ["key"],
-    )
+    await this.em.upsert({
+      key,
+      value: JSON.stringify(value),
+    })
 
     // Update cache if present
-    const cached = this.#context.cache.get(CacheKey.Setting)
+    const cached = this.context.cache.get(CacheKey.Setting)
     if (cached) {
-      this.#context.cache.set(CacheKey.Setting, {
+      this.context.cache.set(CacheKey.Setting, {
         ...cached,
         [key]: value,
       })

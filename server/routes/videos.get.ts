@@ -8,10 +8,12 @@ export default createRoute({
     let videos = context.cache.get(CacheKey.Videos)
 
     if (!videos) {
-      videos = await VideoEntity.createQueryBuilder()
-        .orderBy("createdAt", "DESC")
-        .limit(100)
-        .getMany()
+      videos = await context.db.em.findAll(VideoEntity, {
+        orderBy: {
+          createdAt: "DESC",
+        },
+        limit: 100,
+      })
 
       context.cache.set(CacheKey.Videos, videos)
     }

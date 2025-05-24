@@ -1,19 +1,20 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm"
+import { Entity, Opt, PrimaryKey, Property, Unique } from "@mikro-orm/core"
 
 @Entity()
-export class PersistentThreadEntity extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id!: number
+export class PersistentThreadEntity {
+  @PrimaryKey()
+  id: number & Opt
 
-  @Column()
-  channelId!: string
+  @Property()
+  channelId: string
 
-  @Column()
-  messageId!: string
+  @Property()
+  messageId: string
 
-  @Column({ unique: true })
-  threadId!: string
+  @Property()
+  @Unique()
+  threadId: string
 
-  @Column()
-  userId!: string
+  @Property()
+  userId: string
 }

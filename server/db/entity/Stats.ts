@@ -1,40 +1,19 @@
-import {
-  BaseEntity,
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-} from "typeorm"
+import { Entity, Opt, PrimaryKey, Property } from "@mikro-orm/core"
 
 @Entity()
-export class StatsEntity extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id!: number
+export class StatsEntity {
+  @PrimaryKey()
+  id: number & Opt
 
-  @Column()
-  channelId!: string
+  @Property()
+  channelId: string
 
-  @Column()
-  userId!: string
+  @Property()
+  userId: string
 
-  @CreateDateColumn({
+  @Property({
     type: "int",
     precision: 10,
-    default: Math.floor(Date.now() / 1000),
-    transformer: {
-      from: (value?: number) => {
-        if (!value) return
-
-        const date = new Date()
-
-        date.setTime(value * 1000)
-
-        return date
-      },
-      to: () => {
-        return Math.floor(Date.now() / 1000)
-      },
-    },
   })
-  timestamp!: Date
+  timestamp: number & Opt = Math.floor(Date.now() / 1000)
 }

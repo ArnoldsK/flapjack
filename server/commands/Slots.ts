@@ -47,8 +47,8 @@ export default class SlotsCommand extends BaseCommand {
     )
 
   async execute() {
-    const creditsModel = new CreditsModel(this.member)
-    const wallet = await creditsModel.getWallet()
+    const creditsModel = new CreditsModel(this.context)
+    const wallet = await creditsModel.getWallet(this.member.id)
 
     const rawAmount = this.interaction.options.getString(
       OptionName.Amount,
@@ -56,7 +56,7 @@ export default class SlotsCommand extends BaseCommand {
     )
     const amount = parseCreditsAmount(rawAmount, wallet.credits)
 
-    const winningEmojis = [...Array.from({length: 3}).keys()].map(() => {
+    const winningEmojis = [...Array.from({ length: 3 }).keys()].map(() => {
       const item = randomValue(this.#distribution)!
       return item.emoji
     })
@@ -66,7 +66,10 @@ export default class SlotsCommand extends BaseCommand {
     const winAmount = amount * winMulti
     const creditsToAdd = winAmount - amount
 
-    const newWallet = await creditsModel.addCredits(creditsToAdd)
+    const newWallet = await creditsModel.addCredits(
+      this.member.id,
+      creditsToAdd,
+    )
 
     this.reply({
       ephemeral: !isCasinoChannel(this.channel),

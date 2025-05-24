@@ -60,6 +60,7 @@ const config = [
       "unicorn/no-array-callback-reference": "off", // typescript will handle it
       "unicorn/no-await-expression-member": "off", // less readable and breaks type infers
       "unicorn/prefer-module": "off", // flapjack lives in the past
+      "unicorn/no-array-method-this-argument": "off", // gets confused with MikroORM find()
     },
   },
   {

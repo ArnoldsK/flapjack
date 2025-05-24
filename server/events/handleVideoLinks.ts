@@ -1,5 +1,5 @@
+import { RequiredEntityData } from "@mikro-orm/core"
 import { Events, GuildMember, Message } from "discord.js"
-import { In } from "typeorm"
 import { z } from "zod"
 
 import { DISCORD_IDS } from "~/constants"
@@ -7,7 +7,6 @@ import { CacheKey } from "~/server/cache"
 import { VideoEntity } from "~/server/db/entity/Video"
 import { isNonNullish } from "~/server/utils/boolean"
 import { createEvent } from "~/server/utils/event"
-import { EntityFields } from "~/types/entity"
 
 export default createEvent(
   Events.MessageCreate,
@@ -36,11 +35,17 @@ export default createEvent(
     // #############################################################################
     // Remove videos that have already been saved
     // #############################################################################
-    const existingVideos = await VideoEntity.createQueryBuilder()
-      .where({
-        videoId: In(messageVideoIds),
-      })
-      .getMany()
+    const existingVideos = await context.db.em.find(
+      VideoEntity,
+      {
+        videoId: {
+          $in: messageVideoIds,
+        },
+      },
+      {
+        fields: ["videoId"],
+      },
+    )
 
     const existingVideoIds = new Set(
       existingVideos.map((video) => video.videoId),
@@ -69,7 +74,7 @@ export default createEvent(
     // #############################################################################
     // Save video data and clear cache
     // #############################################################################
-    await VideoEntity.createQueryBuilder().insert().values(videoData).execute()
+    await context.db.em.insertMany(VideoEntity, videoData)
 
     context.cache.set(CacheKey.Videos, null)
 
@@ -170,7 +175,7 @@ const getVideoData = async ({
   videoId: string
   message: Message
   member: GuildMember
-}): Promise<Omit<EntityFields<VideoEntity>, "id" | "createdAt"> | null> => {
+}): Promise<RequiredEntityData<VideoEntity> | null> => {
   const videoUrl = `https://www.youtube.com/watch?v=${videoId}`
 
   // Get video details

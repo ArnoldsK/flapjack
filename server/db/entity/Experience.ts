@@ -1,12 +1,10 @@
-import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm"
+import { Entity, PrimaryKey, Property } from "@mikro-orm/core"
 
 @Entity()
-export class ExperienceEntity extends BaseEntity {
-  @PrimaryColumn({
-    unique: true,
-  })
+export class ExperienceEntity {
+  @PrimaryKey()
   userId: string
 
-  @Column()
+  @Property()
   exp: number
 }

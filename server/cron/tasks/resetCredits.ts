@@ -1,10 +1,11 @@
 import { DISCORD_IDS } from "~/constants"
 import { Color } from "~/constants"
-import { CreditsEntity } from "~/server/db/entity/Credits"
+import { CreditsModel } from "~/server/db/model/Credits"
 import { Task } from "~/types/tasks"
 
 export const resetCredits: Task = async (context) => {
-  await CreditsEntity.createQueryBuilder().delete().execute()
+  const model = new CreditsModel(context)
+  await model.removeAll()
 
   const embeds = [
     {

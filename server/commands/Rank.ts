@@ -86,7 +86,7 @@ export default class RankCommand extends BaseCommand {
   }
 
   async #handleMember(member: GuildMember) {
-    const model = new ExperienceModel(member)
+    const model = new ExperienceModel(this.context)
     const allRankData = await model.getAllRankData()
     const rankData = allRankData.find((el) => el.member.id === member.id)
 
@@ -101,7 +101,7 @@ export default class RankCommand extends BaseCommand {
   }
 
   async #handleTop() {
-    const model = new ExperienceModel(this.member)
+    const model = new ExperienceModel(this.context)
     const allRankData = await model.getAllRankData()
     const allRankDataText = this.#allRankDataToText(allRankData)
 

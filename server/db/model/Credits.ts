@@ -1,10 +1,10 @@
 import { GuildMember } from "discord.js"
-import { Repository } from "typeorm"
 
 import { DISCORD_IDS, UPPER_CLASS_MESSAGE_CREDITS } from "~/constants"
+import { BaseModel } from "~/server/base/Model"
 import { appConfig } from "~/server/config"
-import { db } from "~/server/database"
 import { CreditsEntity } from "~/server/db/entity/Credits"
+import { assert } from "~/server/utils/error"
 
 export interface Wallet {
   member: GuildMember
@@ -12,57 +12,39 @@ export interface Wallet {
   updatedAt: Date
 }
 
-export class CreditsModel {
-  #member: GuildMember
-  #repository: Repository<CreditsEntity>
-
-  constructor(member: GuildMember) {
-    if (member.user.bot) {
-      throw new Error("Not allowed for bots")
-    }
-
-    this.#member = member
-    this.#repository = db.getRepository(CreditsEntity)
-  }
-
-  async getWallet(): Promise<Wallet> {
-    const entity = await this.#repository.findOne({
-      where: {
-        userId: this.#member.id,
-      },
+export class CreditsModel extends BaseModel {
+  async getWallet(userId: string): Promise<Wallet> {
+    const entity = await this.em.findOne(CreditsEntity, {
+      userId,
     })
 
+    const member = this.context.guild().members.cache.get(userId)
+    assert(!!member, "Member not found")
+
     return {
-      member: this.#member,
+      member,
       credits: entity?.credits ?? BigInt(0),
       updatedAt: entity?.updatedAt ?? new Date(),
     }
   }
 
-  async addCredits(amount: bigint | number): Promise<Wallet> {
-    const { member, credits } = await this.getWallet()
+  async addCredits(userId: string, amount: bigint | number): Promise<Wallet> {
+    const { member, credits } = await this.getWallet(userId)
 
     const bigAmount: bigint =
       typeof amount === "bigint" ? amount : BigInt(Math.floor(amount))
 
     const newCredits = credits + bigAmount
-    const newUpdatedAt = new Date()
 
-    await this.#repository.upsert(
-      [
-        {
-          userId: this.#member.id,
-          credits: newCredits,
-          updatedAt: newUpdatedAt,
-        },
-      ],
-      ["userId"],
-    )
+    const entity = await this.em.upsert(CreditsEntity, {
+      userId,
+      credits: newCredits,
+    })
 
     const newWallet: Wallet = {
       member,
       credits: newCredits,
-      updatedAt: newUpdatedAt,
+      updatedAt: entity.updatedAt,
     }
 
     await this.#handleUpperClassRole(newWallet)
@@ -71,8 +53,8 @@ export class CreditsModel {
   }
 
   async getAllWallets(): Promise<Wallet[]> {
-    const entities = await this.#repository.find()
-    const members = this.#member.guild.members.cache
+    const entities = await this.em.findAll(CreditsEntity)
+    const members = this.context.guild().members.cache
 
     return entities
       .filter((entity) => members.has(entity.userId))
@@ -86,11 +68,17 @@ export class CreditsModel {
   async #handleUpperClassRole(wallet: Wallet) {
     if (appConfig.dev) return
 
-    const role = this.#member.guild.roles.cache.get(
-      DISCORD_IDS.roles.upperClass,
-    )
+    const role = this.context
+      .guild()
+      .roles.cache.get(DISCORD_IDS.roles.upperClass)
     if (!role) return
 
-    await (wallet.credits >= UPPER_CLASS_MESSAGE_CREDITS ? this.#member.roles.add(role) : this.#member.roles.remove(role));
+    await (wallet.credits >= UPPER_CLASS_MESSAGE_CREDITS
+      ? wallet.member.roles.add(role)
+      : wallet.member.roles.remove(role))
+  }
+
+  async removeAll() {
+    await this.em.nativeDelete(CreditsEntity, {})
   }
 }
