@@ -2,6 +2,7 @@ import { Events } from "discord.js"
 
 import { MIN_CREDITS_PER_MESSAGE, RANK_ACTIVE_ROLE_LEVEL } from "~/constants"
 import { DISCORD_IDS } from "~/constants"
+import { appConfig } from "~/server/config"
 import { CreditsModel } from "~/server/db/model/Credits"
 import { ExperienceModel } from "~/server/db/model/Experience"
 import { isTextChannel } from "~/server/utils/channel"
@@ -11,7 +12,7 @@ import { embedAuthor } from "~/server/utils/member"
 
 export default createEvent(
   Events.MessageCreate,
-  { productionOnly: true },
+  { productionOnly: false },
   async (context, message) => {
     if (message.author.bot) return
     if (!message.member) return
@@ -45,7 +46,7 @@ export default createEvent(
         DISCORD_IDS.channels.bepsi,
       )
 
-      if (isTextChannel(channel)) {
+      if (!appConfig.dev && isTextChannel(channel)) {
         channel.send({
           embeds: [
             {
