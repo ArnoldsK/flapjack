@@ -1,19 +1,13 @@
-import {
-  Entity,
-  Column,
-  BaseEntity,
-  CreateDateColumn,
-  PrimaryGeneratedColumn,
-} from "typeorm"
+import { Entity, Opt, PrimaryKey, Property } from "@mikro-orm/core"
 
 @Entity()
-export class RedgifsEntity extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: string
+export class RedgifsEntity {
+  @PrimaryKey({ autoincrement: true })
+  id: string & Opt
 
-  @Column({ type: "text" })
+  @Property({ type: "text" })
   token: string
 
-  @CreateDateColumn()
-  createdAt: Date
+  @Property()
+  createdAt: Date & Opt = new Date()
 }

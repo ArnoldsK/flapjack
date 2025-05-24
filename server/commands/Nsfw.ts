@@ -45,7 +45,7 @@ export default class NsfwCommand extends BaseCommand {
   }
 
   async #fetchPosts(): Promise<RedGifsGif[]> {
-    const model = new RedgifsModel()
+    const model = new RedgifsModel(this.context)
 
     return await model.getGifs()
   }

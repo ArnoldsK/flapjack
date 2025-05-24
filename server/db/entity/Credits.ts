@@ -1,30 +1,16 @@
-import {
-  Entity,
-  Column,
-  BaseEntity,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from "typeorm"
+import { Entity, Opt, PrimaryKey, Property } from "@mikro-orm/core"
 
 @Entity()
-export class CreditsEntity extends BaseEntity {
-  @PrimaryColumn({
-    unique: true,
-  })
+export class CreditsEntity {
+  @PrimaryKey()
   userId: string
 
-  @Column({
+  @Property({
     type: "bigint",
     unsigned: true,
-    transformer: {
-      from: BigInt,
-      to(value?: bigint): string {
-        return value?.toString() ?? "0"
-      },
-    },
   })
   credits: bigint
 
-  @UpdateDateColumn()
-  updatedAt: Date
+  @Property({ onUpdate: () => new Date() })
+  updatedAt: Date & Opt
 }

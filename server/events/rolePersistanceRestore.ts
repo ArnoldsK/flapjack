@@ -6,12 +6,12 @@ import { createEvent } from "~/server/utils/event"
 export default createEvent(
   Events.GuildMemberAdd,
   { productionOnly: true },
-  async (_context, member) => {
+  async (context, member) => {
     if (member.user.bot) return
 
-    const model = new RolesModel(member)
+    const model = new RolesModel(context)
 
-    const savedRoleIds = await model.getRoleIds()
+    const savedRoleIds = await model.getRoleIds(member.id)
     if (savedRoleIds.length === 0) return
 
     const roles = member.guild.roles.cache.filter(({ id }) =>

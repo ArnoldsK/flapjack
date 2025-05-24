@@ -1,39 +1,28 @@
-import { Repository } from "typeorm"
+import { RequiredEntityData } from "@mikro-orm/core"
 
-import { db } from "~/server/database"
+import { BaseModel } from "~/server/base/Model"
 import { CommandExecuteEntity } from "~/server/db/entity/CommandExecute"
 import { ApiStatsCommand } from "~/types/api"
-import { EntityFields } from "~/types/entity"
 
-type CreateInput = Omit<EntityFields<CommandExecuteEntity>, "id" | "createdAt">
-
-export class CommandExecuteModel {
-  #repository: Repository<CommandExecuteEntity>
-
-  constructor() {
-    this.#repository = db.getRepository(CommandExecuteEntity)
-  }
-
-  async create(input: CreateInput) {
-    await this.#repository
-      .create({
-        ...input,
-        createdAt: new Date(),
-      })
-      .save()
+export class CommandExecuteModel extends BaseModel {
+  async create(input: RequiredEntityData<CommandExecuteEntity>) {
+    await this.em.create(CommandExecuteEntity, input)
+    await this.em.flush()
   }
 
   async getApiItems(): Promise<ApiStatsCommand[]> {
-    const entities = await this.#repository.find()
+    const entities = await this.em.findAll(CommandExecuteEntity)
 
-    return [...entities.reduce((acc, entity) => {
+    return [
+      ...entities.reduce((acc, entity) => {
         const name = entity.commandName
         const count = acc.get(name) ?? 0
 
         acc.set(name, count + 1)
 
         return acc
-      }, new Map<string, number>())]
+      }, new Map<string, number>()),
+    ]
       .map(([name, count]) => ({
         name,
         count,

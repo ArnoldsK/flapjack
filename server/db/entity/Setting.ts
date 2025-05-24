@@ -1,12 +1,12 @@
-import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm"
+import { Entity, PrimaryKey, Property } from "@mikro-orm/core"
 
 import type { SettingKey } from "~/server/db/model/Setting"
 
 @Entity()
-export class SettingEntity extends BaseEntity {
-  @PrimaryColumn({ unique: true, type: "varchar" })
+export class SettingEntity {
+  @PrimaryKey()
   key: SettingKey
 
-  @Column({ type: "text" })
+  @Property({ type: "text" })
   value: string
 }

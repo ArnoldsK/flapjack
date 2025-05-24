@@ -47,8 +47,8 @@ export default class RouletteCommand extends BaseCommand {
       true,
     ) as ColorKey
 
-    const creditsModel = new CreditsModel(this.member)
-    const wallet = await creditsModel.getWallet()
+    const creditsModel = new CreditsModel(this.context)
+    const wallet = await creditsModel.getWallet(this.member.id)
 
     const rawAmount = this.interaction.options.getString(
       OptionName.Amount,
@@ -65,7 +65,7 @@ export default class RouletteCommand extends BaseCommand {
     }
 
     const winAmount = amount * winMulti
-    const newWallet = await creditsModel.addCredits(winAmount)
+    const newWallet = await creditsModel.addCredits(this.member.id, winAmount)
 
     this.reply({
       ephemeral: !isCasinoChannel(this.channel),

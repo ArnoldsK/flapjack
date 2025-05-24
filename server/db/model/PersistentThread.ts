@@ -1,25 +1,14 @@
-import { Repository } from "typeorm"
+import { RequiredEntityData } from "@mikro-orm/core"
 
-import { db } from "~/server/database"
+import { BaseModel } from "~/server/base/Model"
 import { PersistentThreadEntity } from "~/server/db/entity/PersistentThread"
-import { EntityFields } from "~/types/entity"
 
-type CreateInput = Omit<EntityFields<PersistentThreadEntity>, "id">
-
-export class PersistentThreadModel {
-  #repository: Repository<PersistentThreadEntity>
-
-  constructor() {
-    this.#repository = db.getRepository(PersistentThreadEntity)
-  }
-
+export class PersistentThreadModel extends BaseModel {
   async getByThreadId(threadId: string) {
-    return this.#repository.findOne({
-      where: { threadId },
-    })
+    return this.em.findOne(PersistentThreadEntity, { threadId })
   }
 
-  async upsert(input: CreateInput) {
-    await this.#repository.upsert([input], ["threadId"])
+  async upsert(input: RequiredEntityData<PersistentThreadEntity>) {
+    await this.em.upsert(PersistentThreadEntity, input)
   }
 }

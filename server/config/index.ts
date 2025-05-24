@@ -8,7 +8,6 @@ const env = z
     DEV: z.string(),
     WEB_PORT: z.string(),
     WEB_BASE_URL: z.string(),
-    DB_TYPE: z.string(),
     DB_HOST: z.string(),
     DB_PORT: z.string(),
     DB_USERNAME: z.string(),
@@ -30,7 +29,6 @@ export const appConfig = {
   dev: env.DEV === "true",
 
   db: {
-    type: env.DB_TYPE,
     host: env.DB_HOST,
     port: Number.parseInt(env.DB_PORT, 10),
     username: env.DB_USERNAME,

@@ -1,31 +1,25 @@
-import {
-  BaseEntity,
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-} from "typeorm"
+import { Entity, PrimaryKey, Opt, Property } from "@mikro-orm/core"
 
 @Entity()
-export class ReminderEntity extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number
+export class ReminderEntity {
+  @PrimaryKey({ autoincrement: true })
+  id: number & Opt
 
-  @Column()
+  @Property()
   channelId: string
 
-  @Column()
+  @Property()
   messageId: string
 
-  @Column()
+  @Property()
   userId: string
 
-  @Column({ type: "text" })
+  @Property({ type: "text" })
   value: string
 
-  @Column()
+  @Property()
   expiresAt: Date
 
-  @CreateDateColumn()
-  createdAt: Date
+  @Property()
+  createdAt: Date & Opt = new Date()
 }

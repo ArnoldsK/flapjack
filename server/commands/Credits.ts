@@ -95,8 +95,8 @@ export default class CreditsCommand extends BaseCommand {
     const isSelf = user.id === this.user.id
     const intro = isSelf ? "You have" : `${member.displayName} has`
 
-    const creditsModel = new CreditsModel(member)
-    const wallet = await creditsModel.getWallet()
+    const creditsModel = new CreditsModel(this.context)
+    const wallet = await creditsModel.getWallet(member.id)
 
     this.reply({
       ephemeral: !isCasinoChannel(this.channel),
@@ -123,8 +123,8 @@ export default class CreditsCommand extends BaseCommand {
       return
     }
 
-    const creditsModel = new CreditsModel(this.member)
-    const wallet = await creditsModel.getWallet()
+    const creditsModel = new CreditsModel(this.context)
+    const wallet = await creditsModel.getWallet(this.member.id)
 
     const rawAmount = this.interaction.options.getString(
       OptionName.Amount,
@@ -132,9 +132,8 @@ export default class CreditsCommand extends BaseCommand {
     )
     const amount = parseCreditsAmount(rawAmount, wallet.credits)
 
-    const targetCreditsModel = new CreditsModel(targetMember)
-    await targetCreditsModel.addCredits(amount)
-    await creditsModel.addCredits(-amount)
+    await creditsModel.addCredits(targetMember.id, amount)
+    await creditsModel.addCredits(this.member.id, -amount)
 
     this.reply({
       embeds: [
@@ -149,7 +148,7 @@ export default class CreditsCommand extends BaseCommand {
   }
 
   async #handleTop() {
-    const creditsModel = new CreditsModel(this.member)
+    const creditsModel = new CreditsModel(this.context)
     const wallets = await creditsModel.getAllWallets()
 
     this.reply({

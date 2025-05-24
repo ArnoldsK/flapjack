@@ -1,6 +1,7 @@
 import "reflect-metadata"
 import http from "node:http"
 
+import { RequestContext } from "@mikro-orm/core"
 import { Client, Events, GatewayIntentBits } from "discord.js"
 import express from "express"
 import next from "next"
@@ -8,7 +9,7 @@ import next from "next"
 import { DISCORD_IDS } from "~/constants"
 import CacheManager from "~/server/cache"
 import { appConfig } from "~/server/config"
-import { db } from "~/server/database"
+import { createConnection } from "~/server/db"
 import {
   getSetupCommands,
   handleApiCommands,
@@ -33,7 +34,7 @@ nextApp.prepare().then(async () => {
   // #############################################################################
   // Database
   // #############################################################################
-  await db.initialize()
+  const db = await createConnection()
 
   // #############################################################################
   // Client
@@ -57,6 +58,7 @@ nextApp.prepare().then(async () => {
     client,
     guild: () => client.guilds.cache.get(DISCORD_IDS.guild)!,
     cache: new CacheManager(),
+    db,
   }
 
   // #############################################################################
@@ -132,6 +134,10 @@ nextApp.prepare().then(async () => {
   server.use(express.urlencoded({ extended: true }))
   server.use(express.static("public"))
 
+  server.use((_req, _res, next) => {
+    RequestContext.create(db.em, next)
+  })
+
   await handleCustomRoutes(context, server)
 
   server.all("*", (req, res) => handle(req, res))
@@ -141,12 +147,14 @@ nextApp.prepare().then(async () => {
   })
 
   // #############################################################################
-  // On Ctrl+C remove local commands
+  // Graceful exit
   // #############################################################################
   process.on("SIGINT", async () => {
-    if (!appConfig.dev) return
+    await db.close()
 
-    await removeApiCommands()
+    if (appConfig.dev) {
+      await removeApiCommands()
+    }
 
     process.exit(2)
   })

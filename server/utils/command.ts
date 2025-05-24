@@ -117,21 +117,15 @@ export const getSetupCommands = async (
         // #############################################################################
         // Statistics
         // #############################################################################
-        await handleCommandExecuteStatistics(interaction)
+        const model = new CommandExecuteModel(context)
+        await model.create({
+          input: interaction.toString(),
+          commandName: interaction.commandName,
+          userId: interaction.user.id,
+          channelId: interaction.channelId,
+        })
       },
     } satisfies SetupCommand
-  })
-}
-
-const handleCommandExecuteStatistics = async (
-  interaction: ChatInputCommandInteraction,
-) => {
-  const model = new CommandExecuteModel()
-  await model.create({
-    input: interaction.toString(),
-    commandName: interaction.commandName,
-    userId: interaction.user.id,
-    channelId: interaction.channelId,
   })
 }
 

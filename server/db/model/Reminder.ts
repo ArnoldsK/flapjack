@@ -1,36 +1,28 @@
-import { LessThanOrEqual, Repository } from "typeorm"
+import { RequiredEntityData } from "@mikro-orm/core"
 
-import { db } from "~/server/database"
+import { BaseModel } from "~/server/base/Model"
 import { ReminderEntity } from "~/server/db/entity/Reminder"
 
-interface CreateInput {
-  channelId: string
-  messageId: string
-  userId: string
-  value: string
-  expiresAt: Date
-}
-
-export class ReminderModel {
-  #repository: Repository<ReminderEntity>
-
-  constructor() {
-    this.#repository = db.getRepository(ReminderEntity)
-  }
-
-  async create(input: CreateInput) {
-    await this.#repository
-      .create({
-        ...input,
-        createdAt: new Date(),
-      })
-      .save()
+export class ReminderModel extends BaseModel {
+  async create(input: RequiredEntityData<ReminderEntity>) {
+    await this.em.create(ReminderEntity, input)
+    await this.em.flush()
   }
 
   async getAllExpired() {
-    return this.#repository.find({
-      where: {
-        expiresAt: LessThanOrEqual(new Date()),
+    return this.em.find(ReminderEntity, {
+      expiresAt: {
+        $lte: new Date(),
+      },
+    })
+  }
+
+  async remove(ids: number[]) {
+    if (ids.length === 0) return
+
+    await this.em.nativeDelete(ReminderEntity, {
+      id: {
+        $in: ids,
       },
     })
   }

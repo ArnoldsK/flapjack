@@ -1,28 +1,22 @@
-import {
-  BaseEntity,
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-} from "typeorm"
+import { Entity, Opt, PrimaryKey, Property } from "@mikro-orm/core"
 
 @Entity()
-export class CommandExecuteEntity extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number
+export class CommandExecuteEntity {
+  @PrimaryKey({ autoincrement: true })
+  id: number & Opt
 
-  @Column()
+  @Property()
   userId: string
 
-  @Column()
+  @Property()
   channelId: string
 
-  @Column()
+  @Property()
   commandName: string
 
-  @Column({ type: "text" })
+  @Property({ type: "text" })
   input: string
 
-  @CreateDateColumn()
-  createdAt: Date
+  @Property()
+  createdAt: Date & Opt = new Date()
 }

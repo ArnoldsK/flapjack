@@ -8,7 +8,7 @@ import {
   RECAP_PRIVATE_CHANNEL_IDS,
 } from "~/constants"
 import { appConfig } from "~/server/config"
-import { StaticModel } from "~/server/db/model/Static"
+import { StaticDataModel } from "~/server/db/model/StaticData"
 import { isTextChannel } from "~/server/utils/channel"
 import { d } from "~/server/utils/date"
 import { assert } from "~/server/utils/error"
@@ -40,8 +40,8 @@ export const createWeekRecap: Task = async (context) => {
     return
   }
 
-  const model = new StaticModel(StaticDataType.WeekRecap)
-  await model.set({
+  const model = new StaticDataModel(context)
+  await model.set(StaticDataType.WeekRecap, {
     createdAt: new Date(),
     messages: recapMessages,
   })

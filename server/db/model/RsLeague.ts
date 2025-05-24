@@ -1,28 +1,16 @@
 import { GuildMember } from "discord.js"
-import { Repository } from "typeorm"
 
-import { db } from "~/server/database"
+import { BaseModel } from "~/server/base/Model"
 import { RsLeagueEntity } from "~/server/db/entity/RsLeague"
 
-export class RsLeagueModel {
-  #member: GuildMember
-  #repository: Repository<RsLeagueEntity>
-
-  constructor(member: GuildMember) {
-    if (member.user.bot) {
-      throw new Error("Not allowed for bots")
-    }
-
-    this.#member = member
-    this.#repository = db.getRepository(RsLeagueEntity)
-  }
-
+export class RsLeagueModel extends BaseModel {
   async getAll() {
-    const entities = await this.#repository.find()
+    const entities = await this.em.findAll(RsLeagueEntity)
+    const members = this.context.guild().members.cache
 
     return entities
       .map((entity) => ({
-        member: this.#member.guild.members.cache.get(entity.userId),
+        member: members.get(entity.userId),
         name: entity.name,
       }))
       .filter(
@@ -35,25 +23,14 @@ export class RsLeagueModel {
       )
   }
 
-  async setName(name: string) {
-    await this.#repository.upsert(
-      [
-        {
-          userId: this.#member.id,
-          name,
-        },
-      ],
-      ["userId"],
-    )
-  }
-
-  async remove() {
-    await this.#repository.delete({
-      userId: this.#member.id,
+  async setName(userId: string, name: string) {
+    await this.em.upsert({
+      userId,
+      name,
     })
   }
 
-  async removeByUserId(userId: string) {
-    await this.#repository.delete({ userId })
+  async remove(userId: string) {
+    await this.em.nativeDelete(RsLeagueEntity, { userId })
   }
 }

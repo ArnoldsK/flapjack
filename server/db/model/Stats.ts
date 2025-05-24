@@ -1,32 +1,19 @@
-import { Guild } from "discord.js"
-import { Repository } from "typeorm"
+import { RequiredEntityData } from "@mikro-orm/core"
 
-import { db } from "~/server/database"
+import { BaseModel } from "~/server/base/Model"
 import { StatsEntity } from "~/server/db/entity/Stats"
 import { d } from "~/server/utils/date"
 import { ApiStatsDay } from "~/types/api"
-import { EntityFields } from "~/types/entity"
 
-type CreateInput = Omit<EntityFields<StatsEntity>, "id" | "timestamp">
-
-export class StatsModel {
-  #repository: Repository<StatsEntity>
-
-  constructor() {
-    this.#repository = db.getRepository(StatsEntity)
+export class StatsModel extends BaseModel {
+  async create(input: RequiredEntityData<StatsEntity>) {
+    await this.em.create(StatsEntity, input)
+    await this.em.flush()
   }
 
-  async create(input: CreateInput) {
-    await this.#repository
-      .create({
-        ...input,
-        timestamp: new Date(),
-      })
-      .save()
-  }
-
-  async getApiItems(guild: Guild): Promise<ApiStatsDay[]> {
-    const entities = await this.#repository.find()
+  async getApiItems(): Promise<ApiStatsDay[]> {
+    const entities = await this.em.findAll(StatsEntity)
+    const guild = this.context.guild()
 
     // Group items by day
     const statsByDateMap: Record<string, StatsEntity[]> = {}
@@ -81,6 +68,16 @@ export class StatsModel {
           .filter((el) => el.messageCount)
           .sort((a, b) => b.messageCount - a.messageCount),
       }
+    })
+  }
+
+  async removeOld() {
+    const minDate = d().subtract(6, "months")
+
+    await this.em.nativeDelete(StatsEntity, {
+      timestamp: {
+        $lt: minDate.unix(),
+      },
     })
   }
 }

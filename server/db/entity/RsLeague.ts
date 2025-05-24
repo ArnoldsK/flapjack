@@ -1,12 +1,10 @@
-import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm"
+import { Entity, PrimaryKey, Property } from "@mikro-orm/core"
 
 @Entity()
-export class RsLeagueEntity extends BaseEntity {
-  @PrimaryColumn({
-    unique: true,
-  })
+export class RsLeagueEntity {
+  @PrimaryKey()
   userId: string
 
-  @Column()
+  @Property()
   name: string
 }

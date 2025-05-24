@@ -1,8 +1,7 @@
 import { GuildMember } from "discord.js"
-import { Repository } from "typeorm"
 
 import { EXP_PER_MESSAGE } from "~/constants"
-import { db } from "~/server/database"
+import { BaseModel } from "~/server/base/Model"
 import { ExperienceEntity } from "~/server/db/entity/Experience"
 import { isNonNullish } from "~/server/utils/boolean"
 import { getExperienceLevelData } from "~/server/utils/experience"
@@ -21,51 +20,38 @@ export interface ExperienceRankData {
   levelData: ExperienceLevelData
 }
 
-export class ExperienceModel {
-  #member: GuildMember
-  #repository: Repository<ExperienceEntity>
-
-  constructor(member: GuildMember) {
-    if (member.user.bot) {
-      throw new Error("Not allowed for bots")
-    }
-
-    this.#member = member
-    this.#repository = db.getRepository(ExperienceEntity)
-  }
-
-  async getExp() {
-    const entity = await this.#repository.findOne({
-      where: {
-        userId: this.#member.id,
-      },
+export class ExperienceModel extends BaseModel {
+  async getExp(userId: string) {
+    const entity = await this.em.findOne(ExperienceEntity, {
+      userId,
     })
 
     return entity?.exp ?? 0
   }
 
-  async addExp() {
-    const exp = await this.getExp()
+  async addExp(userId: string) {
+    const exp = await this.getExp(userId)
 
-    await this.#repository.upsert(
-      [
-        {
-          userId: this.#member.id,
-          exp: exp + EXP_PER_MESSAGE,
-        },
-      ],
-      ["userId"],
-    )
+    const entity = await this.em.upsert(ExperienceEntity, {
+      userId,
+      exp: exp + EXP_PER_MESSAGE,
+    })
+
+    return {
+      oldExp: exp,
+      newExp: entity.exp,
+    }
   }
 
   async getAllRankData() {
-    const entities = await this.#repository.find({
-      order: { exp: "DESC" },
+    const entities = await this.em.findAll(ExperienceEntity, {
+      orderBy: { exp: "DESC" },
     })
-    const rankByUserId = this.#getRankByUserId(entities)
+    const rankByUserId = this.#mapRankByUserId(entities)
+    const members = this.context.guild().members.cache
 
     return entities.reduce<ExperienceRankData[]>((items, entity) => {
-      const member = this.#member.guild.members.cache.get(entity.userId)
+      const member = members.get(entity.userId)
       const rank = rankByUserId.get(entity.userId)
       if (!member || !rank) {
         return items
@@ -84,9 +70,11 @@ export class ExperienceModel {
     }, [])
   }
 
-  #getRankByUserId(entities: ExperienceEntity[]): Map<string, number> {
+  #mapRankByUserId(entities: ExperienceEntity[]): Map<string, number> {
     const userIds = entities
-      .map((entity) => this.#member.guild.members.cache.get(entity.userId)?.id)
+      .map(
+        (entity) => this.context.guild().members.cache.get(entity.userId)?.id,
+      )
       .filter(isNonNullish)
 
     return new Map<string, number>(userIds.map((userId, i) => [userId, i + 1]))

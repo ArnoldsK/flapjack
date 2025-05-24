@@ -101,7 +101,7 @@ export default class RemindCommand extends BaseCommand {
     const message = await reply.fetch()
 
     // Create the entity
-    const model = new ReminderModel()
+    const model = new ReminderModel(this.context)
     await model.create({
       channelId: this.channel.id,
       messageId: message.id,

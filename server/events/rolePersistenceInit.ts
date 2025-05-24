@@ -20,10 +20,6 @@ export default createEvent(
       }))
     if (memberRoleIds.length === 0) return
 
-    await RolesEntity.createQueryBuilder()
-      .insert()
-      .values(memberRoleIds)
-      .orUpdate(["roleIds"], "userId")
-      .execute()
+    await context.db.em.upsertMany(RolesEntity, memberRoleIds)
   },
 )

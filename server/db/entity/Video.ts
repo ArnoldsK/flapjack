@@ -1,49 +1,43 @@
-import {
-  BaseEntity,
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-} from "typeorm"
+import { Entity, PrimaryKey, Property, Opt } from "@mikro-orm/core"
 
 @Entity()
-export class VideoEntity extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number
+export class VideoEntity {
+  @PrimaryKey({ autoincrement: true })
+  id: number & Opt
 
-  @Column()
+  @Property()
   userId: string
 
-  @Column()
+  @Property()
   userDisplayName: string
 
-  @Column()
+  @Property()
   channelId: string
 
-  @Column()
+  @Property()
   messageId: string
 
-  @Column()
+  @Property()
   videoUrl: string
 
-  @Column()
+  @Property()
   videoId: string
 
-  @Column()
+  @Property()
   title: string
 
-  @Column({ type: "varchar", nullable: true })
+  @Property({ type: "varchar", nullable: true })
   deArrowTitle: string | null
 
-  @Column()
+  @Property()
   thumbnailUrl: string
 
-  @Column()
+  @Property()
   authorName: string
 
-  @Column()
+  @Property()
   authorUrl: string
 
-  @CreateDateColumn()
-  createdAt: Date
+  @Property()
+  createdAt: Date & Opt = new Date()
 }

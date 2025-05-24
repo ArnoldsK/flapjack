@@ -70,7 +70,7 @@ export default class BlackjackCommand extends BaseCommand {
   #_creditsModel: CreditsModel
   get #creditsModel() {
     if (!this.#_creditsModel) {
-      this.#_creditsModel = new CreditsModel(this.member)
+      this.#_creditsModel = new CreditsModel(this.context)
     }
     return this.#_creditsModel
   }
@@ -103,7 +103,7 @@ export default class BlackjackCommand extends BaseCommand {
     // #############################################################################
     // Prepare credits
     // #############################################################################
-    const wallet = await this.#creditsModel.getWallet()
+    const wallet = await this.#creditsModel.getWallet(this.member.id)
 
     const rawAmount = this.interaction.options.getString(
       OptionName.Amount,
@@ -118,7 +118,10 @@ export default class BlackjackCommand extends BaseCommand {
 
     game.dispatch(actions.deal({ bet: amount }))
 
-    const newWallet = await this.#creditsModel.addCredits(-amount)
+    const newWallet = await this.#creditsModel.addCredits(
+      this.member.id,
+      -amount,
+    )
     const canDouble = newWallet.credits >= amount
 
     const { embed, components, gameOver, wonAmount } = this.#parseGame(game, {
@@ -208,7 +211,7 @@ export default class BlackjackCommand extends BaseCommand {
       // Modify credits
       // #############################################################################
       if (["double", "split"].includes(action)) {
-        await this.#creditsModel.addCredits(-state.initialBet)
+        await this.#creditsModel.addCredits(this.member.id, -state.initialBet)
       }
 
       // #############################################################################
@@ -239,7 +242,7 @@ export default class BlackjackCommand extends BaseCommand {
         await this.#handleAwaitResponse(nextResponse, game)
       }
     } catch {
-      const wallet = await this.#creditsModel.getWallet()
+      const wallet = await this.#creditsModel.getWallet(this.member.id)
       const state = game.getState()
       const lostAmount = state.finalBet || state.initialBet
 
@@ -263,7 +266,10 @@ export default class BlackjackCommand extends BaseCommand {
   }
 
   async #handleGameOver(game: Game, wonAmount: number): Promise<string> {
-    const wallet = await this.#creditsModel.addCredits(wonAmount)
+    const wallet = await this.#creditsModel.addCredits(
+      this.member.id,
+      wonAmount,
+    )
     const state = game.getState()
 
     const rightHand = state.handInfo.right

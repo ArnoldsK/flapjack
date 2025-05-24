@@ -1,10 +1,6 @@
 import { Events } from "discord.js"
 
-import {
-  EXP_PER_MESSAGE,
-  MIN_CREDITS_PER_MESSAGE,
-  RANK_ACTIVE_ROLE_LEVEL,
-} from "~/constants"
+import { MIN_CREDITS_PER_MESSAGE, RANK_ACTIVE_ROLE_LEVEL } from "~/constants"
 import { DISCORD_IDS } from "~/constants"
 import { CreditsModel } from "~/server/db/model/Credits"
 import { ExperienceModel } from "~/server/db/model/Experience"
@@ -16,34 +12,35 @@ import { embedAuthor } from "~/server/utils/member"
 export default createEvent(
   Events.MessageCreate,
   { productionOnly: true },
-  async (_context, message) => {
+  async (context, message) => {
     if (message.author.bot) return
     if (!message.member) return
 
     // #############################################################################
     // Experience
     // #############################################################################
-    const expModel = new ExperienceModel(message.member)
-    const exp = await expModel.getExp()
-
-    // Add exp
-    await expModel.addExp()
+    const expModel = new ExperienceModel(context)
+    const { oldExp, newExp } = await expModel.addExp(message.member.id)
 
     // Parse exp change
-    const { lvl } = getExperienceLevelData(exp)
-    const { lvl: lvlNew } = getExperienceLevelData(exp + EXP_PER_MESSAGE)
+    const { lvl } = getExperienceLevelData(oldExp)
+    const { lvl: newLvl } = getExperienceLevelData(newExp)
 
     // Active role
     const activeRole = message.guild?.roles.cache.get(
       DISCORD_IDS.roles.activeMember,
     )
 
-    if (lvlNew >= RANK_ACTIVE_ROLE_LEVEL && activeRole && !message.member.roles.cache.get(activeRole.id)) {
-        message.member.roles.add(activeRole)
-      }
+    if (
+      newLvl >= RANK_ACTIVE_ROLE_LEVEL &&
+      activeRole &&
+      !message.member.roles.cache.get(activeRole.id)
+    ) {
+      message.member.roles.add(activeRole)
+    }
 
     // Level-up
-    if (lvlNew > lvl && lvlNew >= RANK_ACTIVE_ROLE_LEVEL) {
+    if (newLvl > lvl && newLvl >= RANK_ACTIVE_ROLE_LEVEL) {
       const channel = message.guild?.channels.cache.get(
         DISCORD_IDS.channels.bepsi,
       )
@@ -54,7 +51,7 @@ export default createEvent(
             {
               author: embedAuthor(message.member),
               title: "Level Up!",
-              description: `LVL ${lvlNew}`,
+              description: `LVL ${newLvl}`,
               color: message.member.displayColor,
             },
           ],
@@ -65,13 +62,14 @@ export default createEvent(
     // #############################################################################
     // Credits
     // #############################################################################
-    const creditsModel = new CreditsModel(message.member)
-    const wallet = await creditsModel.getWallet()
+    const creditsModel = new CreditsModel(context)
+    const wallet = await creditsModel.getWallet(message.member.id)
 
     const secondsSinceUpdate = (Date.now() - wallet.updatedAt.getTime()) / 1000
     const timeBasedAmount = Math.floor(secondsSinceUpdate * 0.2)
 
     await creditsModel.addCredits(
+      message.member.id,
       Math.max(MIN_CREDITS_PER_MESSAGE, timeBasedAmount),
     )
   },

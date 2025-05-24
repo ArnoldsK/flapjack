@@ -1,33 +1,28 @@
-import { Repository } from "typeorm"
-
-import { db } from "~/server/database"
+import { BaseModel } from "~/server/base/Model"
 import { RedgifsEntity } from "~/server/db/entity/Redgifs"
 import { d } from "~/server/utils/date"
 import { RedGifsResponse } from "~/types/redgifs"
 
-export class RedgifsModel {
-  #repository: Repository<RedgifsEntity>
-
-  constructor() {
-    this.#repository = db.getRepository(RedgifsEntity)
-  }
-
+export class RedgifsModel extends BaseModel {
   async getToken(): Promise<string> {
     let token: string
 
-    const [entity] = await this.#repository.find()
+    const [entity] = await this.em.findAll(RedgifsEntity, {
+      limit: 1,
+    })
 
     if (!entity || this.#isExpired(entity.createdAt)) {
       // Delete expired
       if (entity) {
-        await entity.remove()
+        await this.em.removeAndFlush(entity)
       }
 
       // Get a new token
       token = await this.#getNewToken()
 
       // Save it
-      await this.#repository.create({ token }).save()
+      await this.em.create(RedgifsEntity, { token })
+      await this.em.flush()
     } else {
       token = entity.token
     }
