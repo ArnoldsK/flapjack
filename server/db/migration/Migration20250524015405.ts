@@ -21,7 +21,7 @@ export class Migration20250524015405 extends Migration {
 
       create table if not exists rs_league_entity (user_id varchar(255) not null, name varchar(255) not null, primary key (user_id)) default character set utf8mb4 engine = InnoDB;
 
-      create table if not exists setting_entity (${e("key")} varchar(255) not null, value text not null, primary key (key)) default character set utf8mb4 engine = InnoDB;
+      create table if not exists setting_entity (${e("key")} varchar(255) not null, value text not null, primary key (${e("key")})) default character set utf8mb4 engine = InnoDB;
 
       create table if not exists static_data_entity (type varchar(255) not null, value longtext not null, primary key (type)) default character set utf8mb4 engine = InnoDB;
 
