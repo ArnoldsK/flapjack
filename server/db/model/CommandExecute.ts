@@ -7,7 +7,7 @@ import { ApiStatsCommand } from "~/types/api"
 export class CommandExecuteModel extends BaseModel {
   async create(input: RequiredEntityData<CommandExecuteEntity>) {
     await this.em.create(CommandExecuteEntity, input)
-    await this.em.persistAndFlush(CommandExecuteEntity)
+    await this.em.flush()
   }
 
   async getApiItems(): Promise<ApiStatsCommand[]> {

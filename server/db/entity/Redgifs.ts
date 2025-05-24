@@ -2,7 +2,7 @@ import { Entity, Opt, PrimaryKey, Property } from "@mikro-orm/core"
 
 @Entity()
 export class RedgifsEntity {
-  @PrimaryKey()
+  @PrimaryKey({ autoincrement: true })
   id: string & Opt
 
   @Property({ type: "text" })

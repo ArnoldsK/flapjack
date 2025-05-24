@@ -1,6 +1,7 @@
 import {
   ArrayType,
   Entity,
+  Opt,
   PrimaryKey,
   Property,
   Unique,
@@ -8,8 +9,8 @@ import {
 
 @Entity()
 export class RolesEntity {
-  @PrimaryKey()
-  id: number
+  @PrimaryKey({ autoincrement: true })
+  id: number & Opt
 
   @Property()
   @Unique()

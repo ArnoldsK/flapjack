@@ -2,7 +2,7 @@ import { Entity, PrimaryKey, Opt, Property } from "@mikro-orm/core"
 
 @Entity()
 export class ReminderEntity {
-  @PrimaryKey()
+  @PrimaryKey({ autoincrement: true })
   id: number & Opt
 
   @Property()

@@ -2,7 +2,7 @@ import { Entity, Opt, PrimaryKey, Property, Unique } from "@mikro-orm/core"
 
 @Entity()
 export class PersistentThreadEntity {
-  @PrimaryKey()
+  @PrimaryKey({ autoincrement: true })
   id: number & Opt
 
   @Property()

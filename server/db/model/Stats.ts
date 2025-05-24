@@ -8,7 +8,7 @@ import { ApiStatsDay } from "~/types/api"
 export class StatsModel extends BaseModel {
   async create(input: RequiredEntityData<StatsEntity>) {
     await this.em.create(StatsEntity, input)
-    await this.em.persistAndFlush(StatsEntity)
+    await this.em.flush()
   }
 
   async getApiItems(): Promise<ApiStatsDay[]> {

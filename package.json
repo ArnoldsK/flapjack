@@ -9,8 +9,8 @@
     "start": "cross-env NODE_ENV=development node dist/server/index.js",
     "lint": "npx eslint .",
     "lint:fix": "npx eslint . --fix",
-    "migrations:make": "mikro-orm migration:create --config ./server/config/db.ts",
-    "migrations:latest": "mikro-orm migration:up --config ./server/config/db.ts"
+    "migration:make": "mikro-orm migration:create --blank --config ./server/config/db.ts",
+    "migration:run": "mikro-orm migration:up --config ./server/config/db.ts"
   },
   "dependencies": {
     "@mikro-orm/cli": "^6.4.15",

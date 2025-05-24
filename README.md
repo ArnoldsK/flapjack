@@ -1,3 +1,3 @@
 # xD
 
-Migrations must be ran manually: `npm run migrations:latest`
+Migrations must be ran manually: `npm run migration:run`

@@ -2,7 +2,7 @@ import { Entity, Opt, PrimaryKey, Property } from "@mikro-orm/core"
 
 @Entity()
 export class CommandExecuteEntity {
-  @PrimaryKey()
+  @PrimaryKey({ autoincrement: true })
   id: number & Opt
 
   @Property()

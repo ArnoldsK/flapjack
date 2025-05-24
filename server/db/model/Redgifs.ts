@@ -22,7 +22,7 @@ export class RedgifsModel extends BaseModel {
 
       // Save it
       await this.em.create(RedgifsEntity, { token })
-      await this.em.persistAndFlush(RedgifsEntity)
+      await this.em.flush()
     } else {
       token = entity.token
     }

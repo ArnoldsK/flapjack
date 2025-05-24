@@ -12,5 +12,5 @@ export class CreditsEntity {
   credits: bigint
 
   @Property({ onUpdate: () => new Date() })
-  updatedAt: Date & Opt = new Date()
+  updatedAt: Date & Opt
 }

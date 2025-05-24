@@ -2,7 +2,7 @@ import { Entity, PrimaryKey, Property, Opt } from "@mikro-orm/core"
 
 @Entity()
 export class VideoEntity {
-  @PrimaryKey()
+  @PrimaryKey({ autoincrement: true })
   id: number & Opt
 
   @Property()

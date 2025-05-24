@@ -6,7 +6,7 @@ import { ReminderEntity } from "~/server/db/entity/Reminder"
 export class ReminderModel extends BaseModel {
   async create(input: RequiredEntityData<ReminderEntity>) {
     await this.em.create(ReminderEntity, input)
-    await this.em.persistAndFlush(ReminderEntity)
+    await this.em.flush()
   }
 
   async getAllExpired() {
