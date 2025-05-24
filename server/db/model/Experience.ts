@@ -21,10 +21,10 @@ export interface ExperienceRankData {
 }
 
 export class ExperienceModel extends BaseModel {
+  protected override Entity = ExperienceEntity
+
   async getExp(userId: string) {
-    const entity = await this.em.findOne(ExperienceEntity, {
-      userId,
-    })
+    const entity = await this.em.findOne(this.Entity, { userId })
 
     return entity?.exp ?? 0
   }
@@ -32,7 +32,7 @@ export class ExperienceModel extends BaseModel {
   async addExp(userId: string) {
     const exp = await this.getExp(userId)
 
-    const entity = await this.em.upsert(ExperienceEntity, {
+    const entity = await this.em.upsert(this.Entity, {
       userId,
       exp: exp + EXP_PER_MESSAGE,
     })
@@ -44,7 +44,7 @@ export class ExperienceModel extends BaseModel {
   }
 
   async getAllRankData() {
-    const entities = await this.em.findAll(ExperienceEntity, {
+    const entities = await this.em.findAll(this.Entity, {
       orderBy: { exp: "DESC" },
     })
     const rankByUserId = this.#mapRankByUserId(entities)

@@ -4,8 +4,10 @@ import { BaseModel } from "~/server/base/Model"
 import { RsLeagueEntity } from "~/server/db/entity/RsLeague"
 
 export class RsLeagueModel extends BaseModel {
+  protected override Entity = RsLeagueEntity
+
   async getAll() {
-    const entities = await this.em.findAll(RsLeagueEntity)
+    const entities = await this.em.findAll(this.Entity)
     const members = this.context.guild().members.cache
 
     return entities
@@ -31,6 +33,6 @@ export class RsLeagueModel extends BaseModel {
   }
 
   async remove(userId: string) {
-    await this.em.nativeDelete(RsLeagueEntity, { userId })
+    await this.em.nativeDelete(this.Entity, { userId })
   }
 }

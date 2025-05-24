@@ -3,10 +3,12 @@ import { StaticDataEntity } from "~/server/db/entity/StaticData"
 import { StaticData, StaticDataType } from "~/types/entity"
 
 export class StaticDataModel extends BaseModel {
+  protected override Entity = StaticDataEntity
+
   async get<Type extends StaticDataType>(
     dataType: Type,
   ): Promise<StaticData[Type] | null> {
-    const entity = await this.em.findOne(StaticDataEntity, {
+    const entity = await this.em.findOne(this.Entity, {
       type: dataType,
     })
 
@@ -17,7 +19,7 @@ export class StaticDataModel extends BaseModel {
     dataType: Type,
     value: StaticData[Type],
   ) {
-    await this.em.upsert(StaticDataEntity, {
+    await this.em.upsert(this.Entity, {
       type: dataType,
       value,
     })

@@ -13,10 +13,10 @@ export interface Wallet {
 }
 
 export class CreditsModel extends BaseModel {
+  protected override Entity = CreditsEntity
+
   async getWallet(userId: string): Promise<Wallet> {
-    const entity = await this.em.findOne(CreditsEntity, {
-      userId,
-    })
+    const entity = await this.em.findOne(this.Entity, { userId })
 
     const member = this.context.guild().members.cache.get(userId)
     assert(!!member, "Member not found")
@@ -36,7 +36,7 @@ export class CreditsModel extends BaseModel {
 
     const newCredits = credits + bigAmount
 
-    const entity = await this.em.upsert(CreditsEntity, {
+    const entity = await this.em.upsert(this.Entity, {
       userId,
       credits: newCredits,
     })
@@ -53,7 +53,7 @@ export class CreditsModel extends BaseModel {
   }
 
   async getAllWallets(): Promise<Wallet[]> {
-    const entities = await this.em.findAll(CreditsEntity)
+    const entities = await this.em.findAll(this.Entity)
     const members = this.context.guild().members.cache
 
     return entities
@@ -79,6 +79,6 @@ export class CreditsModel extends BaseModel {
   }
 
   async removeAll() {
-    await this.em.nativeDelete(CreditsEntity, {})
+    await this.em.nativeDelete(this.Entity, {})
   }
 }

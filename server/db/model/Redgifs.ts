@@ -4,10 +4,12 @@ import { d } from "~/server/utils/date"
 import { RedGifsResponse } from "~/types/redgifs"
 
 export class RedgifsModel extends BaseModel {
+  protected override Entity = RedgifsEntity
+
   async getToken(): Promise<string> {
     let token: string
 
-    const [entity] = await this.em.findAll(RedgifsEntity, {
+    const [entity] = await this.em.findAll(this.Entity, {
       limit: 1,
     })
 
@@ -21,7 +23,7 @@ export class RedgifsModel extends BaseModel {
       token = await this.#getNewToken()
 
       // Save it
-      await this.em.create(RedgifsEntity, { token })
+      await this.em.create(this.Entity, { token })
       await this.em.flush()
     } else {
       token = entity.token

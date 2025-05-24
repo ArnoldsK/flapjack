@@ -5,13 +5,15 @@ import { CommandExecuteEntity } from "~/server/db/entity/CommandExecute"
 import { ApiStatsCommand } from "~/types/api"
 
 export class CommandExecuteModel extends BaseModel {
+  protected override Entity = CommandExecuteEntity
+
   async create(input: RequiredEntityData<CommandExecuteEntity>) {
-    await this.em.create(CommandExecuteEntity, input)
+    await this.em.create(this.Entity, input)
     await this.em.flush()
   }
 
   async getApiItems(): Promise<ApiStatsCommand[]> {
-    const entities = await this.em.findAll(CommandExecuteEntity)
+    const entities = await this.em.findAll(this.Entity)
 
     return [
       ...entities.reduce((acc, entity) => {

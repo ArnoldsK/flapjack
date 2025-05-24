@@ -18,6 +18,8 @@ export const DEFAULT_SETTINGS: Settings = {
 }
 
 export class SettingModel extends BaseModel {
+  protected override Entity = SettingEntity
+
   // #############################################################################
   // Cache
   // #############################################################################
@@ -43,7 +45,7 @@ export class SettingModel extends BaseModel {
     }
 
     // Get saved
-    const entities = await this.em.findAll(SettingEntity)
+    const entities = await this.em.findAll(this.Entity)
     const settings = { ...DEFAULT_SETTINGS }
 
     for (const [key, defaultValue] of Object.entries(settings)) {
@@ -61,7 +63,7 @@ export class SettingModel extends BaseModel {
       .filter((key) => !defaultKeys.includes(key))
 
     if (oldKeys.length > 0) {
-      await this.em.nativeDelete(SettingEntity, {
+      await this.em.nativeDelete(this.Entity, {
         key: {
           $in: oldKeys,
         },

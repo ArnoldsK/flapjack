@@ -14,7 +14,7 @@ import {
 import { Permission, permission } from "~/server/utils/permission"
 import { BaseContext } from "~/types"
 
-class BaseCommand {
+export class BaseCommand {
   constructor(
     protected context: BaseContext,
     protected interaction: ChatInputCommandInteraction,
@@ -110,5 +110,3 @@ class BaseCommand {
     return this.interaction.options.getSubcommand(true) as T
   }
 }
-
-export { BaseCommand }

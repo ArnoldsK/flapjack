@@ -1,13 +1,12 @@
-import { EntityManager } from "@mikro-orm/core"
+import { AnyEntity, EntityManager } from "@mikro-orm/core"
 
 import { BaseContext } from "~/types"
 
 export abstract class BaseModel {
-  context: BaseContext
-  em: EntityManager
+  protected Entity: AnyEntity
+  protected em: EntityManager
 
-  constructor(context: BaseContext) {
-    this.context = context
+  constructor(protected context: BaseContext) {
     this.em = context.db.em.fork()
   }
 }

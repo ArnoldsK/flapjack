@@ -6,13 +6,15 @@ import { d } from "~/server/utils/date"
 import { ApiStatsDay } from "~/types/api"
 
 export class StatsModel extends BaseModel {
+  protected override Entity = StatsEntity
+
   async create(input: RequiredEntityData<StatsEntity>) {
-    await this.em.create(StatsEntity, input)
+    await this.em.create(this.Entity, input)
     await this.em.flush()
   }
 
   async getApiItems(): Promise<ApiStatsDay[]> {
-    const entities = await this.em.findAll(StatsEntity)
+    const entities = await this.em.findAll(this.Entity)
     const guild = this.context.guild()
 
     // Group items by day
@@ -74,7 +76,7 @@ export class StatsModel extends BaseModel {
   async removeOld() {
     const minDate = d().subtract(6, "months")
 
-    await this.em.nativeDelete(StatsEntity, {
+    await this.em.nativeDelete(this.Entity, {
       timestamp: {
         $lt: minDate.unix(),
       },

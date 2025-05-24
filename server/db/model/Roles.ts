@@ -4,8 +4,10 @@ import { BaseModel } from "~/server/base/Model"
 import { RolesEntity } from "~/server/db/entity/Roles"
 
 export class RolesModel extends BaseModel {
+  protected override Entity = RolesEntity
+
   async getAll() {
-    const entities = await this.em.findAll(RolesEntity)
+    const entities = await this.em.findAll(this.Entity)
     const members = this.context.guild().members.cache
 
     return entities
@@ -24,7 +26,7 @@ export class RolesModel extends BaseModel {
   }
 
   async getRoleIds(userId: string): Promise<string[]> {
-    const entity = await this.em.findOne(RolesEntity, { userId })
+    const entity = await this.em.findOne(this.Entity, { userId })
 
     if (!entity) {
       return []
