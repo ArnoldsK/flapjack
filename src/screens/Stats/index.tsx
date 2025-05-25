@@ -6,14 +6,15 @@ import * as S from "./styles"
 
 import { d } from "~/server/utils/date"
 import { Page } from "~/src/components/Page"
-import { ApiStats } from "~/types/api"
+import { ApiStats, ApiStatsDay } from "~/types/api"
 
 interface StatsScreenProps {
   stats: ApiStats
 }
 
-const yearMonthFormat = "YYYY MMMM"
-const dateStringFormat = "YYYY-MM-DD"
+const YEAR_MONTH_ALL = "all-year-months"
+const YEAR_MONTH_FORMAT = "YYYY MMMM"
+const DATE_STRING_FORMAT = "YYYY-MM-DD"
 
 const formatChannelName = (name: string) => {
   return name.replace("╰", "")
@@ -45,9 +46,12 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
   // Second level separation
   // #############################################################################
   const currentMonthStats = useMemo(() => {
-    return messagesPerDay.filter(
-      (item) => d(item.dateString).format(yearMonthFormat) === currentYearMonth,
-    )
+    return currentYearMonth === YEAR_MONTH_ALL
+      ? messagesPerDay
+      : messagesPerDay.filter(
+          (item) =>
+            d(item.dateString).format(YEAR_MONTH_FORMAT) === currentYearMonth,
+        )
   }, [currentYearMonth, messagesPerDay])
 
   const currentMonthPastDates = useMemo((): number[] => {
@@ -78,7 +82,7 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
 
   const dateStrings = useMemo(() => {
     return currentMonthStats.map((item) =>
-      d(item.dateString).format(dateStringFormat),
+      d(item.dateString).format(DATE_STRING_FORMAT),
     )
   }, [currentMonthStats])
 
@@ -86,7 +90,7 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
 
   // Set as current if possible, otherwise first
   useEffect(() => {
-    const nowDateString = d().format(dateStringFormat)
+    const nowDateString = d().format(DATE_STRING_FORMAT)
     const dateString = dateStrings.find((el) => el === nowDateString)
 
     setCurrentDateString(dateString ?? dateStrings.at(-1))
@@ -96,8 +100,47 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
   // Current stats
   // #############################################################################
   const currentStats = useMemo(() => {
+    if (currentYearMonth === YEAR_MONTH_ALL) {
+      const mergeTopEntities = <T extends { id: string; messageCount: number }>(
+        accList: T[],
+        newList: T[],
+      ): T[] => {
+        const map = new Map<string, T>()
+
+        for (const item of accList) {
+          map.set(item.id, { ...item })
+        }
+
+        for (const item of newList) {
+          const existing = map.get(item.id)
+          if (existing) {
+            existing.messageCount += item.messageCount
+          } else {
+            map.set(item.id, { ...item })
+          }
+        }
+
+        return [...map.values()].sort((a, b) => b.messageCount - a.messageCount)
+      }
+
+      return messagesPerDay.reduce<ApiStatsDay>(
+        (acc, item) => ({
+          ...acc,
+          messageCount: acc.messageCount + item.messageCount,
+          topChannels: mergeTopEntities(acc.topChannels, item.topChannels),
+          topUsers: mergeTopEntities(acc.topUsers, item.topUsers),
+        }),
+        {
+          dateString: YEAR_MONTH_ALL,
+          messageCount: 0,
+          topChannels: [],
+          topUsers: [],
+        },
+      )
+    }
+
     return messagesPerDay.find((item) => item.dateString === currentDateString)
-  }, [currentDateString, messagesPerDay])
+  }, [currentDateString, currentYearMonth, messagesPerDay])
 
   const currentMonthTotals = useMemo(() => {
     const absoluteMax = Math.max(
@@ -133,59 +176,67 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
             active={currentYearMonth === yearMonth}
             onClick={() => setCurrentYearMonth(yearMonth)}
           >
-            <span>{yearMonth}</span>
+            {yearMonth}
           </S.Month>
         ))}
+        <S.Month
+          active={currentYearMonth === YEAR_MONTH_ALL}
+          onClick={() => setCurrentYearMonth(YEAR_MONTH_ALL)}
+        >
+          Combined
+        </S.Month>
       </S.Months>
 
       {currentStats && (
         <S.Stats>
           <S.StatColumn>
-            <S.Stat>
-              <S.CalendarWrap>
-                {currentMonthPastDates.map((date) => (
-                  <S.Day key={date} $disabled>
-                    {date}
-                  </S.Day>
-                ))}
-                {dateStrings.map((dateString) => (
-                  <S.Day
-                    key={dateString}
-                    $active={dateString === currentDateString}
-                    $hover={dateString === currentHoverDateString}
-                    onClick={() => setCurrentDateString(dateString)}
-                    onMouseEnter={() => setCurrentHoverDateString(dateString)}
-                    onMouseLeave={() => setCurrentHoverDateString(null)}
-                  >
-                    {d(dateString).format("D")}
-                  </S.Day>
-                ))}
-                {currentMonthFutureDates.map((date) => (
-                  <S.Day key={date} $disabled>
-                    {date}
-                  </S.Day>
-                ))}
-              </S.CalendarWrap>
-              <S.GraphWrap>
-                {currentMonthPastDates.map((date) => (
-                  <S.GraphBar key={date} $heightPrc={0} />
-                ))}
-                {currentMonthTotals.totals.map(({ total, dateString }) => (
-                  <S.GraphBar
-                    key={dateString}
-                    $heightPrc={(total / currentMonthTotals.max) * 100}
-                    $active={dateString === currentDateString}
-                    $hover={dateString === currentHoverDateString}
-                    onClick={() => setCurrentDateString(dateString)}
-                    onMouseEnter={() => setCurrentHoverDateString(dateString)}
-                    onMouseLeave={() => setCurrentHoverDateString(null)}
-                  />
-                ))}
-                {currentMonthFutureDates.map((date) => (
-                  <S.GraphBar key={date} $heightPrc={0} />
-                ))}
-              </S.GraphWrap>
-            </S.Stat>
+            {currentYearMonth !== YEAR_MONTH_ALL && (
+              <S.Stat>
+                <S.CalendarWrap>
+                  {currentMonthPastDates.map((date) => (
+                    <S.Day key={date} $disabled>
+                      {date}
+                    </S.Day>
+                  ))}
+                  {dateStrings.map((dateString) => (
+                    <S.Day
+                      key={dateString}
+                      $active={dateString === currentDateString}
+                      $hover={dateString === currentHoverDateString}
+                      onClick={() => setCurrentDateString(dateString)}
+                      onMouseEnter={() => setCurrentHoverDateString(dateString)}
+                      onMouseLeave={() => setCurrentHoverDateString(null)}
+                    >
+                      {d(dateString).format("D")}
+                    </S.Day>
+                  ))}
+                  {currentMonthFutureDates.map((date) => (
+                    <S.Day key={date} $disabled>
+                      {date}
+                    </S.Day>
+                  ))}
+                </S.CalendarWrap>
+                <S.GraphWrap>
+                  {currentMonthPastDates.map((date) => (
+                    <S.GraphBar key={date} $heightPrc={0} />
+                  ))}
+                  {currentMonthTotals.totals.map(({ total, dateString }) => (
+                    <S.GraphBar
+                      key={dateString}
+                      $heightPrc={(total / currentMonthTotals.max) * 100}
+                      $active={dateString === currentDateString}
+                      $hover={dateString === currentHoverDateString}
+                      onClick={() => setCurrentDateString(dateString)}
+                      onMouseEnter={() => setCurrentHoverDateString(dateString)}
+                      onMouseLeave={() => setCurrentHoverDateString(null)}
+                    />
+                  ))}
+                  {currentMonthFutureDates.map((date) => (
+                    <S.GraphBar key={date} $heightPrc={0} />
+                  ))}
+                </S.GraphWrap>
+              </S.Stat>
+            )}
             <S.Stat>
               <S.CollapseCheckbox type="checkbox" />
               <S.StatItemsWrap>

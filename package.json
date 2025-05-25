@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "nodemon",
     "dev:cmd": "cross-env LOCAL_COMMANDS=true nodemon",
+    "dev:web": "cross-env WEB_ONLY=true nodemon",
     "build": "rm -rf dist/ && next build && tsc --project tsconfig.server.json && tsc-alias -p tsconfig.server.json",
     "start": "cross-env NODE_ENV=development node dist/server/index.js",
     "lint": "npx eslint .",

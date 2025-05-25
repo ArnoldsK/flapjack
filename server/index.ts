@@ -72,6 +72,8 @@ nextApp.prepare().then(async () => {
   // Client events
   // #############################################################################
   client.once(Events.ClientReady, async () => {
+    if (appConfig.webOnly) return
+
     console.log(`> Discord client ready as ${client.user?.tag}`)
 
     // Pre-fetch members
@@ -80,6 +82,8 @@ nextApp.prepare().then(async () => {
   })
 
   client.on(Events.InteractionCreate, async (interaction) => {
+    if (appConfig.webOnly) return
+
     if (interaction.isChatInputCommand()) {
       const command = commands.find((el) => el.name === interaction.commandName)
 
@@ -100,6 +104,8 @@ nextApp.prepare().then(async () => {
   const groupedEvents = await getGroupedEvents()
 
   for (const event of groupedEvents) {
+    if (appConfig.webOnly) break
+
     client.on(event.name, async (...args) => {
       try {
         await Promise.all(

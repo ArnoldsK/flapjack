@@ -16,6 +16,7 @@ const env = z
     DISCORD_TOKEN: z.string(),
     DISCORD_CLIENT: z.string(),
     LOCAL_COMMANDS: z.string().default("false"),
+    WEB_ONLY: z.string().default("false"),
     GIPHY_API_KEY: z.string(),
     DEEPL_AUTH_KEY: z.string(),
     HOSTING_AUTH_NAME: z.string(),
@@ -27,6 +28,11 @@ const port = Number.parseInt(env.WEB_PORT, 10)
 
 export const appConfig = {
   dev: env.DEV === "true",
+
+  /**
+   * Initialize the Discord client but don't run any events.
+   */
+  webOnly: env.WEB_ONLY === "true",
 
   db: {
     host: env.DB_HOST,

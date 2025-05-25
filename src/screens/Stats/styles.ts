@@ -100,7 +100,7 @@ export const StatText = styled.div`
 
 export const CountBadge = styled.div`
   flex-shrink: 0;
-  width: 40px;
+  min-width: 40px;
   text-align: center;
   display: inline-block;
   background: #b492d433;
@@ -128,7 +128,7 @@ export const Day = styled.div<DayProps>`
   padding: 8px;
   border: 1px solid
     ${({ $active, $hover }) =>
-      $active ? "#b492d4" : ($hover ? "#b492d488" : "transparent")};
+      $active ? "#b492d4" : $hover ? "#b492d488" : "transparent"};
 
   ${({ $disabled }) =>
     $disabled &&
