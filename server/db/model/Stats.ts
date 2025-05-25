@@ -21,7 +21,7 @@ export class StatsModel extends BaseModel {
     const statsByDateMap: Record<string, StatsEntity[]> = {}
 
     for (const item of entities) {
-      const dateString = d(item.timestamp).format("YYYY-MM-DD")
+      const dateString = d(item.timestamp * 1000).format("YYYY-MM-DD")
 
       if (statsByDateMap[dateString]) {
         statsByDateMap[dateString].push(item)
