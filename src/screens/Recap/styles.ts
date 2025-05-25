@@ -85,7 +85,7 @@ export const Pound = styled.span`
 `
 
 export const Content = styled.div`
-  padding: 33vh 0 20vh;
+  padding: 20vh 0 20vh;
   width: 100%;
 `
 

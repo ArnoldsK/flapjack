@@ -148,11 +148,11 @@ export const RecapMessage = ({ message, membersData }: RecapMessageProps) => {
         blurred = true
       })
 
-      globalThis.location.replace(url.intent)
+      location.replace(url.intent)
 
       setTimeout(() => {
         if (!blurred) {
-          globalThis.location.assign(url.https)
+          location.assign(url.https)
         }
       }, 1000)
     },
@@ -175,8 +175,12 @@ export const RecapMessage = ({ message, membersData }: RecapMessageProps) => {
         </S.ChannelName>
         <S.MessageLeft>
           <S.Avatar>
-            {/* TODO use next/image */}
-            <img src={memberData.avatarUrl} alt={message.member.username} />
+            <Image
+              src={memberData.avatarUrl}
+              alt={message.member.username}
+              width={40}
+              height={40}
+            />
           </S.Avatar>
         </S.MessageLeft>
         <S.MessageRight>
