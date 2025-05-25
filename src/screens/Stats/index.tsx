@@ -169,23 +169,25 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
   // #############################################################################
   return (
     <Page title="Stats">
-      <S.Months>
-        {yearMonths.map((yearMonth) => (
+      {yearMonths.length > 0 && (
+        <S.Months>
+          {yearMonths.map((yearMonth) => (
+            <S.Month
+              key={yearMonth}
+              active={currentYearMonth === yearMonth}
+              onClick={() => setCurrentYearMonth(yearMonth)}
+            >
+              {yearMonth}
+            </S.Month>
+          ))}
           <S.Month
-            key={yearMonth}
-            active={currentYearMonth === yearMonth}
-            onClick={() => setCurrentYearMonth(yearMonth)}
+            active={currentYearMonth === YEAR_MONTH_ALL}
+            onClick={() => setCurrentYearMonth(YEAR_MONTH_ALL)}
           >
-            {yearMonth}
+            Combined
           </S.Month>
-        ))}
-        <S.Month
-          active={currentYearMonth === YEAR_MONTH_ALL}
-          onClick={() => setCurrentYearMonth(YEAR_MONTH_ALL)}
-        >
-          Combined
-        </S.Month>
-      </S.Months>
+        </S.Months>
+      )}
 
       {currentStats && (
         <S.Stats>
