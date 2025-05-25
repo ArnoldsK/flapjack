@@ -4,7 +4,7 @@ import * as S from "./styles"
 
 const MENU_ITEMS = [
   {
-    name: "Weekly recap",
+    name: "Recap",
     path: "/recap",
   },
   {

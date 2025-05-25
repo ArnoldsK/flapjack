@@ -7,8 +7,6 @@ import { AvatarGrid } from "~/src/components/AvatarGrid"
 import { Page } from "~/src/components/Page"
 import { ApiAvatars } from "~/types/api"
 
-
-
 const DISCORD_INVITE_URL = "https://discord.gg/j6wSTnukKn"
 
 interface HomeScreenProps {
