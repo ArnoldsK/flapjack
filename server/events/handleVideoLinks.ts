@@ -35,7 +35,7 @@ export default createEvent(
     // #############################################################################
     // Remove videos that have already been saved
     // #############################################################################
-    const existingVideos = await context.db.em.find(
+    const existingVideos = await context.em().find(
       VideoEntity,
       {
         videoId: {
@@ -74,7 +74,7 @@ export default createEvent(
     // #############################################################################
     // Save video data and clear cache
     // #############################################################################
-    await context.db.em.insertMany(VideoEntity, videoData)
+    await context.em().insertMany(VideoEntity, videoData)
 
     context.cache.set(CacheKey.Videos, null)
 

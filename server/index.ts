@@ -58,7 +58,7 @@ nextApp.prepare().then(async () => {
     client,
     guild: () => client.guilds.cache.get(DISCORD_IDS.guild)!,
     cache: new CacheManager(),
-    db,
+    em: () => db.em.fork(),
   }
 
   // #############################################################################

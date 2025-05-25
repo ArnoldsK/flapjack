@@ -8,7 +8,7 @@ export default createRoute({
     let videos = context.cache.get(CacheKey.Videos)
 
     if (!videos) {
-      videos = await context.db.em.findAll(VideoEntity, {
+      videos = await context.em().findAll(VideoEntity, {
         orderBy: {
           createdAt: "DESC",
         },

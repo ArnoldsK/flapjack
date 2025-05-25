@@ -7,6 +7,6 @@ export abstract class BaseModel {
   protected em: EntityManager
 
   constructor(protected context: BaseContext) {
-    this.em = context.db.em.fork()
+    this.em = context.em()
   }
 }

@@ -20,6 +20,6 @@ export default createEvent(
       }))
     if (memberRoleIds.length === 0) return
 
-    await context.db.em.upsertMany(RolesEntity, memberRoleIds)
+    await context.em().upsertMany(RolesEntity, memberRoleIds)
   },
 )
