@@ -85,7 +85,7 @@ export const Recap = ({ recap, membersData }: RecapScreenProps) => {
     (e: MouseEvent, channelId: string) => {
       e.preventDefault()
 
-      const channelEl = document.querySelector(`#\\${channelId}`)
+      const channelEl = document.querySelector(`#c${channelId}`)
       if (!channelEl) return
 
       window.scrollTo({
@@ -115,7 +115,7 @@ export const Recap = ({ recap, membersData }: RecapScreenProps) => {
               {channels.map((channel) => (
                 <S.NavItem
                   key={channel.id}
-                  href={`#${channel.id}`}
+                  href={`#c${channel.id}`}
                   onClick={(e) => onChannelClick(e, channel.id)}
                   $active={channel.id === activeChannelId}
                 >
@@ -129,7 +129,7 @@ export const Recap = ({ recap, membersData }: RecapScreenProps) => {
         <S.Content>
           {messagesByChannel.map(({ channel, messages }) => (
             <S.Channel
-              id={channel.id}
+              id={`c${channel.id}`}
               className={CHANNEL_CLASS_NAME}
               key={channel.id}
             >
