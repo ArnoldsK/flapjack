@@ -85,7 +85,7 @@ export const Recap = ({ recap, membersData }: RecapScreenProps) => {
     (e: MouseEvent, channelId: string) => {
       e.preventDefault()
 
-      const channelEl = document.querySelector(`#${channelId}`)
+      const channelEl = document.querySelector(`#\\${channelId}`)
       if (!channelEl) return
 
       window.scrollTo({
