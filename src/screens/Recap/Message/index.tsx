@@ -224,7 +224,8 @@ export const RecapMessage = ({ message, membersData }: RecapMessageProps) => {
                       <Image
                         src={emoji.url}
                         alt={emoji.identifier}
-                        fill
+                        width={16}
+                        height={16}
                         style={{ objectFit: "contain" }}
                       />
                     ) : (
