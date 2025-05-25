@@ -77,7 +77,7 @@ export const Recap = ({ recap, membersData }: RecapScreenProps) => {
     })
 
     if (activeChannelEl) {
-      setActiveChannelId(activeChannelEl.id)
+      setActiveChannelId(activeChannelEl.id.slice(1))
     }
   }, [scrollY])
 
