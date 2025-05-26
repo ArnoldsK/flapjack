@@ -1,7 +1,10 @@
+import { ChannelType } from "discord-api-types/v10"
 import { GetServerSideProps } from "next"
 import absoluteUrl from "next-absolute-url"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
+import TextIcon from "./icons/text.svg"
+import ThreadIcon from "./icons/thread.svg"
 import * as S from "./styles"
 
 import { d } from "~/server/utils/date"
@@ -165,6 +168,21 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
   >(null)
 
   // #############################################################################
+  // Channel icon
+  // #############################################################################
+  const getChannelIcon = useCallback((type: ChannelType) => {
+    switch (type) {
+      case ChannelType.PublicThread:
+      case ChannelType.PrivateThread: {
+        return <ThreadIcon />
+      }
+      default: {
+        return <TextIcon />
+      }
+    }
+  }, [])
+
+  // #############################################################################
   // Render
   // #############################################################################
   return (
@@ -256,6 +274,7 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
               {currentStats.topChannels.map((channel) => (
                 <S.StatItem key={channel.id} $muted={!channel.name}>
                   <S.CountBadge>{channel.messageCount}</S.CountBadge>
+                  <S.StatIcon>{getChannelIcon(channel.type)}</S.StatIcon>
                   <S.StatText>
                     {formatChannelName(channel.name) || channel.id}
                   </S.StatText>

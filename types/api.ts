@@ -1,3 +1,5 @@
+import { ChannelType } from "discord.js"
+
 import { VideoEntity } from "~/server/db/entity/Video"
 import { WeekRecapData } from "~/types/recap"
 
@@ -12,6 +14,7 @@ export interface ApiStatsDay {
   topChannels: Array<{
     id: string
     name: string
+    type: ChannelType
     messageCount: number
   }>
 }

@@ -1,4 +1,5 @@
 import { RequiredEntityData } from "@mikro-orm/core"
+import { ChannelType } from "discord.js"
 
 import { BaseModel } from "~/server/base/Model"
 import { StatsEntity } from "~/server/db/entity/Stats"
@@ -53,6 +54,9 @@ export class StatsModel extends BaseModel {
             : (map[item.channelId] = {
                 id: item.channelId,
                 name: guild.channels.cache.get(item.channelId)?.name ?? "",
+                type:
+                  guild.channels.cache.get(item.channelId)?.type ??
+                  ChannelType.GuildText,
                 messageCount: 1,
               }),
           map

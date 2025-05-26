@@ -23,5 +23,8 @@
     "Trueish",
     "weeb"
   ],
-  "jest.runMode": "on-demand"
+  "jest.runMode": "on-demand",
+  "workbench.editorAssociations": {
+    "*.svg": "default"
+  }
 }

@@ -92,6 +92,17 @@ export const StatItem = styled.div<{ $muted?: boolean }>`
   gap: 8px;
 `
 
+export const StatIcon = styled.div`
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.5;
+  margin-right: -4px;
+`
+
 export const StatText = styled.div`
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -100,7 +111,7 @@ export const StatText = styled.div`
 
 export const CountBadge = styled.div`
   flex-shrink: 0;
-  min-width: 40px;
+  min-width: 50px;
   text-align: center;
   display: inline-block;
   background: #b492d433;

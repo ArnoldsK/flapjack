@@ -44,6 +44,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@svgr/webpack": "^8.1.0",
     "@types/delta-e": "^0.0.2",
     "@types/express": "^4.17.17",
     "@types/get-image-colors": "^4.0.5",

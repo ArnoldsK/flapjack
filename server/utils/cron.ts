@@ -13,7 +13,7 @@ export interface CronTask {
   expression: string
   isRawExpression: boolean
   productionOnly: boolean
-  task: Task
+  task: Task<unknown>
 }
 
 export const handleCron = async (context: BaseContext) => {
