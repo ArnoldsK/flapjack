@@ -18,6 +18,14 @@ export default createRoute({
       context.cache.set(CacheKey.Videos, videos)
     }
 
+    // Use fresh display names
+    const members = context.guild().members.cache
+    videos = videos.map((video) => ({
+      ...video,
+      userDisplayName:
+        members.get(video.userId)?.displayName ?? video.userDisplayName,
+    }))
+
     res.json(videos)
   },
 })
