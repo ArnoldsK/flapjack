@@ -28,7 +28,10 @@ export const VideosScreen = ({ videos }: VideoSCreenProps) => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <S.Thumbnail $src={video.thumbnailUrl} />
+              <S.ThumbnailWrap>
+                <S.User>{video.userDisplayName}</S.User>
+                <S.Thumbnail $src={video.thumbnailUrl} />
+              </S.ThumbnailWrap>
               <S.Details>
                 <S.Title>{video.deArrowTitle ?? video.title}</S.Title>
                 <S.Author>{video.authorName}</S.Author>

@@ -1,5 +1,6 @@
 import styled from "styled-components"
 
+import { BREAKPOINTS } from "~/constants/layout"
 import { PAGE_PADDING } from "~/src/components/Page/styles"
 
 const VIDEOS_GAP = 32
@@ -69,6 +70,30 @@ export const Video = styled.a`
       background: #333;
       box-shadow: 0 0 0 1px #888;
     }
+  }
+`
+
+export const ThumbnailWrap = styled.div`
+  position: relative;
+`
+
+export const User = styled.div`
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: #333;
+  border-radius: 4px;
+  padding: 4px;
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0;
+
+  ${Video}:hover & {
+    opacity: 1;
+  }
+
+  @media ${BREAKPOINTS.TABLET_AND_DOWN} {
+    opacity: 1;
   }
 `
 

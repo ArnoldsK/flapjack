@@ -20,7 +20,7 @@ export const Sidebar = styled.div`
   flex-direction: column;
   justify-content: center;
 
-  @media ${BREAKPOINTS.TABLET_DOWN} {
+  @media ${BREAKPOINTS.TABLET_AND_DOWN} {
     display: none;
   }
 `

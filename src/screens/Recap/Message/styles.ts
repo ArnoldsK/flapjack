@@ -49,7 +49,7 @@ export const MessageLeft = styled.div`
 export const MessageRight = styled.div`
   padding-right: 72px;
 
-  @media ${BREAKPOINTS.TABLET_DOWN} {
+  @media ${BREAKPOINTS.TABLET_AND_DOWN} {
     padding-right: 36px;
   }
 `
