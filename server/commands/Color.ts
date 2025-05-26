@@ -21,10 +21,12 @@ import {
   purgeRole,
   setMemberColorRole,
 } from "~/server/utils/role"
+import { joinAsLines } from "~/server/utils/string"
 
 enum SubcommandName {
   Suggest = "suggest",
   Custom = "custom",
+  Gradient = "gradient",
   None = "none",
 }
 
@@ -33,7 +35,7 @@ enum OptionName {
 }
 
 export default class ColorCommand extends BaseCommand {
-  static version = 3
+  static version = 4
 
   static command = new SlashCommandBuilder()
     .setName("color")
@@ -58,6 +60,11 @@ export default class ColorCommand extends BaseCommand {
     )
     .addSubcommand((subcommand) =>
       subcommand
+        .setName(SubcommandName.Gradient)
+        .setDescription("Choose a two-color gradient color"),
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
         .setName(SubcommandName.None)
         .setDescription("Remove existing custom color"),
     )
@@ -73,6 +80,17 @@ export default class ColorCommand extends BaseCommand {
 
       case SubcommandName.Custom: {
         await this.#handleCustom()
+        return
+      }
+
+      case SubcommandName.Gradient: {
+        await this.reply({
+          ephemeral: true,
+          content: joinAsLines(
+            "This feature cannot be automated yet.",
+            "Choose the colors from <https://pepsidog.lv/color> and ping an admin to set it for you.",
+          ),
+        })
         return
       }
 
