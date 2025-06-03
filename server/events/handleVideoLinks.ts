@@ -7,97 +7,125 @@ import { CacheKey } from "~/server/cache"
 import { VideoEntity } from "~/server/db/entity/Video"
 import { isNonNullish } from "~/server/utils/boolean"
 import { createEvent } from "~/server/utils/event"
+import { BaseContext } from "~/types"
 
 export default createEvent(
   Events.MessageCreate,
   { productionOnly: true },
   async (context, message) => {
-    // #############################################################################
     // Validate message
-    // #############################################################################
     const { author, member, content } = message
 
-    if (
-      author.bot ||
-      !member ||
-      !content ||
-      message.channel.id !== DISCORD_IDS.channels.videos
-    ) {
+    if (author.bot || !member || !content) {
       return
     }
 
-    // #############################################################################
     // Extract video IDs
-    // #############################################################################
     const messageVideoIds = getVideoIds(content)
     if (messageVideoIds.length === 0) return
 
-    // #############################################################################
-    // Remove videos that have already been saved
-    // #############################################################################
-    const existingVideos = await context.em().find(
-      VideoEntity,
-      {
-        videoId: {
-          $in: messageVideoIds,
-        },
-      },
-      {
-        fields: ["videoId"],
-      },
-    )
-
-    const existingVideoIds = new Set(
-      existingVideos.map((video) => video.videoId),
-    )
-    const videoIds = messageVideoIds.filter(
-      (videoId) => !existingVideoIds.has(videoId),
-    )
-    if (videoIds.length === 0) return
-
-    // #############################################################################
-    // Get video data
-    // #############################################################################
-    const videoData = (
+    // Get DeArrow titles
+    const deArrowTitles = new Map(
       await Promise.all(
-        videoIds.map((videoId) =>
-          getVideoData({
-            videoId,
-            message,
-            member,
-          }),
+        messageVideoIds.map(
+          async (videoId) => [videoId, await getDeArrowTitle(videoId)] as const,
         ),
-      )
-    ).filter(isNonNullish)
-    if (videoData.length === 0) return
+      ),
+    )
 
-    // #############################################################################
-    // Save video data and clear cache
-    // #############################################################################
-    await context.em().insertMany(VideoEntity, videoData)
-
-    context.cache.set(CacheKey.Videos, null)
-
-    // #############################################################################
-    // Send DeArrow titles
-    // #############################################################################
-    const deArrowTitles = videoData
-      .map((video) => video.deArrowTitle)
-      .filter(isNonNullish)
-
-    if (deArrowTitles.length > 0) {
-      message.reply({
-        embeds: deArrowTitles.map((title) => ({
-          description: title,
-        })),
-        allowedMentions: {
-          users: [],
-          repliedUser: false,
-        },
+    // Handle videos channel
+    if (message.channel.id === DISCORD_IDS.channels.videos) {
+      await handleSaveVideo(context, {
+        videoIds: messageVideoIds,
+        deArrowTitles,
+        message,
+        member,
       })
     }
+
+    // Send DeArrow titles
+    await sendDeArrowTitles({
+      message,
+      deArrowTitles,
+    })
   },
 )
+
+const handleSaveVideo = async (
+  context: BaseContext,
+  {
+    videoIds,
+    deArrowTitles,
+    message,
+    member,
+  }: {
+    videoIds: string[]
+    deArrowTitles: Map<string, string | null>
+    message: Message
+    member: GuildMember
+  },
+) => {
+  // Remove videos that have already been saved
+  const existingVideos = await context.em().find(
+    VideoEntity,
+    {
+      videoId: {
+        $in: videoIds,
+      },
+    },
+    {
+      fields: ["videoId"],
+    },
+  )
+
+  const existingVideoIds = new Set(existingVideos.map((video) => video.videoId))
+  const newVideoIds = videoIds.filter(
+    (videoId) => !existingVideoIds.has(videoId),
+  )
+  if (newVideoIds.length === 0) return
+
+  // Get video data
+  const videoData = (
+    await Promise.all(
+      newVideoIds.map((videoId) =>
+        getVideoData({
+          videoId,
+          message,
+          member,
+          deArrowTitle: deArrowTitles.get(videoId) ?? null,
+        }),
+      ),
+    )
+  ).filter(isNonNullish)
+  if (videoData.length === 0) return
+
+  // Save video data and clear cache
+  await context.em().insertMany(VideoEntity, videoData)
+
+  context.cache.set(CacheKey.Videos, null)
+}
+
+const sendDeArrowTitles = async ({
+  message,
+  deArrowTitles,
+}: {
+  message: Message
+  deArrowTitles: Map<string, string | null>
+}) => {
+  const titles = [...deArrowTitles.values()].filter(isNonNullish)
+
+  if (titles.length > 0) {
+    message.reply({
+      embeds: titles.map((title) => ({
+        description: title,
+      })),
+      allowedMentions: {
+        users: [],
+        repliedUser: false,
+      },
+    })
+  }
+}
 
 const getVideoIds = (content: string): string[] => {
   const regex =
@@ -171,10 +199,12 @@ const getVideoData = async ({
   videoId,
   message,
   member,
+  deArrowTitle,
 }: {
   videoId: string
   message: Message
   member: GuildMember
+  deArrowTitle: string | null
 }): Promise<RequiredEntityData<VideoEntity> | null> => {
   const videoUrl = `https://www.youtube.com/watch?v=${videoId}`
 
@@ -183,9 +213,6 @@ const getVideoData = async ({
   if (!videoDetails) {
     return null
   }
-
-  // Get DeArrow title
-  const deArrowTitle = await getDeArrowTitle(videoId)
 
   // Result
   return {
