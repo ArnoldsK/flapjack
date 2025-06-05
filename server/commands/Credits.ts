@@ -118,8 +118,9 @@ export default class CreditsCommand extends BaseCommand {
     }
 
     const isSelf = targetUser.id === this.user.id
-    if (isSelf) {
-      this.fail("Can't give to yourself")
+    const isBot = targetUser.bot
+    if (isSelf || isBot) {
+      this.fail(isBot ? "Can't give to bots" : "Can't give to yourself")
       return
     }
 
