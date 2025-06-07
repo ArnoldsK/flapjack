@@ -28,6 +28,10 @@ export default createEvent(
     }
 
     const removeFromCredits = BigInt(UPPER_CLASS_MESSAGE_CREDITS)
-    await creditsModel.addCredits(message.member.id, -removeFromCredits)
+    await creditsModel.addCredits({
+      userId: message.member.id,
+      amount: -removeFromCredits,
+      isCasino: false,
+    })
   },
 )

@@ -22,9 +22,12 @@ export default createEvent(
       embeds: [
         {
           color: Color.green,
-          description: newCommits.length > 0
-            ? joinAsLines(...newCommits.map((commit) => `- ${commit.message}`))
-            : "Restarted with no changes",
+          description:
+            newCommits.length > 0
+              ? joinAsLines(
+                  ...newCommits.map((commit) => `- ${commit.message}`),
+                )
+              : "Restarted with no changes (could be a crash)",
         },
       ],
     })

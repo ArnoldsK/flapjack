@@ -65,7 +65,11 @@ export default class RouletteCommand extends BaseCommand {
     }
 
     const winAmount = amount * winMulti
-    const newWallet = await creditsModel.addCredits(this.member.id, winAmount)
+    const newWallet = await creditsModel.addCredits({
+      userId: this.member.id,
+      amount: winAmount,
+      isCasino: true,
+    })
 
     this.reply({
       ephemeral: !isCasinoChannel(this.channel),

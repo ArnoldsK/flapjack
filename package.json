@@ -9,12 +9,14 @@
     "build": "rm -rf dist/ && next build && tsc --project tsconfig.server.json && tsc-alias -p tsconfig.server.json",
     "start": "cross-env NODE_ENV=development node dist/server/index.js",
     "lint": "npx eslint .",
-    "lint:fix": "npx eslint . --fix"
+    "lint:fix": "npx eslint . --fix",
+    "migration:make": "mikro-orm migration:create --blank --config ./server/config/db.ts",
+    "migration:run": "mikro-orm migration:up --config ./server/config/db.ts"
   },
   "dependencies": {
-    "@mikro-orm/cli": "^6.4.15",
-    "@mikro-orm/core": "^6.4.15",
-    "@mikro-orm/mysql": "^6.4.15",
+    "@mikro-orm/core": "^6.4.16",
+    "@mikro-orm/migrations": "^6.4.16",
+    "@mikro-orm/mysql": "^6.4.16",
     "@napi-rs/canvas": "^0.1.59",
     "@types/node": "20.3.1",
     "@types/react": "18.2.12",
@@ -44,6 +46,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@mikro-orm/cli": "^6.4.16",
     "@svgr/webpack": "^8.1.0",
     "@types/delta-e": "^0.0.2",
     "@types/express": "^4.17.17",

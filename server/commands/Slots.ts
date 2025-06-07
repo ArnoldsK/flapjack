@@ -66,10 +66,11 @@ export default class SlotsCommand extends BaseCommand {
     const winAmount = amount * winMulti
     const creditsToAdd = winAmount - amount
 
-    const newWallet = await creditsModel.addCredits(
-      this.member.id,
-      creditsToAdd,
-    )
+    const newWallet = await creditsModel.addCredits({
+      userId: this.member.id,
+      amount: creditsToAdd,
+      isCasino: true,
+    })
 
     this.reply({
       ephemeral: !isCasinoChannel(this.channel),

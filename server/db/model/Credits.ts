@@ -1,3 +1,4 @@
+import { RequiredEntityData } from "@mikro-orm/core"
 import { GuildMember } from "discord.js"
 
 import { DISCORD_IDS, UPPER_CLASS_MESSAGE_CREDITS } from "~/constants"
@@ -12,6 +13,22 @@ export interface Wallet {
   updatedAt: Date
 }
 
+const parseEntityCredits = (
+  entity: Pick<CreditsEntity, "credits" | "multiplier"> | null,
+): bigint => {
+  return (entity?.credits ?? 0n) * BigInt(entity?.multiplier ?? 1)
+}
+
+const getUpsertData = (
+  userId: string,
+  credits: bigint,
+): RequiredEntityData<CreditsEntity> => ({
+  userId,
+  // Unsigned field allows only positive values
+  credits: credits < 0n ? -credits : credits,
+  multiplier: credits < 0n ? -1 : 1,
+})
+
 export class CreditsModel extends BaseModel {
   protected override Entity = CreditsEntity
 
@@ -23,12 +40,33 @@ export class CreditsModel extends BaseModel {
 
     return {
       member,
-      credits: entity?.credits ?? BigInt(0),
+      credits: parseEntityCredits(entity),
       updatedAt: entity?.updatedAt ?? new Date(),
     }
   }
 
-  async addCredits(userId: string, amount: bigint | number): Promise<Wallet> {
+  async addBotCredits(amount: bigint) {
+    const userId = this.context.guild().client.user.id
+    const entity = await this.em.findOne(this.Entity, { userId })
+
+    const newCredits = parseEntityCredits(entity) + amount
+
+    await this.em.upsert(this.Entity, getUpsertData(userId, newCredits))
+  }
+
+  async addCredits({
+    userId,
+    amount,
+    isCasino,
+  }: {
+    userId: string
+    amount: bigint | number
+    /**
+     * Is this credits transaction done in the casino?
+     * Will modify bot credits with the opposite amount.
+     */
+    isCasino: boolean
+  }): Promise<Wallet> {
     const { member, credits } = await this.getWallet(userId)
 
     const bigAmount: bigint =
@@ -36,10 +74,20 @@ export class CreditsModel extends BaseModel {
 
     const newCredits = credits + bigAmount
 
-    const entity = await this.em.upsert(this.Entity, {
-      userId,
-      credits: newCredits,
-    })
+    const entity = await this.em.upsert(
+      this.Entity,
+      getUpsertData(userId, newCredits),
+    )
+
+    // Modify bot credits with the opposite amount
+    if (isCasino) {
+      try {
+        await this.addBotCredits(-bigAmount)
+      } catch {
+        // Should not fail the user credits add
+        console.error("Failed to add bot credits")
+      }
+    }
 
     const newWallet: Wallet = {
       member,
@@ -60,13 +108,14 @@ export class CreditsModel extends BaseModel {
       .filter((entity) => members.has(entity.userId))
       .map((entity) => ({
         member: members.get(entity.userId)!,
-        credits: entity.credits,
+        credits: entity.credits * BigInt(entity.multiplier),
         updatedAt: entity.updatedAt,
       }))
   }
 
   async #handleUpperClassRole(wallet: Wallet) {
     if (appConfig.dev) return
+    if (wallet.member.user.bot) return
 
     const role = this.context
       .guild()

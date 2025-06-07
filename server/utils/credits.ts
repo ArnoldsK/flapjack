@@ -17,7 +17,7 @@ export const getCreditsEmoji = (value: bigint | number): string => {
   return (
     Object.entries(minValueMap).find(
       ([, minValue]) => value >= minValue,
-    )?.[0] ?? ""
+    )?.[0] ?? "<:Coins1:1204533883702612018>"
   )
 }
 
@@ -28,7 +28,7 @@ export const formatCredits = (value: bigint | number): string => {
 
   const items = [
     {
-      from: BigInt("1"),
+      from: -Infinity,
       to: BigInt("99999"),
       suffix: "",
       multiplier: BigInt("1"),

@@ -2,6 +2,7 @@ import { SlashCommandBuilder } from "discord.js"
 
 import { OPTION_DESCRIPTION_AMOUNT } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
+import { appConfig } from "~/server/config"
 import { CreditsModel } from "~/server/db/model/Credits"
 import { sortBigInt } from "~/server/utils/array"
 import { isCasinoChannel } from "~/server/utils/channel"
@@ -12,6 +13,7 @@ enum SubcommandName {
   View = "view",
   Give = "give",
   Top = "top",
+  Adjust = "adjust", // local dev only
 }
 
 enum OptionName {
@@ -19,10 +21,33 @@ enum OptionName {
   Amount = "amount",
 }
 
+const addLocalDevSubcommands = (cb: SlashCommandBuilder) => {
+  if (appConfig.dev) {
+    cb.addSubcommand((subcommand) =>
+      subcommand
+        .setName(SubcommandName.Adjust)
+        .setDescription("Adjust user credits")
+        .addUserOption((option) =>
+          option
+            .setName(OptionName.User)
+            .setDescription("User to give credits to")
+            .setRequired(true),
+        )
+        .addNumberOption((option) =>
+          option
+            .setName(OptionName.Amount)
+            .setDescription("Exact amount of credits")
+            .setRequired(true),
+        ),
+    )
+  }
+  return cb
+}
+
 export default class CreditsCommand extends BaseCommand {
   static version = 3
 
-  static command = new SlashCommandBuilder()
+  static command = addLocalDevSubcommands(new SlashCommandBuilder())
     .setName("credits")
     .setDescription("Manage your credits")
     .addSubcommand((subcommand) =>
@@ -74,6 +99,11 @@ export default class CreditsCommand extends BaseCommand {
 
       case SubcommandName.Top: {
         await this.#handleTop()
+        break
+      }
+
+      case SubcommandName.Adjust: {
+        await this.#handleAdjust()
         break
       }
 
@@ -133,8 +163,16 @@ export default class CreditsCommand extends BaseCommand {
     )
     const amount = parseCreditsAmount(rawAmount, wallet.credits)
 
-    await creditsModel.addCredits(targetMember.id, amount)
-    await creditsModel.addCredits(this.member.id, -amount)
+    await creditsModel.addCredits({
+      userId: targetMember.id,
+      amount,
+      isCasino: false,
+    })
+    await creditsModel.addCredits({
+      userId: this.member.id,
+      amount: -amount,
+      isCasino: false,
+    })
 
     this.reply({
       embeds: [
@@ -168,6 +206,45 @@ export default class CreditsCommand extends BaseCommand {
               value: formatCredits(amount),
               inline: true,
             })),
+        },
+      ],
+    })
+  }
+
+  async #handleAdjust() {
+    if (!appConfig.dev) {
+      this.fail("Not on local dev env")
+      return
+    }
+
+    const targetUser = this.interaction.options.getUser(OptionName.User, true)
+    const targetMember = this.guild.members.cache.get(targetUser.id)
+    if (!targetMember) {
+      this.fail("User not found")
+      return
+    }
+
+    const rawAmount = this.interaction.options.getNumber(
+      OptionName.Amount,
+      true,
+    )
+    const amount = BigInt(rawAmount)
+
+    const creditsModel = new CreditsModel(this.context)
+    await creditsModel.addCredits({
+      userId: targetMember.id,
+      amount,
+      isCasino: false,
+    })
+
+    this.reply({
+      ephemeral: true,
+      embeds: [
+        {
+          color: this.member.displayColor,
+          description: `Adjusted by ${formatCredits(amount)} for ${
+            targetMember.displayName
+          }`,
         },
       ],
     })
