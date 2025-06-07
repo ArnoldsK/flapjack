@@ -176,13 +176,10 @@ const parseMessageDataReactions = (
     messages
       .map((message) => ({
         ...message,
-        reactionCount: (message.reactionCount = message.reactions.reduce(
-          (c, r) => c + r.count,
-          0,
-        )),
+        reactionCount: message.reactions.reduce((c, r) => c + r.count, 0),
       }))
       // Remove stale messages
-      .filter((el) => el.reactionCount >= 3)
+      .filter((el) => el.reactionCount >= 5)
   )
 }
 

@@ -1,7 +1,6 @@
 import type { GetServerSideProps } from "next"
 import absoluteUrl from "next-absolute-url"
 import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react"
-import { useWindowScroll } from "react-use"
 
 import { RecapMessage } from "./Message"
 import * as S from "./styles"
@@ -20,36 +19,50 @@ export const Recap = ({ recap, membersData }: RecapScreenProps) => {
     MessagesByChannel[]
   >([])
 
+  const getSortedChannelMessages = useCallback(
+    (channelId: string) => {
+      return recap.messages
+        .filter((el) => el.channel.id === channelId)
+        .sort(
+          (a, b) =>
+            // More reactions first
+            b.reactionCount - a.reactionCount ||
+            // Older first
+            Date.parse(a.createdAt as unknown as string) -
+              Date.parse(b.createdAt as unknown as string),
+        )
+    },
+    [recap.messages],
+  )
+
   useEffect(() => {
     setMessagesByChannel(
       RECAP_CHANNEL_IDS.map((channelId): MessagesByChannel | null => {
-        const messages = recap.messages
-          .filter((el) => el.channel.id === channelId)
-          .sort(
-            (a, b) =>
-              // More reactions first
-              b.reactionCount - a.reactionCount ||
-              // Older first
-              Date.parse(a.createdAt as unknown as string) -
-                Date.parse(b.createdAt as unknown as string),
-          )
-          .slice(0, 5)
+        const sortedMessages = getSortedChannelMessages(channelId)
+        const messages = sortedMessages.slice(0, 5)
+        const moreMessages = sortedMessages.slice(5)
+
+        if (moreMessages.length === 1) {
+          // Just add it to the main list, no point in asking to show 1 more
+          messages.push(...moreMessages)
+          moreMessages.length = 0
+        }
 
         return messages.length > 0
           ? {
               channel: messages[0].channel,
               messages,
+              moreMessages,
             }
           : null
       }).filter((el): el is MessagesByChannel => !!el),
     )
-  }, [recap.messages])
+  }, [getSortedChannelMessages, recap.messages])
 
   // #############################################################################
   // Channels
   // #############################################################################
   const [activeChannelId, setActiveChannelId] = useState<string>()
-  const { y: scrollY } = useWindowScroll()
 
   const channels = useMemo(() => {
     return messagesByChannel.map((el) => el.channel)
@@ -66,20 +79,28 @@ export const Recap = ({ recap, membersData }: RecapScreenProps) => {
   }, [channels])
 
   useEffect(() => {
-    const channelEls = [
-      ...document.querySelectorAll(`.${CHANNEL_CLASS_NAME}`),
-    ] as HTMLDivElement[]
+    const onScroll = () => {
+      const channelEls = [
+        ...document.querySelectorAll(`.${CHANNEL_CLASS_NAME}`),
+      ] as HTMLDivElement[]
 
-    const activeChannelEl = channelEls.reverse().find((el) => {
-      const bb = el.getBoundingClientRect()
+      const activeChannelEl = channelEls.reverse().find((el) => {
+        const bb = el.getBoundingClientRect()
 
-      return bb.top < window.innerHeight / 2
-    })
+        return bb.top < window.innerHeight / 2
+      })
 
-    if (activeChannelEl) {
-      setActiveChannelId(activeChannelEl.id.slice(1))
+      if (activeChannelEl) {
+        setActiveChannelId(activeChannelEl.id.slice(1))
+      }
     }
-  }, [scrollY])
+
+    window.addEventListener("scroll", onScroll)
+
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+    }
+  }, [])
 
   const onChannelClick = useCallback(
     (e: MouseEvent, channelId: string) => {
@@ -127,7 +148,7 @@ export const Recap = ({ recap, membersData }: RecapScreenProps) => {
           </S.NavWrap>
         </S.Sidebar>
         <S.Content>
-          {messagesByChannel.map(({ channel, messages }) => (
+          {messagesByChannel.map(({ channel, messages, moreMessages }) => (
             <S.Channel
               id={`c${channel.id}`}
               className={CHANNEL_CLASS_NAME}
@@ -140,6 +161,21 @@ export const Recap = ({ recap, membersData }: RecapScreenProps) => {
                   membersData={membersData}
                 />
               ))}
+              {moreMessages.length > 0 && (
+                <S.MoreMessagesWrap>
+                  <input type="checkbox" id={`show-more-${channel.id}`} />
+                  <S.ShowMoreLabel htmlFor={`show-more-${channel.id}`}>
+                    Show {moreMessages.length} more
+                  </S.ShowMoreLabel>
+                  {moreMessages.map((message) => (
+                    <RecapMessage
+                      key={message.id}
+                      message={message}
+                      membersData={membersData}
+                    />
+                  ))}
+                </S.MoreMessagesWrap>
+              )}
             </S.Channel>
           ))}
         </S.Content>

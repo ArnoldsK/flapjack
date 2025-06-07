@@ -23,6 +23,11 @@ export default createRoute({
     if (recap) {
       response.recap = recap
 
+      // TODO: Remove if you see this
+      response.recap.messages = response.recap.messages.filter(
+        (m) => m.reactionCount >= 5,
+      )
+
       const recapMemberIds = dedupe(
         recap.messages.map((message) => message.member.id),
       )

@@ -9,7 +9,6 @@ import {
   useState,
 } from "react"
 import reactStringReplace from "react-string-replace"
-import { useWindowScroll } from "react-use"
 
 import { Pound } from "../styles"
 import { RecapMessage as RecapMessageGraph } from "../types"
@@ -18,7 +17,6 @@ import * as S from "./styles"
 
 import { RECAP_PRIVATE_CHANNEL_IDS } from "~/constants"
 import { d } from "~/server/utils/date"
-import { clamp, interpolate } from "~/server/utils/number"
 import { ApiRecapMember } from "~/types/api"
 
 interface RecapMessageProps {
@@ -30,8 +28,6 @@ interface MessageUrl {
   https: string
   intent: string
 }
-
-const MESSAGE_CLASS_NAME = "recap-message"
 
 export const RecapMessage = ({ message, membersData }: RecapMessageProps) => {
   // #############################################################################
@@ -72,39 +68,6 @@ export const RecapMessage = ({ message, membersData }: RecapMessageProps) => {
       )
       .map((line, i) => <div key={i}>{line}</div>)
   }, [isPrivate, message.content])
-
-  // #############################################################################
-  // Scroll into view
-  // #############################################################################
-  const wrapRef = useRef<HTMLDivElement>(null)
-  const { y: scrollY } = useWindowScroll()
-
-  useEffect(() => {
-    const wrapEl = wrapRef.current
-    if (!wrapEl) return
-
-    const wH = window.innerHeight
-    // At which point should the image transition "reach it's goal"
-    // If it's 0.5, the image will be normalized when it's in the middle of the screen
-    const goalY = wH * 0.5
-
-    const bb = wrapEl.getBoundingClientRect()
-
-    const offsetY = bb.top - goalY
-    const offsetStartY = wH - goalY
-
-    const transformPrc = clamp((offsetY / offsetStartY) * 100, 0, 100)
-
-    // Adjust message style
-    const msgEl = wrapEl.querySelector(
-      `.${MESSAGE_CLASS_NAME}`,
-    ) as HTMLDivElement
-    const translateY = transformPrc
-    const scale = interpolate(transformPrc, 100, 0, 0, 1)
-
-    msgEl.style.translate = `0 ${translateY}%`
-    msgEl.style.scale = String(scale)
-  }, [scrollY])
 
   // #############################################################################
   // Video
@@ -163,12 +126,8 @@ export const RecapMessage = ({ message, membersData }: RecapMessageProps) => {
   // Render
   // #############################################################################
   return (
-    <S.Wrap ref={wrapRef}>
-      <S.Message
-        className={MESSAGE_CLASS_NAME}
-        href={url.https}
-        onClick={(e) => handleNavigate(e)}
-      >
+    <S.Wrap>
+      <S.Message href={url.https} onClick={(e) => handleNavigate(e)}>
         <S.ChannelName>
           <Pound />
           {message.channel.name}

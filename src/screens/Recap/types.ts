@@ -11,4 +11,5 @@ export type RecapMessage = WeekRecapData["messages"][number]
 export interface MessagesByChannel {
   channel: RecapMessage["channel"]
   messages: RecapMessage[]
+  moreMessages: RecapMessage[]
 }

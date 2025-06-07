@@ -6,11 +6,13 @@ export const REACTION_EMOJI_SIZE = 16
 
 export const Wrap = styled.div`
   width: 100%;
-  max-width: 694px;
-  margin-bottom: 33vh;
+  padding: 33vh 0;
+  display: flex;
+  align-items: center;
 `
 
 export const Message = styled.a`
+  width: 100%;
   display: flex;
   min-height: 48px;
   padding: 8px;
