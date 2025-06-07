@@ -8,6 +8,7 @@ export enum Unicode {
   longDash = "—",
 }
 
+// prettier-ignore
 export enum Color {
   white = 0xFF_FF_FF,
   black = 0x00_00_00,
@@ -103,7 +104,6 @@ export const RECAP_CHANNEL_IDS = [
   DISCORD_IDS.channels.bepsi,
   DISCORD_IDS.channels.irl,
   DISCORD_IDS.channels.auto,
-  DISCORD_IDS.channels.garage,
   DISCORD_IDS.channels.technology,
   DISCORD_IDS.channels.movies,
   DISCORD_IDS.channels.animals,
