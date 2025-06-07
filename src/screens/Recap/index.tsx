@@ -176,6 +176,7 @@ export const Recap = ({ recap, membersData }: RecapScreenProps) => {
                   ))}
                 </S.MoreMessagesWrap>
               )}
+              <S.Separator />
             </S.Channel>
           ))}
         </S.Content>

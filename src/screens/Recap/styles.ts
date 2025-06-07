@@ -99,8 +99,16 @@ export const Channel = styled.div`
   align-items: center;
 `
 
+export const Separator = styled.div`
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: #2b2d31;
+`
+
 export const ShowMoreLabel = styled.label`
   align-self: flex-start;
+  margin-bottom: 11vh;
   margin-left: 80px;
   cursor: pointer;
   display: block;
