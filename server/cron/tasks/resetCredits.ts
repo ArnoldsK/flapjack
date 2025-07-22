@@ -17,7 +17,7 @@ export const resetCredits: Task = async (context) => {
   const embeds: APIEmbed[] = [
     {
       color: Color.red,
-      title: `All credits have been reset`,
+      title: "All credits have been reset",
       description: `${botUser.displayName} had ${formatCredits(botWallet.credits)}`,
     },
   ]
