@@ -21,47 +21,73 @@ export const getCreditsEmoji = (value: bigint | number): string => {
   )
 }
 
-export const formatCredits = (value: bigint | number): string => {
+type AmountSuffix = "K" | "M" | "B" | "T"
+
+export const formatCreditsAmount = (
+  value: bigint | number,
+): {
+  amount: number
+  suffix: AmountSuffix | null
+} => {
   if (typeof value === "number") {
     value = Math.floor(value)
   }
 
-  const items = [
+  const items: Array<{
+    from: bigint
+    to: bigint | number
+    suffix: AmountSuffix | null
+    multiplier: bigint
+    decimals: number
+  }> = [
     {
-      from: -Infinity,
-      to: BigInt("99999"),
-      suffix: "",
+      from: BigInt("0"),
+      to: BigInt("9999"),
+      suffix: null,
       multiplier: BigInt("1"),
+      decimals: 0,
     },
     {
-      from: BigInt("100000"),
-      to: BigInt("9999999"),
+      from: BigInt("10000"),
+      to: BigInt("999999"),
       suffix: "K",
       multiplier: BigInt("1000"),
+      decimals: 1,
+    },
+    {
+      from: BigInt("1000000"),
+      to: BigInt("9999999"),
+      suffix: "M",
+      multiplier: BigInt("1000000"),
+      decimals: 2,
     },
     {
       from: BigInt("10000000"),
-      to: BigInt("9999999999"),
+      to: BigInt("99999999"),
       suffix: "M",
       multiplier: BigInt("1000000"),
+      decimals: 1,
     },
     {
-      from: BigInt("10000000000"),
-      to: BigInt("9999999999999"),
+      from: BigInt("100000000"),
+      to: BigInt("999999999"),
+      suffix: "M",
+      multiplier: BigInt("1000000"),
+      decimals: 0, // By this point we don't care about decimals
+    },
+    {
+      from: BigInt("1000000000"),
+      to: BigInt("999999999999"),
       suffix: "B",
       multiplier: BigInt("1000000000"),
+      decimals: 0,
     },
     {
-      from: BigInt("10000000000000"),
-      to: BigInt("9999999999999999"),
+      from: BigInt("1000000000000"),
+      to: Infinity,
       suffix: "T",
       multiplier: BigInt("1000000000000"),
-    },
-    {
-      from: BigInt("10000000000000000"),
-      to: Infinity,
-      suffix: "Q",
-      multiplier: BigInt("1000000000000000"),
+      decimals: 0,
     },
   ]
 
@@ -69,9 +95,25 @@ export const formatCredits = (value: bigint | number): string => {
     return value >= from && value < to
   })
 
-  const amount = Math.floor(
-    Number(BigInt(value) / (item?.multiplier ?? BigInt(1))),
+  const maxDecimals = items
+    .map((i) => i.decimals)
+    .reduce((a, b) => Math.max(a, b), 0)
+  const decimalsMultiplier = BigInt(10 ** maxDecimals)
+  const divider = item?.multiplier ?? BigInt(1)
+  const amountWithMaxDecimals =
+    Number((BigInt(value) * decimalsMultiplier) / divider) / 100
+  const amount = Number.parseFloat(
+    amountWithMaxDecimals.toFixed(item?.decimals ?? 0),
   )
+
+  return {
+    amount,
+    suffix: item?.suffix || null,
+  }
+}
+
+export const formatCredits = (value: bigint | number): string => {
+  const { amount, suffix } = formatCreditsAmount(value)
 
   if (!amount) {
     return "no credits"
@@ -79,7 +121,7 @@ export const formatCredits = (value: bigint | number): string => {
 
   return [
     amount,
-    item?.suffix,
+    suffix,
     value >= 30 ? Unicode.thinSpace : null,
     getCreditsEmoji(value) || null,
   ].join("")

@@ -1,4 +1,8 @@
-import { getCreditsEmoji, parseCreditsAmount } from "~/server/utils/credits"
+import {
+  formatCreditsAmount,
+  getCreditsEmoji,
+  parseCreditsAmount,
+} from "~/server/utils/credits"
 
 test("getCreditsEmoji", () => {
   expect(getCreditsEmoji(0)).toContain("")
@@ -36,4 +40,75 @@ test("parseCreditsAmount", () => {
   expect(() => parseCreditsAmount("-100", 1000)).toThrow()
 
   expect(() => parseCreditsAmount("0", 1000)).toThrow()
+})
+
+test("formatCreditsAmount", () => {
+  expect(formatCreditsAmount(0)).toStrictEqual({
+    amount: 0,
+    suffix: null,
+  })
+  expect(formatCreditsAmount(1)).toStrictEqual({
+    amount: 1,
+    suffix: null,
+  })
+  expect(formatCreditsAmount(12)).toStrictEqual({
+    amount: 12,
+    suffix: null,
+  })
+  expect(formatCreditsAmount(123)).toStrictEqual({
+    amount: 123,
+    suffix: null,
+  })
+  expect(formatCreditsAmount(1123)).toStrictEqual({
+    amount: 1123,
+    suffix: null,
+  })
+  expect(formatCreditsAmount(10_000)).toStrictEqual({
+    amount: 10,
+    suffix: "K",
+  })
+  expect(formatCreditsAmount(12_123)).toStrictEqual({
+    amount: 12.1,
+    suffix: "K",
+  })
+  expect(formatCreditsAmount(123_123)).toStrictEqual({
+    amount: 123.1,
+    suffix: "K",
+  })
+  expect(formatCreditsAmount(1_123_123)).toStrictEqual({
+    amount: 1.12,
+    suffix: "M",
+  })
+  expect(formatCreditsAmount(10_000_000)).toStrictEqual({
+    amount: 10,
+    suffix: "M",
+  })
+  expect(formatCreditsAmount(12_123_123)).toStrictEqual({
+    amount: 12.1,
+    suffix: "M",
+  })
+  expect(formatCreditsAmount(123_123_123)).toStrictEqual({
+    amount: 123,
+    suffix: "M",
+  })
+  expect(formatCreditsAmount(1_123_123_123)).toStrictEqual({
+    amount: 1,
+    suffix: "B",
+  })
+  expect(formatCreditsAmount(12_123_123_123)).toStrictEqual({
+    amount: 12,
+    suffix: "B",
+  })
+  expect(formatCreditsAmount(123_123_123_123)).toStrictEqual({
+    amount: 123,
+    suffix: "B",
+  })
+  expect(formatCreditsAmount(1_123_123_123_123)).toStrictEqual({
+    amount: 1,
+    suffix: "T",
+  })
+  expect(formatCreditsAmount(12_123_123_123_123)).toStrictEqual({
+    amount: 12,
+    suffix: "T",
+  })
 })
