@@ -10,6 +10,12 @@ export const parseHexColor = (hex: string): HexColorString | null => {
     return null
   }
 
+  // Discord does not allow #000000, so we replace it with #000001
+  // This is a workaround to avoid issues with the color role creation
+  if (hex === "#000000") {
+    return "#000001"
+  }
+
   return hex.toUpperCase() as HexColorString
 }
 
