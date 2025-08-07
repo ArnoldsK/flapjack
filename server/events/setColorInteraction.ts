@@ -16,7 +16,7 @@ export default createEvent(
     const member = context.guild().members.cache.get(interaction.user.id)
     if (!member) return
 
-    await setMemberColorRole(member, hex)
+    await setMemberColorRole(member, [hex, null])
 
     await interaction.reply({
       ephemeral: true,
