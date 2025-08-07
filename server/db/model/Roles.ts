@@ -36,7 +36,7 @@ export class RolesModel extends BaseModel {
   }
 
   async setRoleIds(userId: string, roleIds: string[]) {
-    await this.em.upsert({
+    await this.em.upsert(this.Entity, {
       userId,
       roleIds,
     })
