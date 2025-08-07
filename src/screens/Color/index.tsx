@@ -20,7 +20,7 @@ export const ColorScreen = () => {
   const [color1, setColor1] = useState("#a9c9ff")
   const [color2, setColor2] = useState("#ffbbec")
 
-  const copyText = `I want ${color1.toUpperCase()} and ${color2.toUpperCase()} gradient`
+  const copyText = `/color gradient color1:${color1.toUpperCase()} color2:${color2.toUpperCase()}`
 
   const [, copyToClipboard] = useCopyToClipboard()
 
@@ -58,7 +58,7 @@ export const ColorScreen = () => {
         </S.ColorsWrap>
         <S.Container onClick={() => copyToClipboard(copyText)}>
           <S.ContainerNote>Click to copy</S.ContainerNote>
-          {copyText}
+          <S.ContainerText>{copyText}</S.ContainerText>
         </S.Container>
       </S.Wrap>
     </Page>

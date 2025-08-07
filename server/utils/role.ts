@@ -54,7 +54,7 @@ export const purgeRole = async (role: Role) => {
 export const setMemberColorRole = async (
   member: GuildMember,
   color: HexColorString,
-) => {
+): Promise<Role> => {
   const oldRole = getMemberColorRole(member)
   if (oldRole) {
     await member.roles.remove(oldRole)
@@ -68,4 +68,6 @@ export const setMemberColorRole = async (
     color,
   })
   await member.roles.add(role)
+
+  return role
 }

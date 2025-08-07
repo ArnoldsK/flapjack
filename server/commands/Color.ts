@@ -3,6 +3,8 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  REST,
+  Routes,
   SlashCommandBuilder,
 } from "discord.js"
 import colorPalette from "get-image-colors"
@@ -10,7 +12,9 @@ import colorPalette from "get-image-colors"
 import { DISCORD_BACKGROUND_COLOR_LAB } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { getUserColorPreviewImage } from "~/server/canvas/userAutoColorPreview"
+import { appConfig } from "~/server/config"
 import {
+  hexToDecimal,
   labArrayToObject,
   parseHexColor,
   setColorInteractionId,
@@ -21,7 +25,6 @@ import {
   purgeRole,
   setMemberColorRole,
 } from "~/server/utils/role"
-import { joinAsLines } from "~/server/utils/string"
 
 enum SubcommandName {
   Suggest = "suggest",
@@ -32,10 +35,12 @@ enum SubcommandName {
 
 enum OptionName {
   Hex = "hex",
+  Color1 = "color1",
+  Color2 = "color2",
 }
 
 export default class ColorCommand extends BaseCommand {
-  static version = 4
+  static version = 5
 
   static command = new SlashCommandBuilder()
     .setName("color")
@@ -61,7 +66,23 @@ export default class ColorCommand extends BaseCommand {
     .addSubcommand((subcommand) =>
       subcommand
         .setName(SubcommandName.Gradient)
-        .setDescription("Choose a two-color gradient color"),
+        .setDescription(
+          "Choose a two-color gradient color. Send an empty command to get a preview URL.",
+        )
+        .addStringOption((option) =>
+          option
+            .setName(OptionName.Color1)
+            .setDescription("First color in hex, e.g. #B492D4")
+            .setMinLength(6)
+            .setMaxLength(7),
+        )
+        .addStringOption((option) =>
+          option
+            .setName(OptionName.Color2)
+            .setDescription("Second color in hex, e.g. #D4B492")
+            .setMinLength(6)
+            .setMaxLength(7),
+        ),
     )
     .addSubcommand((subcommand) =>
       subcommand
@@ -84,13 +105,7 @@ export default class ColorCommand extends BaseCommand {
       }
 
       case SubcommandName.Gradient: {
-        await this.reply({
-          ephemeral: true,
-          content: joinAsLines(
-            "This feature cannot be automated yet.",
-            "Choose the colors from <https://pepsidog.lv/color> and ping an admin to set it for you.",
-          ),
-        })
+        await this.#handleGradient()
         return
       }
 
@@ -175,6 +190,55 @@ export default class ColorCommand extends BaseCommand {
     this.reply({
       ephemeral: true,
       content: `Changed your color to ${hex}`,
+    })
+  }
+
+  async #handleGradient() {
+    const color1 = this.interaction.options.getString(OptionName.Color1)
+    const color2 = this.interaction.options.getString(OptionName.Color2)
+
+    if (!color1 && !color2) {
+      this.reply({
+        ephemeral: true,
+        content:
+          "You can get and preview colors at <https://pepsidog.lv/color>",
+      })
+      return
+    } else if (!color1 || !color2) {
+      this.fail("You need to provide both colors for a gradient.")
+      return
+    }
+
+    const hex1 = parseHexColor(color1)
+    const hex2 = parseHexColor(color2)
+
+    if (!hex1 || !hex2) {
+      this.fail(
+        "Not a valid hex color. You can get and preview colors at <https://pepsidog.lv/color>",
+      )
+      return
+    }
+
+    // Handle the role upsert the old way
+    const role = await setMemberColorRole(this.member, hex1)
+
+    // Update the role via api to have the gradient
+    // TODO: Remove this when discord.js supports it
+    const rest = new REST({ version: "10" }).setToken(appConfig.discord.token)
+
+    await rest.patch(Routes.guildRole(this.guild.id, role.id), {
+      body: {
+        colors: {
+          primary_color: hexToDecimal(hex1),
+          secondary_color: hexToDecimal(hex2),
+          tertiary_color: null,
+        },
+      },
+    })
+
+    this.reply({
+      ephemeral: true,
+      content: `Changed your color to ${hex1} and ${hex2} gradient`,
     })
   }
 

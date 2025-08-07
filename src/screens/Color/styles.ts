@@ -13,7 +13,7 @@ export const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 32px 64px;
+  padding: 32px 30px;
   background: #1a1a1e;
   border-radius: 8px;
 
@@ -31,6 +31,10 @@ export const ContainerNote = styled.div`
   font-size: 10px;
   opacity: 0.5;
   pointer-events: none;
+`
+
+export const ContainerText = styled.span`
+  font-family: monospace;
 `
 
 const animate = keyframes`

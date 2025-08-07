@@ -63,3 +63,7 @@ export const getBackgroundTextColor = (hex: string) => {
 
   return text.hex("rgb")
 }
+
+export const hexToDecimal = (hex: string): number => {
+  return Number.parseInt(hex.replace("#", ""), 16)
+}
