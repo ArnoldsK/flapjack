@@ -1,7 +1,14 @@
 import styled from "styled-components"
 
-export const Heading = styled.h1`
+export const Header = styled.div`
   margin: -32px 0 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  * {
+    margin: 0;
+  }
 `
 
 export const LogoWrap = styled.a`
@@ -15,7 +22,8 @@ export const Logo = styled.img`
   border-radius: 50%;
   width: 128px;
   height: 128px;
-  animation: spin-expand-in 1s forwards ease-in-out,
+  animation:
+    spin-expand-in 1s forwards ease-in-out,
     spin-horizontal 3s 1s infinite ease-in-out;
 `
 
