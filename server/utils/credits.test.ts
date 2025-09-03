@@ -43,6 +43,10 @@ test("parseCreditsAmount", () => {
 })
 
 test("formatCreditsAmount", () => {
+  expect(formatCreditsAmount(-123_123)).toStrictEqual({
+    amount: -123.1,
+    suffix: "K",
+  })
   expect(formatCreditsAmount(0)).toStrictEqual({
     amount: 0,
     suffix: null,

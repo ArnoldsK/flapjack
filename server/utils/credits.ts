@@ -29,8 +29,10 @@ export const formatCreditsAmount = (
   amount: number
   suffix: AmountSuffix | null
 } => {
+  const isNegative = value < 0
+
   if (typeof value === "number") {
-    value = Math.floor(value)
+    value = Math.abs(Math.floor(value))
   }
 
   const items: Array<{
@@ -102,9 +104,9 @@ export const formatCreditsAmount = (
   const divider = item?.multiplier ?? BigInt(1)
   const amountWithMaxDecimals =
     Number((BigInt(value) * decimalsMultiplier) / divider) / 100
-  const amount = Number.parseFloat(
-    amountWithMaxDecimals.toFixed(item?.decimals ?? 0),
-  )
+  const amount =
+    Number.parseFloat(amountWithMaxDecimals.toFixed(item?.decimals ?? 0)) *
+    (isNegative ? -1 : 1)
 
   return {
     amount,
