@@ -20,6 +20,8 @@ const FREAK_USERNAMES = new Set([
   "Polterghaasstt",
   "Electrum18",
   "foxrukey",
+  "Lusi",
+  "vi1zx",
 ])
 
 export default createEvent(
