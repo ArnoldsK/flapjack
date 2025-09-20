@@ -35,7 +35,10 @@ export default createEvent(
         )
 
         replyingToUsername = referencedMessage.author.username
-        replyingToContent = referencedMessage.content
+        replyingToContent = parseMentions(
+          referencedMessage.content,
+          message.guild,
+        )
       } catch {
         // ignore
       }
