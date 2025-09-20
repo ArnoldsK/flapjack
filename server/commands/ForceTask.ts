@@ -27,7 +27,7 @@ enum OptionName {
   Task = "task",
 }
 
-export default class ForceStatsCommand extends BaseCommand {
+export default class ForceTaskCommand extends BaseCommand {
   static version = version
 
   static command = new SlashCommandBuilder()
