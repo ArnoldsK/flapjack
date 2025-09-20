@@ -39,6 +39,16 @@ export default createEvent(
           referencedMessage.content,
           message.guild,
         )
+
+        const firstImage = referencedMessage.attachments.find((attachment) =>
+          attachment.contentType?.startsWith("image/"),
+        )
+
+        if (firstImage) {
+          replyingToContent += ` [Image: ${firstImage.url}]`
+        }
+
+        replyingToContent = replyingToContent.trim()
       } catch {
         // ignore
       }
