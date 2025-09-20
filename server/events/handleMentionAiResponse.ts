@@ -1,4 +1,4 @@
-import { Events, Message } from "discord.js"
+import { Events, User } from "discord.js"
 import { ResponseInputText } from "openai/resources/responses/responses"
 
 import { Emoji } from "~/constants"
@@ -27,28 +27,45 @@ export default createEvent(
       return
     }
 
-    let replyingToUsername: string | null = null
+    let replyingToUser: User | null = null
     let replyingToContent: string | null = null
     let replyingToImageUrl: string | null = null
+    let previousQuestion: string | null = null
     if (message.reference?.messageId) {
-      let referencedMessage: Message
       try {
-        referencedMessage = await message.channel.messages.fetch(
+        const referencedMessage = await message.channel.messages.fetch(
           message.reference.messageId,
         )
 
-        replyingToUsername = referencedMessage.author.username
+        // Message context
+        replyingToUser = referencedMessage.author
         replyingToContent = parseMentions(
           referencedMessage.content,
           message.guild,
         ).trim()
 
+        // Image context
         const firstImage = referencedMessage.attachments.find((attachment) =>
           attachment.contentType?.startsWith("image/"),
         )
 
         if (firstImage) {
           replyingToImageUrl = firstImage.url
+        }
+
+        // Bot context
+        if (
+          replyingToUser?.id === message.client.user.id &&
+          referencedMessage.reference?.messageId
+        ) {
+          const secondReferencedMessage = await message.channel.messages.fetch(
+            referencedMessage.reference.messageId,
+          )
+
+          previousQuestion = parseMentions(
+            secondReferencedMessage.content,
+            message.guild,
+          ).trim()
         }
       } catch {
         // ignore
@@ -58,16 +75,12 @@ export default createEvent(
     try {
       await message.channel.sendTyping()
 
-      const inputText: ResponseInputText = {
-        type: "input_text",
-        text:
-          replyingToUsername && replyingToContent
-            ? joinAsLines(
-                `User ${replyingToUsername} said: "${replyingToContent}"`,
-                `The current user asks: "${parsedContent}"`,
-              )
-            : parsedContent,
-      }
+      const inputText = getInputText({
+        parsedContent,
+        replyingToUser,
+        replyingToContent,
+        previousQuestion,
+      })
 
       const response = await context.openAI.responses.create({
         model: "gpt-4o-mini",
@@ -109,3 +122,37 @@ export default createEvent(
     }
   },
 )
+
+const getInputText = ({
+  parsedContent,
+  replyingToUser,
+  replyingToContent,
+  previousQuestion,
+}: {
+  parsedContent: string
+  replyingToUser: User | null
+  replyingToContent: string | null
+  previousQuestion: string | null
+}): ResponseInputText => {
+  let text = parsedContent
+
+  if (replyingToUser && replyingToContent) {
+    if (previousQuestion) {
+      text = joinAsLines(
+        `The previous question was: "${previousQuestion}"`,
+        `You said: "${replyingToContent}"`,
+        `The current user asks: "${parsedContent}"`,
+      )
+    } else {
+      text = joinAsLines(
+        `User ${replyingToUser.username} said: "${replyingToContent}"`,
+        `The current user asks: "${parsedContent}"`,
+      )
+    }
+  }
+
+  return {
+    type: "input_text",
+    text,
+  }
+}
