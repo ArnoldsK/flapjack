@@ -1,10 +1,18 @@
-import { Events, User } from "discord.js"
+import { Events, Message, MessageType } from "discord.js"
 import { ResponseInputText } from "openai/resources/responses/responses"
 
 import { Emoji } from "~/constants"
 import { createEvent } from "~/server/utils/event"
 import { parseMentions } from "~/server/utils/message"
 import { joinAsLines } from "~/server/utils/string"
+import { BaseContext, Nullish } from "~/types"
+
+type UserType = "I" | "Someone" | "You"
+
+interface MessageData {
+  userType: UserType
+  content: string
+}
 
 export default createEvent(
   Events.MessageCreate,
@@ -13,73 +21,51 @@ export default createEvent(
     if (message.author.bot) return
     if (!message.guild) return
 
-    const mentionText = `<@${message.client.user.id}>`
+    if (!(await getIsValidMessage(message))) return
 
-    if (!message.content.startsWith(mentionText)) return
+    const currentContent = parseContent(context, message.content).trim()
+    if (!currentContent) return
 
-    const parsedContent = parseMentions(
-      message.content.slice(mentionText.length),
-      message.guild,
-    ).trim()
-
-    if (!parsedContent) {
-      await message.react(Emoji.cross)
-      return
+    let referencedMessage: Nullish<Message> = null
+    try {
+      referencedMessage = message.reference?.messageId
+        ? await message.channel.messages.fetch(message.reference.messageId)
+        : null
+    } catch {
+      // Ignore
     }
 
-    let replyingToUser: User | null = null
-    let replyingToContent: string | null = null
-    let replyingToImageUrl: string | null = null
-    let previousQuestion: string | null = null
-    if (message.reference?.messageId) {
-      try {
-        const referencedMessage = await message.channel.messages.fetch(
-          message.reference.messageId,
-        )
+    let replyingToName: Nullish<UserType> = null
+    let replyingToContent: Nullish<string> = null
+    let replyingToImageUrl: Nullish<string> = null
+    if (referencedMessage) {
+      replyingToName = parseUserType(referencedMessage.author.id, {
+        currentUserId: message.author.id,
+        clientUserId: message.client.user.id,
+      })
 
-        // Message context
-        replyingToUser = referencedMessage.author
-        replyingToContent = parseMentions(
-          referencedMessage.content,
-          message.guild,
-        ).trim()
+      replyingToContent = parseContent(context, referencedMessage.content)
 
-        // Image context
-        const firstImage = referencedMessage.attachments.find((attachment) =>
+      if (referencedMessage.attachments.size > 0) {
+        replyingToImageUrl = referencedMessage.attachments.find((attachment) =>
           attachment.contentType?.startsWith("image/"),
-        )
-
-        if (firstImage) {
-          replyingToImageUrl = firstImage.url
-        }
-
-        // Bot context
-        if (
-          replyingToUser?.id === message.client.user.id &&
-          referencedMessage.reference?.messageId
-        ) {
-          const secondReferencedMessage = await message.channel.messages.fetch(
-            referencedMessage.reference.messageId,
-          )
-
-          previousQuestion = parseMentions(
-            secondReferencedMessage.content,
-            message.guild,
-          ).trim()
-        }
-      } catch {
-        // ignore
+        )?.url
       }
     }
+
+    const pastConversations = await getPastConversations(context, {
+      referencedMessage,
+      currentUserId: message.author.id,
+    })
 
     try {
       await message.channel.sendTyping()
 
       const inputText = getInputText({
-        parsedContent,
-        replyingToUser,
+        currentContent,
+        replyingToName,
         replyingToContent,
-        previousQuestion,
+        pastConversations,
       })
 
       const response = await context.openAI.responses.create({
@@ -123,36 +109,129 @@ export default createEvent(
   },
 )
 
-const getInputText = ({
-  parsedContent,
-  replyingToUser,
-  replyingToContent,
-  previousQuestion,
-}: {
-  parsedContent: string
-  replyingToUser: User | null
-  replyingToContent: string | null
-  previousQuestion: string | null
-}): ResponseInputText => {
-  let text = parsedContent
+const getIsValidMessage = async (message: Message) => {
+  if (message.content.startsWith(`<@${message.client.user.id}>`)) {
+    return true
+  }
 
-  if (replyingToUser && replyingToContent) {
-    if (previousQuestion) {
-      text = joinAsLines(
-        `The previous question was: "${previousQuestion}"`,
-        `You said: "${replyingToContent}"`,
-        `The current user asks: "${parsedContent}"`,
-      )
-    } else {
-      text = joinAsLines(
-        `User ${replyingToUser.username} said: "${replyingToContent}"`,
-        `The current user asks: "${parsedContent}"`,
-      )
+  if (
+    message.type === MessageType.Reply &&
+    message.mentions.users.has(message.client.user.id)
+  ) {
+    const referencedMessage = await message.fetchReference()
+
+    if (
+      referencedMessage.type === MessageType.Reply &&
+      referencedMessage.author.id === message.client.user.id
+    ) {
+      return true
     }
+  }
+
+  return false
+}
+
+const getInputText = ({
+  currentContent,
+  replyingToName,
+  replyingToContent,
+  pastConversations,
+}: {
+  currentContent: string
+  replyingToName: Nullish<string>
+  replyingToContent: Nullish<string>
+  pastConversations: MessageData[]
+}): ResponseInputText => {
+  const conversation: string[] = pastConversations.map(
+    (conversation) =>
+      `${conversation.userType} said: "${conversation.content}"`,
+  )
+
+  if (replyingToName && replyingToContent) {
+    conversation.push(`${replyingToName} said: "${replyingToContent}"`)
   }
 
   return {
     type: "input_text",
-    text,
+    text: joinAsLines(...conversation, currentContent),
   }
+}
+
+const parseContent = (context: BaseContext, content: string) => {
+  const botMention = `<@${context.client.user!.id}>`
+
+  return parseMentions(
+    content.replaceAll(botMention, ""),
+    context.guild(),
+  ).trim()
+}
+
+const parseUserType = (
+  userId: string,
+  {
+    currentUserId,
+    clientUserId,
+  }: {
+    currentUserId: string
+    clientUserId: string
+  },
+): UserType => {
+  switch (userId) {
+    case currentUserId: {
+      return "I"
+    }
+    case clientUserId: {
+      return "You"
+    }
+    default: {
+      return "Someone"
+    }
+  }
+}
+
+const getPastConversations = async (
+  context: BaseContext,
+  {
+    referencedMessage,
+    currentUserId,
+  }: {
+    referencedMessage: Nullish<Message>
+    currentUserId: string
+  },
+): Promise<MessageData[]> => {
+  if (
+    !referencedMessage ||
+    referencedMessage.author.id !== referencedMessage.client.user.id
+  ) {
+    return []
+  }
+
+  const channel = referencedMessage.channel
+  const clientUserId = referencedMessage.client.user.id
+
+  const conversations: MessageData[] = []
+
+  const handlePreviousMessage = async (messageId: Nullish<string>) => {
+    if (!messageId) return
+
+    const previousMessage = await channel.messages.fetch(messageId)
+    if (!previousMessage) return
+
+    conversations.unshift({
+      userType: parseUserType(previousMessage.author.id, {
+        currentUserId,
+        clientUserId,
+      }),
+      content: parseContent(context, previousMessage.content),
+    })
+
+    if (previousMessage.reference?.messageId) {
+      // ! Recursion
+      await handlePreviousMessage(previousMessage.reference.messageId)
+    }
+  }
+
+  await handlePreviousMessage(referencedMessage.reference?.messageId)
+
+  return conversations
 }

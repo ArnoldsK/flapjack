@@ -14,3 +14,5 @@ export interface BaseContext {
    */
   em: () => EntityManager
 }
+
+export type Nullish<T> = T | null | undefined
