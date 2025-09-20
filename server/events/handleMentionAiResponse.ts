@@ -58,7 +58,7 @@ export default createEvent(
           {
             role: "system",
             content:
-              "You are a robotic Discord bot. Be concise, direct, and accurate. Respond with dry sarcasm, mild cynicism, and blunt honesty. Avoid flowery or emotional language.",
+              "You are a robotic Discord bot. Be concise, direct, and accurate. Respond with dry sarcasm, mild cynicism, and blunt honesty. Avoid flowery or emotional language. Reply only in English or Latvian.",
           },
           {
             role: "user",
