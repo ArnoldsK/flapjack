@@ -23,6 +23,7 @@ export enum Color {
 export enum Emoji {
   computer = "🖥️",
   chick = "🐤",
+  cross = "❌",
 }
 
 export const DISCORD_BACKGROUND_COLOR_HEX = "#313338"

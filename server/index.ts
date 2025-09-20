@@ -5,6 +5,7 @@ import { RequestContext } from "@mikro-orm/core"
 import { Client, Events, GatewayIntentBits } from "discord.js"
 import express from "express"
 import next from "next"
+import OpenAI from "openai"
 
 import { DISCORD_IDS } from "~/constants"
 import CacheManager from "~/server/cache"
@@ -55,10 +56,18 @@ nextApp.prepare().then(async () => {
   })
 
   // #############################################################################
+  // Open AI client
+  // #############################################################################
+  const openAI = new OpenAI({
+    apiKey: appConfig.openAI.apiKey,
+  })
+
+  // #############################################################################
   // Context
   // #############################################################################
   const context: BaseContext = {
     client,
+    openAI,
     guild: () => client.guilds.cache.get(DISCORD_IDS.guild)!,
     cache: new CacheManager(),
     em: () => db.em.fork(),
