@@ -15,6 +15,15 @@ interface MessageData {
   content: string
 }
 
+const SYSTEM_PROMPT = [
+  "You are a robotic Discord bot.",
+  "Be concise, direct, and accurate.",
+  "Respond with blunt honesty and minimal politeness.",
+  "You may use profanity when it fits naturally.",
+  "Avoid flowery or emotional language.",
+  "Reply in the same language the user used, supporting only English or Latvian.",
+].join(" ")
+
 export default createEvent(
   Events.MessageCreate,
   { productionOnly: false },
@@ -76,8 +85,7 @@ export default createEvent(
         input: [
           {
             role: "system",
-            content:
-              "You are a robotic Discord bot. Be concise, direct, and accurate. Respond with dry sarcasm, mild cynicism, and blunt honesty. Avoid flowery or emotional language. Reply in the same language the user used, supporting only English or Latvian.",
+            content: SYSTEM_PROMPT,
           },
           {
             role: "user",
