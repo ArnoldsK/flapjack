@@ -126,12 +126,18 @@ const getIsValidMessage = async (message: Message) => {
   }
 
   if (
+    isTextChannel(message.channel) &&
     message.type === MessageType.Reply &&
+    message.reference?.messageId &&
     message.mentions.users.has(message.client.user.id)
   ) {
-    const referencedMessage = await message.fetchReference()
+    const referencedMessage = await getOrFetchMessage(
+      message.channel,
+      message.reference.messageId,
+    )
 
     if (
+      referencedMessage &&
       referencedMessage.type === MessageType.Reply &&
       referencedMessage.author.id === message.client.user.id
     ) {
