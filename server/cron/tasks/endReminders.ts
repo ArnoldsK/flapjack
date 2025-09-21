@@ -1,6 +1,7 @@
 import { ReminderModel } from "~/server/db/model/Reminder"
 import { isTextChannel } from "~/server/utils/channel"
 import { d } from "~/server/utils/date"
+import { getOrFetchMessage } from "~/server/utils/message"
 import { Task } from "~/types/tasks"
 
 export const endReminders: Task = async (context) => {
@@ -14,7 +15,7 @@ export const endReminders: Task = async (context) => {
       if (!isTextChannel(channel)) return
 
       try {
-        const message = await channel.messages.fetch(reminder.messageId)
+        const message = await getOrFetchMessage(channel, reminder.messageId)
         if (!message) return
 
         const fromNow = d(reminder.createdAt).fromNow()

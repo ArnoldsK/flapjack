@@ -1,9 +1,16 @@
-import { APIEmbed, Guild, GuildMember, MessageCreateOptions } from "discord.js"
+import {
+  APIEmbed,
+  Guild,
+  GuildMember,
+  GuildTextBasedChannel,
+  Message,
+  MessageCreateOptions,
+} from "discord.js"
 
 import { Color, DISCORD_IDS, Unicode } from "~/constants"
 import { isTextChannel } from "~/server/utils/channel"
 import { embedAuthor } from "~/server/utils/member"
-import { BaseContext } from "~/types"
+import { BaseContext, Nullish } from "~/types"
 
 export const parseMentions = (content: string, guild: Guild) => {
   return content
@@ -75,5 +82,18 @@ export const getTimeoutRemovedEmbed = ({
     color: Color.blue,
     author: embedAuthor(member),
     title: "Timeout removed",
+  }
+}
+
+export const getOrFetchMessage = async (
+  channel: GuildTextBasedChannel,
+  messageId: string,
+): Promise<Nullish<Message>> => {
+  try {
+    const cachedMessage = channel.messages.cache.get(messageId)
+    if (cachedMessage) return cachedMessage
+    return await channel.messages.fetch(messageId)
+  } catch {
+    return null
   }
 }

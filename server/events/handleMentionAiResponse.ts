@@ -2,8 +2,9 @@ import { Events, Message, MessageType } from "discord.js"
 import { ResponseInputText } from "openai/resources/responses/responses"
 
 import { Emoji } from "~/constants"
+import { isTextChannel } from "~/server/utils/channel"
 import { createEvent } from "~/server/utils/event"
-import { parseMentions } from "~/server/utils/message"
+import { getOrFetchMessage, parseMentions } from "~/server/utils/message"
 import { joinAsLines } from "~/server/utils/string"
 import { BaseContext, Nullish } from "~/types"
 
@@ -18,9 +19,11 @@ export default createEvent(
   Events.MessageCreate,
   { productionOnly: false },
   async (context, message) => {
-    if (message.author.bot) return
-    if (!message.guild) return
+    const { client, author, guild, channel } = message
 
+    if (!guild) return
+    if (author.bot) return
+    if (!isTextChannel(channel)) return
     if (!(await getIsValidMessage(message))) return
 
     const currentContent = parseContent(context, message.content).trim()
@@ -29,7 +32,7 @@ export default createEvent(
     let referencedMessage: Nullish<Message> = null
     try {
       referencedMessage = message.reference?.messageId
-        ? await message.channel.messages.fetch(message.reference.messageId)
+        ? await getOrFetchMessage(channel, message.reference.messageId)
         : null
     } catch {
       // Ignore
@@ -40,8 +43,8 @@ export default createEvent(
     let replyingToImageUrl: Nullish<string> = null
     if (referencedMessage) {
       replyingToName = parseUserType(referencedMessage.author.id, {
-        currentUserId: message.author.id,
-        clientUserId: message.client.user.id,
+        currentUserId: author.id,
+        clientUserId: client.user.id,
       })
 
       replyingToContent = parseContent(context, referencedMessage.content)
@@ -55,11 +58,11 @@ export default createEvent(
 
     const pastConversations = await getPastConversations(context, {
       referencedMessage,
-      currentUserId: message.author.id,
+      currentUserId: author.id,
     })
 
     try {
-      await message.channel.sendTyping()
+      await channel.sendTyping()
 
       const inputText = getInputText({
         currentContent,
@@ -209,12 +212,16 @@ const getPastConversations = async (
   const channel = referencedMessage.channel
   const clientUserId = referencedMessage.client.user.id
 
+  if (!isTextChannel(channel)) {
+    return []
+  }
+
   const conversations: MessageData[] = []
 
   const handlePreviousMessage = async (messageId: Nullish<string>) => {
     if (!messageId) return
 
-    const previousMessage = await channel.messages.fetch(messageId)
+    const previousMessage = await getOrFetchMessage(channel, messageId)
     if (!previousMessage) return
 
     conversations.unshift({
