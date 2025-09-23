@@ -1,8 +1,13 @@
 import { Events, Message, MessageType } from "discord.js"
-import { ResponseInputText } from "openai/resources/responses/responses"
+import {
+  ResponseInputItem,
+  ResponseInputText,
+} from "openai/resources/responses/responses"
 
 import { Emoji } from "~/constants"
+import { appConfig } from "~/server/config"
 import { isTextChannel } from "~/server/utils/channel"
+import { d } from "~/server/utils/date"
 import { createEvent } from "~/server/utils/event"
 import { getOrFetchMessage, parseMentions } from "~/server/utils/message"
 import { joinAsLines } from "~/server/utils/string"
@@ -15,14 +20,21 @@ interface MessageData {
   content: string
 }
 
-const SYSTEM_PROMPT = [
-  "You are a robotic Discord bot called Flapjack.",
-  "Be concise, direct, and accurate.",
-  "Respond with blunt honesty and minimal politeness.",
-  "You may use profanity when it fits naturally.",
-  "Avoid flowery or emotional language.",
-  "Reply in the same language the user used, supporting only English or Latvian.",
-].join(" ")
+const getSystemPrompt = ({ hasSearch }: { hasSearch: boolean }) =>
+  [
+    "You are a robotic Discord bot called Flapjack.",
+    "Be concise, direct, and accurate.",
+    "Respond with blunt honesty and minimal politeness.",
+    "You may use profanity when it fits naturally.",
+    "Avoid flowery or emotional language.",
+    "Reply in the same language the user used, supporting only English or Latvian.",
+    `The current date and time in Europe/Riga is: ${d().tz("Europe/Riga").format("YYYY-MM-DD HH:mm:ss")}`,
+    hasSearch
+      ? "You must **answer strictly using the following search results**. Do not use your training data. If the results conflict, indicate the conflict and prefer the most recent or authoritative source."
+      : null,
+  ]
+    .filter(Boolean)
+    .join(" ")
 
 export default createEvent(
   Events.MessageCreate,
@@ -70,6 +82,20 @@ export default createEvent(
       currentUserId: author.id,
     })
 
+    let searchContext = ""
+    try {
+      const searchDecision = await getSearchDecisionAndQuery(
+        context,
+        currentContent,
+      )
+
+      if (searchDecision.needsSearch && searchDecision.query) {
+        searchContext = await getSearchContext(searchDecision.query)
+      }
+    } catch (error) {
+      console.error("Web search failed:", error)
+    }
+
     try {
       await channel.sendTyping()
 
@@ -85,8 +111,16 @@ export default createEvent(
         input: [
           {
             role: "system",
-            content: SYSTEM_PROMPT,
-          },
+            content: getSystemPrompt({ hasSearch: Boolean(searchContext) }),
+          } satisfies ResponseInputItem,
+          ...((searchContext
+            ? [
+                {
+                  role: "system",
+                  content: `Search results:\n${searchContext}`,
+                },
+              ]
+            : []) satisfies ResponseInputItem[]),
           {
             role: "user",
             content: replyingToImageUrl
@@ -99,7 +133,7 @@ export default createEvent(
                   },
                 ]
               : inputText.text,
-          },
+          } satisfies ResponseInputItem,
         ],
         max_output_tokens: 300,
         temperature: 0.2,
@@ -255,4 +289,68 @@ const getPastConversations = async (
   await handlePreviousMessage(referencedMessage.reference?.messageId)
 
   return conversations
+}
+
+const getSearchDecisionAndQuery = async (
+  context: BaseContext,
+  content: string,
+): Promise<{ needsSearch: boolean; query?: string }> => {
+  const classify = await context.openAI.responses.create({
+    model: "gpt-4o-mini",
+    input: [
+      {
+        role: "system",
+        content: [
+          "You are a classifier and search-query generator.",
+          "Decide if the user's message requires up-to-date or realtime information from the internet.",
+          `The current date and time in Europe/Riga is: ${d().tz("Europe/Riga").format("YYYY-MM-DD HH:mm:ss")}`,
+          "Answer strictly in JSON with two fields: { needsSearch: 'yes' or 'no', query: 'a concise search query if needsSearch is yes, otherwise empty string' }",
+          "Do not include any extra commentary.",
+        ].join(" "),
+      },
+      { role: "user", content },
+    ],
+    max_output_tokens: 64,
+    temperature: 0,
+  })
+
+  try {
+    const json = JSON.parse(classify.output_text.trim())
+
+    return {
+      needsSearch: json.needsSearch === "yes",
+      query: json.query || undefined,
+    }
+  } catch {
+    return { needsSearch: false } // fallback
+  }
+}
+
+const getSearchContext = async (query: string): Promise<string> => {
+  if (!appConfig.google.apiKey || !appConfig.google.cseId) {
+    throw new Error("Google API key or CSE ID is not configured.")
+  }
+
+  const url = new URL("https://www.googleapis.com/customsearch/v1")
+  url.searchParams.append("key", appConfig.google.apiKey)
+  url.searchParams.append("cx", appConfig.google.cseId)
+  url.searchParams.append("q", query)
+  url.searchParams.append("hl", "en")
+  url.searchParams.append("num", "3")
+
+  const res = await fetch(url)
+  if (!res.ok) {
+    throw new Error(`Google search failed: ${res.status} ${await res.text()}`)
+  }
+
+  const data = await res.json()
+  // Extract snippets for context
+  const items = data.items || []
+  const snippets = items
+    // TODO: add zod validation
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .map((item: any) => `${item.title}: ${item.snippet}`)
+    .slice(0, 3)
+
+  return snippets.join("\n")
 }
