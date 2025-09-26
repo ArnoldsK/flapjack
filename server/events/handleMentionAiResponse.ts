@@ -95,6 +95,7 @@ export default createEvent(
 
         // Log the search query
         await context.em().insert(AiSearchesEntity, {
+          input: currentContent,
           query: searchDecision.query,
         })
       }

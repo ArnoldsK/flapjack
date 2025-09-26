@@ -6,6 +6,9 @@ export class AiSearchesEntity {
   id: number & Opt
 
   @Property({ type: "text" })
+  input: string
+
+  @Property({ type: "text" })
   query: string
 
   @Property()
