@@ -6,6 +6,7 @@ import {
 
 import { Emoji } from "~/constants"
 import { appConfig } from "~/server/config"
+import { AiSearchesEntity } from "~/server/db/entity/AiSearches"
 import { isTextChannel } from "~/server/utils/channel"
 import { d } from "~/server/utils/date"
 import { createEvent } from "~/server/utils/event"
@@ -91,6 +92,11 @@ export default createEvent(
 
       if (searchDecision.needsSearch && searchDecision.query) {
         searchContext = await getSearchContext(searchDecision.query)
+
+        // Log the search query
+        await context.em().insert(AiSearchesEntity, {
+          query: searchDecision.query,
+        })
       }
     } catch (error) {
       console.error("Web search failed:", error)
