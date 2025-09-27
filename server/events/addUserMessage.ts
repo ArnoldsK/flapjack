@@ -5,7 +5,7 @@ import { createEvent } from "~/server/utils/event"
 
 export default createEvent(
   Events.MessageCreate,
-  { productionOnly: false },
+  { productionOnly: true },
   async (context, message) => {
     if (message.author.bot) return
 

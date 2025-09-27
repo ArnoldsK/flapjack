@@ -5,7 +5,7 @@ import { createEvent } from "~/server/utils/event"
 
 export default createEvent(
   Events.MessageDelete,
-  { productionOnly: false },
+  { productionOnly: true },
   async (context, message) => {
     const model = new UserMessageModel(context)
     await model.removeByMessageId(message.id)
