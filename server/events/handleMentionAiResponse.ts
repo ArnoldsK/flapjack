@@ -47,7 +47,7 @@ export default createEvent(
     if (!isTextChannel(channel)) return
     if (!(await getIsValidMessage(message))) return
 
-    const currentContent = parseContent(context, message.content).trim()
+    const currentContent = parseContent(context, message.content)
     if (!currentContent) return
 
     let referencedMessage: Nullish<Message> = null
@@ -224,7 +224,7 @@ const parseContent = (context: BaseContext, content: string) => {
       .replaceAll(botMention, "")
       .split("\n")
       // Remove lines starting with -# (search context)
-      .filter((el) => el.startsWith("-#"))
+      .filter((el) => !el.startsWith("-#"))
       .join("\n"),
     context.guild(),
   ).trim()
