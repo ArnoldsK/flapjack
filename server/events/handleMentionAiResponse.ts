@@ -220,7 +220,12 @@ const parseContent = (context: BaseContext, content: string) => {
   const botMention = `<@${context.client.user!.id}>`
 
   return parseMentions(
-    content.replaceAll(botMention, ""),
+    content
+      .replaceAll(botMention, "")
+      .split("\n")
+      // Remove lines starting with -# (search context)
+      .filter((el) => el.startsWith("-#"))
+      .join("\n"),
     context.guild(),
   ).trim()
 }
@@ -296,7 +301,7 @@ const getPastConversations = async (
 
   await handlePreviousMessage(referencedMessage.reference?.messageId)
 
-  return conversations
+  return conversations.filter((el) => !!el.content)
 }
 
 const getSearchDecisionAndQuery = async (
