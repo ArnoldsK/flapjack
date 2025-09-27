@@ -29,7 +29,17 @@ export class UserMessageModel extends BaseModel {
     return await this.em.find(this.Entity, filter)
   }
 
-  async handleDelete(entity: UserMessageEntity) {
+  /**
+   * Removes the message record from the database.
+   */
+  async removeByMessageId(messageId: string) {
+    await this.em.nativeDelete(this.Entity, { messageId })
+  }
+
+  /**
+   * Removes the message from Discord and from the database.
+   */
+  async deleteAndRemove(entity: UserMessageEntity) {
     try {
       const channels = this.context.guild().channels
       const channel =
