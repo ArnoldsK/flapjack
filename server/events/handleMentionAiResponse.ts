@@ -6,7 +6,6 @@ import {
 
 import { Emoji } from "~/constants"
 import { appConfig } from "~/server/config"
-import { AiSearchesEntity } from "~/server/db/entity/AiSearches"
 import { isTextChannel } from "~/server/utils/channel"
 import { d } from "~/server/utils/date"
 import { createEvent } from "~/server/utils/event"
@@ -83,6 +82,7 @@ export default createEvent(
       currentUserId: author.id,
     })
 
+    let searchQuery = ""
     let searchContext = ""
     try {
       const searchDecision = await getSearchDecisionAndQuery(
@@ -91,13 +91,8 @@ export default createEvent(
       )
 
       if (searchDecision.needsSearch && searchDecision.query) {
+        searchQuery = searchDecision.query
         searchContext = await getSearchContext(searchDecision.query)
-
-        // Log the search query
-        await context.em().insert(AiSearchesEntity, {
-          input: currentContent,
-          query: searchDecision.query,
-        })
       }
     } catch (error) {
       console.error("Web search failed:", error)
@@ -151,7 +146,10 @@ export default createEvent(
       }
 
       await message.reply({
-        content: response.output_text,
+        content: joinAsLines(
+          searchQuery ? `-# 🔍︎ ${searchQuery}` : null,
+          response.output_text,
+        ),
         allowedMentions: { repliedUser: false },
       })
     } catch (error) {

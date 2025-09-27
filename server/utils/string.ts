@@ -1,6 +1,9 @@
 import { Unicode } from "~/constants"
+import { isNonNullish } from "~/server/utils/boolean"
+import { Nullish } from "~/types"
 
-export const joinAsLines = (...values: string[]) => values.join("\n")
+export const joinAsLines = (...values: Nullish<string>[]) =>
+  values.filter(isNonNullish).join("\n")
 
 export const ucFirst = (value: string): string => {
   return value.charAt(0).toUpperCase() + value.slice(1)
