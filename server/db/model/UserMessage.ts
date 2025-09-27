@@ -50,7 +50,10 @@ export class UserMessageModel extends BaseModel {
         throw new Error("Channel not found")
       }
 
-      const message = await channel.messages.fetch(entity.messageId)
+      const message =
+        channel.messages.cache.get(entity.messageId) ??
+        (await channel.messages.fetch(entity.messageId))
+
       if (message) {
         await message.delete()
       }
