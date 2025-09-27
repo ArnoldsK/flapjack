@@ -82,12 +82,19 @@ export default createEvent(
       currentUserId: author.id,
     })
 
+    const inputText = getInputText({
+      currentContent,
+      replyingToName,
+      replyingToContent,
+      pastConversations,
+    })
+
     let searchQuery = ""
     let searchContext = ""
     try {
       const searchDecision = await getSearchDecisionAndQuery(
         context,
-        currentContent,
+        inputText.text,
       )
 
       if (searchDecision.needsSearch && searchDecision.query) {
@@ -100,13 +107,6 @@ export default createEvent(
 
     try {
       await channel.sendTyping()
-
-      const inputText = getInputText({
-        currentContent,
-        replyingToName,
-        replyingToContent,
-        pastConversations,
-      })
 
       const response = await context.openAI.responses.create({
         model: "gpt-4o-mini",
@@ -209,7 +209,10 @@ const getInputText = ({
 
   return {
     type: "input_text",
-    text: joinAsLines(...conversation, currentContent),
+    text:
+      conversation.length > 0
+        ? joinAsLines(...conversation, "---", currentContent)
+        : currentContent,
   }
 }
 
