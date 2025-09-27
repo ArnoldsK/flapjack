@@ -2,7 +2,7 @@ import { createDailyStats } from "~/server/cron/tasks/createDailyStats"
 import { createWeekRecap } from "~/server/cron/tasks/createWeekRecap"
 import { endReminders } from "~/server/cron/tasks/endReminders"
 // import { handleCreditsLotteries } from "~/server/cron/tasks/handleCreditsLotteries"
-import { mcStatus } from "~/server/cron/tasks/mcStatus"
+// import { mcStatus } from "~/server/cron/tasks/mcStatus"
 import { removeNonBoosterIcons } from "~/server/cron/tasks/removeNonBoosterIcons"
 import { removeOldStats } from "~/server/cron/tasks/removeOldStats"
 import { resetCredits } from "~/server/cron/tasks/resetCredits"
@@ -25,13 +25,13 @@ export const cronTasks: CronTask[] = [
   //   productionOnly: true,
   //   task: handleCreditsLotteries,
   // },
-  {
-    description: "MC status",
-    expression: "every 5 minutes",
-    isRawExpression: false,
-    productionOnly: true,
-    task: mcStatus,
-  },
+  // {
+  //   description: "MC status",
+  //   expression: "every 5 minutes",
+  //   isRawExpression: false,
+  //   productionOnly: true,
+  //   task: mcStatus,
+  // },
   {
     description: "End reminders",
     expression: "every minute",
