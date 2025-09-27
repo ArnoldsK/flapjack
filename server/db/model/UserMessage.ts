@@ -19,7 +19,7 @@ export class UserMessageModel extends BaseModel {
     await this.em.flush()
   }
 
-  async getByUser(userId: string, options?: { before?: Date }) {
+  async getByUserId(userId: string, options?: { before?: Date }) {
     const filter: FilterQuery<UserMessageEntity> = { userId }
 
     if (options?.before) {
