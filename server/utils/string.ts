@@ -28,7 +28,7 @@ export const asPlural = (
    * Use $1 for number
    * Use $2 for word
    */
-  format: string,
+  format = "$1 $2",
 ) => {
   word = plural(number, word)
 

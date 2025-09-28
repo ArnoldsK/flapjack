@@ -4,23 +4,36 @@ import { DISCORD_IDS } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { UserMessageModel } from "~/server/db/model/UserMessage"
 import { permission, PermissionFlags } from "~/server/utils/permission"
+import { asPlural } from "~/server/utils/string"
 
 enum OptionName {
-  User = "user",
+  UserId = "user_id",
+  Confirmation = "confirmation",
 }
 
+const BATCH_SIZE = 100
+const CONCURRENCY = 5
+
 export default class DeleteUserMessagesCommand extends BaseCommand {
-  static version = 1
+  static version = 2
 
   static command = new SlashCommandBuilder()
     .setName("delete_user_messages")
     .setDescription(
-      "Delete user's messages that are referenced in the database",
+      "Delete all messages for an user (can only be used in the logs channel)",
     )
-    .addUserOption((option) =>
+    .addStringOption((option) =>
       option
-        .setName(OptionName.User)
-        .setDescription("User to delete messages for")
+        .setName(OptionName.UserId)
+        .setDescription("User ID to delete messages for")
+        .setRequired(true),
+    )
+    .addStringOption((option) =>
+      option
+        .setName(OptionName.Confirmation)
+        .setDescription(
+          "This action cannot be stopped. Type DELETE to confirm!",
+        )
         .setRequired(true),
     )
 
@@ -38,12 +51,24 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
       return
     }
 
-    const user = this.interaction.options.getUser(OptionName.User, true)
+    const userId = this.interaction.options.getString(OptionName.UserId, true)
+    const confirmation = this.interaction.options.getString(
+      OptionName.Confirmation,
+      true,
+    )
+
+    if (confirmation !== "DELETE") {
+      this.reply({
+        ephemeral: true,
+        content: 'You must type "DELETE" to confirm',
+      })
+      return
+    }
 
     const model = new UserMessageModel(this.context)
-    const entities = await model.getByUserId(user.id)
+    const count = await model.getCountByUserId(userId)
 
-    if (entities.length === 0) {
+    if (count === 0) {
       this.reply({
         ephemeral: true,
         content: "No messages found for this user",
@@ -51,16 +76,27 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
       return
     }
 
-    // Defer reply
-    await this.interaction.deferReply()
+    const message = await this.interaction.reply({
+      content: `Deleting ${asPlural(count, "message")} for <@${userId}>...`,
+      fetchReply: true,
+    })
 
-    // Intentionally use for loop to avoid rate limits
-    for (const entity of entities) {
-      await model.deleteAndRemove(entity)
+    let entities = await model.getBatchByUserId(userId, BATCH_SIZE)
+
+    while (entities.length > 0) {
+      for (let i = 0; i < entities.length; i += CONCURRENCY) {
+        const slice = entities.slice(i, i + CONCURRENCY)
+
+        await Promise.all(
+          slice.map((entity) =>
+            model.deleteAndRemove(entity).catch(() => null),
+          ),
+        )
+      }
+
+      entities = await model.getBatchByUserId(userId, BATCH_SIZE)
     }
 
-    await this.editReply({
-      content: `Deleted ${entities.length} messages for <@${user.id}>`,
-    })
+    await message.reply("Deleted all messages!")
   }
 }
