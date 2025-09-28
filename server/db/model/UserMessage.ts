@@ -28,12 +28,19 @@ export class UserMessageModel extends BaseModel {
     options: {
       limit: number
       channelId?: string | null
+      notChannelId?: string | null
     },
   ) {
     const where: FilterQuery<UserMessageEntity> = { userId }
 
     if (options.channelId) {
       where.channelId = options.channelId
+    }
+
+    if (options.notChannelId) {
+      where.$not = {
+        channelId: options.notChannelId,
+      }
     }
 
     return await this.em.find(this.Entity, where, {

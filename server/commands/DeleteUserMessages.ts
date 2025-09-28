@@ -11,13 +11,14 @@ enum OptionName {
   UserId = "user_id",
   Confirmation = "confirmation",
   Channel = "channel",
+  IgnoreChannel = "ignore_channel",
 }
 
 const BATCH_SIZE = 100
 const CONCURRENCY = 5
 
 export default class DeleteUserMessagesCommand extends BaseCommand {
-  static version = 3
+  static version = 4
 
   static command = new SlashCommandBuilder()
     .setName("delete-user-messages")
@@ -41,7 +42,13 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
     .addChannelOption((option) =>
       option
         .setName(OptionName.Channel)
-        .setDescription("Limit to a single channel")
+        .setDescription("Limit messages to a single channel")
+        .addChannelTypes(ChannelType.GuildText),
+    )
+    .addChannelOption((option) =>
+      option
+        .setName(OptionName.IgnoreChannel)
+        .setDescription("Ignore messages from a channel")
         .addChannelTypes(ChannelType.GuildText),
     )
 
@@ -66,27 +73,35 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
     )
 
     const channel = this.interaction.options.getChannel(OptionName.Channel)
+    const ignoreChannel = this.interaction.options.getChannel(
+      OptionName.IgnoreChannel,
+    )
 
     if (confirmation !== "DELETE") {
-      this.reply({
-        ephemeral: true,
-        content: 'You must type "DELETE" to confirm',
-      })
+      this.fail('You must type "DELETE" to confirm')
+      return
+    }
+
+    if (channel && ignoreChannel && channel.id === ignoreChannel.id) {
+      this.fail("Can't limit to a channel that is also ignored")
       return
     }
 
     await this.#handleRemoval({
       userId,
       channelId: channel?.id,
+      ignoreChannelId: ignoreChannel?.id,
     })
   }
 
   async #handleRemoval({
     userId,
     channelId,
+    ignoreChannelId,
   }: {
     userId: string
     channelId: Nullish<string>
+    ignoreChannelId: Nullish<string>
   }) {
     const model = new UserMessageModel(this.context)
     const count = await model.getCountByUserId(userId)
@@ -108,6 +123,7 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
       model.getBatchByUserId(userId, {
         limit: BATCH_SIZE,
         channelId,
+        notChannelId: ignoreChannelId,
       })
 
     let entities = await getBatch()
