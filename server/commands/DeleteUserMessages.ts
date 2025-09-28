@@ -5,6 +5,7 @@ import { BaseCommand } from "~/server/base/Command"
 import { UserMessageModel } from "~/server/db/model/UserMessage"
 import { permission, PermissionFlags } from "~/server/utils/permission"
 import { asPlural } from "~/server/utils/string"
+import { Nullish } from "~/types"
 
 enum OptionName {
   UserId = "user_id",
@@ -19,7 +20,7 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
   static version = 3
 
   static command = new SlashCommandBuilder()
-    .setName("delete_user_messages")
+    .setName("delete-user-messages")
     .setDescription(
       "Delete all messages for an user (can only be used in the logs channel)",
     )
@@ -40,7 +41,7 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
     .addChannelOption((option) =>
       option
         .setName(OptionName.Channel)
-        .setDescription("Limit to a single channel messages")
+        .setDescription("Limit to a single channel")
         .addChannelTypes(ChannelType.GuildText),
     )
 
@@ -74,6 +75,19 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
       return
     }
 
+    await this.#handleRemoval({
+      userId,
+      channelId: channel?.id,
+    })
+  }
+
+  async #handleRemoval({
+    userId,
+    channelId,
+  }: {
+    userId: string
+    channelId: Nullish<string>
+  }) {
     const model = new UserMessageModel(this.context)
     const count = await model.getCountByUserId(userId)
 
@@ -93,7 +107,7 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
     const getBatch = () =>
       model.getBatchByUserId(userId, {
         limit: BATCH_SIZE,
-        channelId: channel?.id,
+        channelId,
       })
 
     let entities = await getBatch()

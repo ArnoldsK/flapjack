@@ -27,7 +27,7 @@ export class UserMessageModel extends BaseModel {
     userId: string,
     options: {
       limit: number
-      channelId?: string
+      channelId?: string | null
     },
   ) {
     const where: FilterQuery<UserMessageEntity> = { userId }
