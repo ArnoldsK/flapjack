@@ -1,3 +1,4 @@
+import { FilterQuery } from "@mikro-orm/core"
 import { Message } from "discord.js"
 
 import { BaseModel } from "~/server/base/Model"
@@ -22,15 +23,23 @@ export class UserMessageModel extends BaseModel {
     return await this.em.count(this.Entity, { userId })
   }
 
-  async getBatchByUserId(userId: string, limit: number) {
-    return await this.em.find(
-      this.Entity,
-      { userId },
-      {
-        orderBy: { createdAt: "ASC" },
-        limit,
-      },
-    )
+  async getBatchByUserId(
+    userId: string,
+    options: {
+      limit: number
+      channelId?: string
+    },
+  ) {
+    const where: FilterQuery<UserMessageEntity> = { userId }
+
+    if (options.channelId) {
+      where.channelId = options.channelId
+    }
+
+    return await this.em.find(this.Entity, where, {
+      orderBy: { createdAt: "ASC" },
+      limit: options.limit,
+    })
   }
 
   /**

@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "discord.js"
+import { ChannelType, SlashCommandBuilder } from "discord.js"
 
 import { DISCORD_IDS } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
@@ -9,13 +9,14 @@ import { asPlural } from "~/server/utils/string"
 enum OptionName {
   UserId = "user_id",
   Confirmation = "confirmation",
+  Channel = "channel",
 }
 
 const BATCH_SIZE = 100
 const CONCURRENCY = 5
 
 export default class DeleteUserMessagesCommand extends BaseCommand {
-  static version = 2
+  static version = 3
 
   static command = new SlashCommandBuilder()
     .setName("delete_user_messages")
@@ -35,6 +36,12 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
           "This action cannot be stopped. Type DELETE to confirm!",
         )
         .setRequired(true),
+    )
+    .addChannelOption((option) =>
+      option
+        .setName(OptionName.Channel)
+        .setDescription("Limit to a single channel messages")
+        .addChannelTypes(ChannelType.GuildText),
     )
 
   static permissions = permission({
@@ -56,6 +63,8 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
       OptionName.Confirmation,
       true,
     )
+
+    const channel = this.interaction.options.getChannel(OptionName.Channel)
 
     if (confirmation !== "DELETE") {
       this.reply({
@@ -81,7 +90,13 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
       fetchReply: true,
     })
 
-    let entities = await model.getBatchByUserId(userId, BATCH_SIZE)
+    const getBatch = () =>
+      model.getBatchByUserId(userId, {
+        limit: BATCH_SIZE,
+        channelId: channel?.id,
+      })
+
+    let entities = await getBatch()
 
     while (entities.length > 0) {
       for (let i = 0; i < entities.length; i += CONCURRENCY) {
@@ -94,7 +109,7 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
         )
       }
 
-      entities = await model.getBatchByUserId(userId, BATCH_SIZE)
+      entities = await getBatch()
     }
 
     await message.reply("Deleted all messages!")
