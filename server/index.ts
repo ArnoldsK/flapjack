@@ -78,7 +78,9 @@ nextApp.prepare().then(async () => {
   // #############################################################################
   const commands = await getSetupCommands(context)
 
-  await handleApiCommands(commands)
+  if (!appConfig.webOnly) {
+    await handleApiCommands(commands)
+  }
 
   // #############################################################################
   // Client events
