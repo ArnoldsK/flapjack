@@ -150,9 +150,6 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
 
     const before = beforeDate ?? new Date()
 
-    let totalTime = 0
-    let batchCount = 0
-
     const getBatch = () =>
       model.getBatchByUserId(userId, {
         limit: BATCH_SIZE,
@@ -161,24 +158,26 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
         before,
       })
 
+    let totalTime = 0
+    let removedCount = 0
     let entities = await getBatch()
 
     while (entities.length > 0) {
-      const start = Date.now()
-
       for (let i = 0; i < entities.length; i += CONCURRENCY) {
         const slice = entities.slice(i, i + CONCURRENCY)
 
         await Promise.all(
-          slice.map((entity) =>
-            model.deleteAndRemove(entity).catch(() => null),
-          ),
+          slice.map(async (entity) => {
+            const start = Date.now()
+
+            await model.deleteAndRemove(entity).catch(() => null)
+
+            const end = Date.now()
+            totalTime += end - start
+            removedCount++
+          }),
         )
       }
-
-      const end = Date.now()
-      totalTime += end - start
-      batchCount++
 
       entities = await getBatch()
     }
@@ -186,8 +185,8 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
     await message.reply(
       joinAsLines(
         "Deleted all messages!",
-        batchCount > 0
-          ? `-# Average ms per batch: ${totalTime / batchCount}`
+        removedCount > 0
+          ? `-# Average ms per batch: ${Math.round(totalTime / removedCount)}`
           : null,
       ),
     )
