@@ -3,6 +3,7 @@ import { ChannelType, SlashCommandBuilder } from "discord.js"
 import { DISCORD_IDS } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { CacheKey } from "~/server/cache"
+import { UserMessageEntity } from "~/server/db/entity/UserMessage"
 import { UserMessageModel } from "~/server/db/model/UserMessage"
 import { dSubtractRelative } from "~/server/utils/date"
 import { permission, PermissionFlags } from "~/server/utils/permission"
@@ -170,7 +171,7 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
           slice.map(async (entity) => {
             const start = Date.now()
 
-            await model.deleteAndRemove(entity).catch(() => null)
+            await this.#deleteMessage(entity)
 
             const end = Date.now()
             totalTime += end - start
@@ -186,9 +187,26 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
       joinAsLines(
         "Deleted all messages!",
         removedCount > 0
-          ? `-# Average ms per batch: ${Math.round(totalTime / removedCount)}`
+          ? `-# Average ms per deletion: ${Math.round(totalTime / removedCount)}`
           : null,
       ),
     )
+  }
+
+  async #deleteMessage(entity: UserMessageEntity) {
+    try {
+      const channels = this.context.guild().channels
+      const channel =
+        channels.cache.get(entity.channelId) ??
+        (await channels.fetch(entity.channelId))
+
+      if (!channel?.isTextBased()) {
+        throw new Error("Channel not found")
+      }
+
+      await channel.messages.delete(entity.messageId)
+    } catch {
+      // Ignore errors
+    }
   }
 }

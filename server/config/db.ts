@@ -22,5 +22,5 @@ export default defineConfig({
   password: appConfig.db.password,
   dbName: appConfig.db.database,
 
-  debug: appConfig.dev,
+  // debug: appConfig.dev,
 })

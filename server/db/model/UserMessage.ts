@@ -63,26 +63,4 @@ export class UserMessageModel extends BaseModel {
   async removeByMessageId(messageId: string) {
     await this.em.nativeDelete(this.Entity, { messageId })
   }
-
-  /**
-   * Removes the message from Discord and from the database.
-   */
-  async deleteAndRemove(entity: UserMessageEntity) {
-    try {
-      const channels = this.context.guild().channels
-      const channel =
-        channels.cache.get(entity.channelId) ??
-        (await channels.fetch(entity.channelId))
-
-      if (!channel?.isTextBased()) {
-        throw new Error("Channel not found")
-      }
-
-      await channel.messages.delete(entity.messageId)
-    } catch {
-      // Ignore errors
-    }
-
-    await this.em.removeAndFlush(entity)
-  }
 }
