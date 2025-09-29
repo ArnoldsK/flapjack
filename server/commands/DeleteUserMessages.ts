@@ -2,9 +2,11 @@ import { ChannelType, SlashCommandBuilder } from "discord.js"
 
 import { DISCORD_IDS } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
+import { CacheKey } from "~/server/cache"
 import { UserMessageModel } from "~/server/db/model/UserMessage"
+import { dSubtractRelative } from "~/server/utils/date"
 import { permission, PermissionFlags } from "~/server/utils/permission"
-import { asPlural } from "~/server/utils/string"
+import { asPlural, joinAsLines } from "~/server/utils/string"
 import { Nullish } from "~/types"
 
 enum OptionName {
@@ -12,13 +14,14 @@ enum OptionName {
   Confirmation = "confirmation",
   Channel = "channel",
   IgnoreChannel = "ignore_channel",
+  Before = "before",
 }
 
 const BATCH_SIZE = 100
 const CONCURRENCY = 5
 
 export default class DeleteUserMessagesCommand extends BaseCommand {
-  static version = 4
+  static version = 5
 
   static command = new SlashCommandBuilder()
     .setName("delete-user-messages")
@@ -51,6 +54,11 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
         .setDescription("Ignore messages from a channel")
         .addChannelTypes(ChannelType.GuildText),
     )
+    .addStringOption((option) =>
+      option
+        .setName(OptionName.Before)
+        .setDescription('Limit messages to before "1 day", "2 weeks", etc.'),
+    )
 
   static permissions = permission({
     type: "allow",
@@ -66,6 +74,11 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
       return
     }
 
+    if (this.context.cache.get(CacheKey.DeleteUserMessagesRunning)) {
+      this.fail("Already deleting someone's messages")
+      return
+    }
+
     const userId = this.interaction.options.getString(OptionName.UserId, true)
     const confirmation = this.interaction.options.getString(
       OptionName.Confirmation,
@@ -76,6 +89,7 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
     const ignoreChannel = this.interaction.options.getChannel(
       OptionName.IgnoreChannel,
     )
+    const before = this.interaction.options.getString(OptionName.Before)
 
     if (confirmation !== "DELETE") {
       this.fail('You must type "DELETE" to confirm')
@@ -87,21 +101,36 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
       return
     }
 
-    await this.#handleRemoval({
-      userId,
-      channelId: channel?.id,
-      ignoreChannelId: ignoreChannel?.id,
-    })
+    const beforeDate = before ? dSubtractRelative(before)?.toDate() : null
+    if (before && !beforeDate) {
+      this.fail("Invalid before date format")
+      return
+    }
+
+    try {
+      this.context.cache.set(CacheKey.DeleteUserMessagesRunning, true)
+
+      await this.#handleRemoval({
+        userId,
+        channelId: channel?.id,
+        ignoreChannelId: ignoreChannel?.id,
+        beforeDate,
+      })
+    } finally {
+      this.context.cache.set(CacheKey.DeleteUserMessagesRunning, false)
+    }
   }
 
   async #handleRemoval({
     userId,
     channelId,
     ignoreChannelId,
+    beforeDate,
   }: {
     userId: string
     channelId: Nullish<string>
     ignoreChannelId: Nullish<string>
+    beforeDate: Nullish<Date>
   }) {
     const model = new UserMessageModel(this.context)
     const count = await model.getCountByUserId(userId)
@@ -119,16 +148,24 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
       fetchReply: true,
     })
 
+    const before = beforeDate ?? new Date()
+
+    let totalTime = 0
+    let batchCount = 0
+
     const getBatch = () =>
       model.getBatchByUserId(userId, {
         limit: BATCH_SIZE,
         channelId,
         notChannelId: ignoreChannelId,
+        before,
       })
 
     let entities = await getBatch()
 
     while (entities.length > 0) {
+      const start = Date.now()
+
       for (let i = 0; i < entities.length; i += CONCURRENCY) {
         const slice = entities.slice(i, i + CONCURRENCY)
 
@@ -139,9 +176,20 @@ export default class DeleteUserMessagesCommand extends BaseCommand {
         )
       }
 
+      const end = Date.now()
+      totalTime += end - start
+      batchCount++
+
       entities = await getBatch()
     }
 
-    await message.reply("Deleted all messages!")
+    await message.reply(
+      joinAsLines(
+        "Deleted all messages!",
+        batchCount > 0
+          ? `-# Average ms per batch: ${totalTime / batchCount}`
+          : null,
+      ),
+    )
   }
 }

@@ -29,6 +29,8 @@ export class UserMessageModel extends BaseModel {
       limit: number
       channelId?: string | null
       notChannelId?: string | null
+      /** Including the date itself */
+      before?: Date | null
     },
   ) {
     const where: FilterQuery<UserMessageEntity> = { userId }
@@ -40,6 +42,12 @@ export class UserMessageModel extends BaseModel {
     if (options.notChannelId) {
       where.$not = {
         channelId: options.notChannelId,
+      }
+    }
+
+    if (options.before) {
+      where.createdAt = {
+        $lte: options.before,
       }
     }
 
