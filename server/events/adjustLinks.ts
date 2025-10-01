@@ -44,24 +44,39 @@ export default createEvent(
       if (!ignore && url && hostname) {
         const fxUrl = url.replace(hostname, "fxtwitter.com")
 
-        message.channel.send(
-          [
-            `${Emoji.chick} for ${message.author.username}`,
-            `[tweet](${fxUrl})`,
-          ].join(" "),
-        )
+        await message.reply(`[tweet](${fxUrl}) embed fix`)
       }
     }
 
     // #############################################################################
     // Square spam embeds (word guessing games)
     // #############################################################################
-    const emojiCount = [...message.content.matchAll(
+    const emojiCount = [
+      ...message.content.matchAll(
         /[\uD800-\uDBFF]|[\u2702-\u27B0]|[\uF680-\uF6C0]|[\u24C2-\uF251]/g,
-      )].length
+      ),
+    ].length
 
     if (emojiCount >= 5) {
       message.suppressEmbeds(true)
+    }
+
+    // #############################################################################
+    // Instagram
+    // #############################################################################
+    if (message.content.includes("instagram.com")) {
+      const matches = message.content.match(
+        /(?:https?:\/\/)?(?:www.)?instagram.com\/?([a-zA-Z0-9._-]+)?\/([p]+)?([reel]+)\/([a-zA-Z0-9\-_.]+)\/?([0-9]+)?/i,
+      )
+      const reelId = matches?.[4]
+
+      if (reelId) {
+        message.suppressEmbeds(true)
+
+        const url = `https://eeinstagram.com/reel/${reelId}/`
+
+        await message.reply(`[reel](${url}) embed fix`)
+      }
     }
   },
 )
