@@ -18,7 +18,7 @@ export default createEvent(
       const urls = [...new Set(matches)].map((url) => url.replace("m.", "www."))
 
       if (urls.length > 0) {
-        message.channel.send(
+        await message.reply(
           `${Emoji.computer} ` + urls.map((url) => `<${url}>`).join("\n"),
         )
       }
