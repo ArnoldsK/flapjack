@@ -18,7 +18,6 @@ const env = z
     LOCAL_COMMANDS: z.string().default("false"),
     WEB_ONLY: z.string().default("false"),
     GIPHY_API_KEY: z.string(),
-    DEEPL_AUTH_KEY: z.string(),
     OPENAI_API_KEY: z.string(),
     HOSTING_AUTH_NAME: z.string(),
     HOSTING_AUTH_TOKEN: z.string(),
@@ -58,10 +57,6 @@ export const appConfig = {
 
   giphy: {
     apiKey: env.GIPHY_API_KEY,
-  },
-
-  deepl: {
-    authKey: env.DEEPL_AUTH_KEY,
   },
 
   hosting: {
