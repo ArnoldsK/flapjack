@@ -66,7 +66,7 @@ export default createEvent(
     // #############################################################################
     if (message.content.includes("instagram.com")) {
       const matches = message.content.match(
-        /(?:https?:\/\/)?(?:www.)?instagram.com\/?([a-zA-Z0-9._-]+)?\/([p]+)?([reel]+s?)\/([a-zA-Z0-9-_.]+)\/?([0-9]+)?/i,
+        /(?:https?:\/\/)(?:www.)?instagram.com\/?([a-zA-Z0-9._-]+)?\/([p]+)?([reel]+s?)\/([a-zA-Z0-9-_.]+)\/?([0-9]+)?/i,
       )
       const reelId = matches?.[4]
 
