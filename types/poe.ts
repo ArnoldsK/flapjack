@@ -7,4 +7,5 @@ export interface PoeScarab {
 export interface PoeScarabData {
   league: string
   scarabs: PoeScarab[]
+  updatedAt: Date
 }

@@ -17,6 +17,11 @@ export const Title = styled.h1`
   margin: 0;
 `
 
+export const Note = styled.div`
+  color: #555;
+  font-size: 12px;
+`
+
 export const Rows = styled.div`
   display: flex;
   flex-direction: column;

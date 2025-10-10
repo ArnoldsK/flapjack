@@ -53,6 +53,7 @@ export const getPoeScarabPrices: Task<PoeScarabData> = async (context) => {
           icon: scarab.icon,
         }) satisfies PoeScarab,
     ),
+    updatedAt: new Date(),
   }
 
   await model.set(StaticDataType.PoeScarabs, staticData)

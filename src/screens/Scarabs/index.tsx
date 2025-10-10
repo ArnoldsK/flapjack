@@ -6,6 +6,7 @@ import { useMemo } from "react"
 import { mapping } from "./mapping"
 import * as S from "./styles"
 
+import { d } from "~/server/utils/date"
 import { Page } from "~/src/components/Page"
 import { PoeScarab, PoeScarabData } from "~/types/poe"
 
@@ -20,6 +21,10 @@ export const ScarabsScreen = ({ data }: ScarabsScreenProps) => {
   const scarabByName = useMemo(() => {
     return new Map(data.scarabs.map((scarab) => [scarab.name, scarab]))
   }, [data.scarabs])
+
+  const updatedString = useMemo(() => {
+    return d(data.updatedAt).fromNow()
+  }, [data.updatedAt])
 
   // #############################################################################
   // Render
@@ -51,6 +56,7 @@ export const ScarabsScreen = ({ data }: ScarabsScreenProps) => {
             </S.Row>
           ))}
         </S.Rows>
+        <S.Note>Updated {updatedString}</S.Note>
       </S.Wrap>
     </Page>
   )
