@@ -1,11 +1,13 @@
 import { GetServerSideProps } from "next"
+import Image from "next/image"
 import absoluteUrl from "next-absolute-url"
+import { useMemo } from "react"
 
 import { mapping } from "./mapping"
 import * as S from "./styles"
 
 import { Page } from "~/src/components/Page"
-import { PoeScarabData } from "~/types/poe"
+import { PoeScarab, PoeScarabData } from "~/types/poe"
 
 const BAD_VALUE_MAX = 1
 const GOOD_VALUE_MIN = 2
@@ -15,13 +17,17 @@ interface ScarabsScreenProps {
 }
 
 export const ScarabsScreen = ({ data }: ScarabsScreenProps) => {
+  const scarabByName = useMemo(() => {
+    return new Map(data.scarabs.map((scarab) => [scarab.name, scarab]))
+  }, [data.scarabs])
+
   // #############################################################################
   // Render
   // #############################################################################
   return (
     <Page title="PoE Scarabs">
       <S.Wrap>
-        <S.Title>{data.league}</S.Title>
+        <S.Title>Scarabs in {data.league}</S.Title>
         <S.Rows>
           {mapping.rows.map((row, rowIndex) => (
             <S.Row key={rowIndex}>
@@ -29,29 +35,13 @@ export const ScarabsScreen = ({ data }: ScarabsScreenProps) => {
                 <S.Column key={columnIndex} $align={column.align}>
                   {column.groups.map((group, groupIndex) => (
                     <S.Group key={groupIndex}>
-                      {group.map((name, nameIndex) => {
-                        const scarab = data.scarabs.find(
-                          (el) => el.name === name,
-                        )
+                      {group.map((name) => {
+                        const scarab = scarabByName.get(name)
 
-                        const value = Math.floor(scarab?.chaosValue ?? 0)
-                        const bad = value < BAD_VALUE_MAX
-                        const good = value > GOOD_VALUE_MIN
-
-                        return (
-                          <S.Scarab
-                            key={nameIndex}
-                            $blank={!scarab}
-                            $bad={bad}
-                            $good={good}
-                          >
-                            {!!scarab && (
-                              <>
-                                <S.ScarabPrice>{value}c</S.ScarabPrice>
-                                <S.ScarabLabel>{scarab.name}</S.ScarabLabel>
-                              </>
-                            )}
-                          </S.Scarab>
+                        return scarab ? (
+                          <Scarab key={name} scarab={scarab} />
+                        ) : (
+                          <S.BlankScarab key={name} />
                         )
                       })}
                     </S.Group>
@@ -63,6 +53,22 @@ export const ScarabsScreen = ({ data }: ScarabsScreenProps) => {
         </S.Rows>
       </S.Wrap>
     </Page>
+  )
+}
+
+const Scarab = ({ scarab }: { scarab: PoeScarab }) => {
+  const value = Math.floor(scarab?.chaosValue ?? 0)
+  const bad = value < BAD_VALUE_MAX
+  const good = value > GOOD_VALUE_MIN
+
+  return (
+    <S.Scarab $bad={bad} $good={good}>
+      <S.ScarabIcon>
+        <Image src={scarab.icon} alt="" fill />
+      </S.ScarabIcon>
+      <S.ScarabPrice>{value}c</S.ScarabPrice>
+      <S.ScarabLabel>{scarab.name}</S.ScarabLabel>
+    </S.Scarab>
   )
 }
 

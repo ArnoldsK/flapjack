@@ -2,12 +2,15 @@ import styled from "styled-components"
 
 import { checkUnreachable } from "~/server/utils/error"
 
+const SCARAB_SIZE = 40
+const SCARAB_PADDING = 4
+
 export const Wrap = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 28px;
+  gap: 32px;
 `
 
 export const Title = styled.h1`
@@ -56,47 +59,52 @@ export const Group = styled.div`
   gap: 5px;
 `
 
+export const ScarabIcon = styled.div`
+  position: relative;
+  width: ${SCARAB_SIZE - SCARAB_PADDING * 2}px;
+  aspect-ratio: 1;
+`
+
 export const ScarabPrice = styled.div`
+  position: absolute;
+  z-index: 1;
   font-size: 12px;
+  line-height: 1;
+  right: ${SCARAB_PADDING / 2}px;
+  bottom: ${SCARAB_PADDING / 2}px;
+  filter: drop-shadow(-1px 0 0 #222) drop-shadow(1px 0 0 #222)
+    drop-shadow(0 -1px 0 #222) drop-shadow(0 1px 0 #222);
 `
 
 export const ScarabLabel = styled.div`
   position: absolute;
+  z-index: 2;
   bottom: calc(100% + 5px);
-  left: 50%;
-  translate: -50% 0;
   white-space: nowrap;
   display: none;
   pointer-events: none;
   background: #000;
-  border-radius: 4px;
-  padding: 4px;
+  border-radius: ${SCARAB_PADDING}px;
+  padding: ${SCARAB_PADDING}px;
+`
+
+export const BlankScarab = styled.div`
+  width: ${SCARAB_SIZE}px;
+  height: ${SCARAB_SIZE}px;
 `
 
 interface ScarabProps {
-  $blank: boolean
   $bad: boolean
   $good: boolean
 }
-export const Scarab = styled.div<ScarabProps>`
+export const Scarab = styled(BlankScarab)<ScarabProps>`
+  position: relative;
+  border-radius: ${SCARAB_PADDING}px;
+  padding: ${SCARAB_PADDING}px;
   display: flex;
   justify-content: center;
-  align-items: center;
-  width: 40px;
-  height: 40px;
-  position: relative;
-  border-radius: 4px;
-
-  &:hover {
-    ${ScarabLabel} {
-      display: block;
-    }
-  }
-
-  background: ${({ $blank, $bad, $good }) => {
-    if ($blank) {
-      return "none"
-    }
+  align-items: flex-start;
+  background: ${({ $bad, $good }) => {
     if ($bad) {
       return "#4b1a1a"
     }
@@ -105,4 +113,10 @@ export const Scarab = styled.div<ScarabProps>`
     }
     return "#333333"
   }};
+
+  &:hover {
+    ${ScarabLabel} {
+      display: block;
+    }
+  }
 `

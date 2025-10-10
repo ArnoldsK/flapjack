@@ -1,6 +1,6 @@
 module.exports = {
   images: {
-    domains: ["cdn.discordapp.com", "cdn.pepsidog.lv"],
+    domains: ["cdn.discordapp.com", "cdn.pepsidog.lv", "web.poecdn.com"],
   },
   compiler: {
     styledComponents: true,
