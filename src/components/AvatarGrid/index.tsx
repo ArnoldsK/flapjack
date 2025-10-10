@@ -209,8 +209,10 @@ export const AvatarGrid = ({ avatarUrls }: AvatarGridProps) => {
             onMouseMove={onMouseMove}
             onMouseLeave={onMouseLeave}
             $animate={avatarsInit}
-            $x={item.avatar.x}
-            $y={item.avatar.y}
+            style={{
+              left: `${item.avatar.x}px`,
+              top: `${item.avatar.y}px`,
+            }}
           >
             <Image src={item.avatar.url} alt="" fill sizes="100%" />
           </S.Avatar>

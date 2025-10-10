@@ -1,7 +1,7 @@
 import { ChannelType } from "discord-api-types/v10"
 import { GetServerSideProps } from "next"
 import absoluteUrl from "next-absolute-url"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { CSSProperties, useCallback, useEffect, useMemo, useState } from "react"
 
 import TextIcon from "./icons/text.svg"
 import ThreadIcon from "./icons/thread.svg"
@@ -21,6 +21,19 @@ const DATE_STRING_FORMAT = "YYYY-MM-DD"
 
 const formatChannelName = (name: string) => {
   return name.replace("╰", "")
+}
+
+const getGraphBarStyle = ({
+  heightPrc,
+  hover,
+}: {
+  heightPrc: number
+  hover?: boolean
+}) => {
+  return {
+    "--bar-background": hover ? "#b492d488" : "#b492d433",
+    "--bar-height": `${heightPrc}%`,
+  } as CSSProperties
 }
 
 export const StatsScreen = ({ stats }: StatsScreenProps) => {
@@ -238,21 +251,29 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
                 </S.CalendarWrap>
                 <S.GraphWrap>
                   {currentMonthPastDates.map((date) => (
-                    <S.GraphBar key={date} $heightPrc={0} />
+                    <S.GraphBar
+                      key={date}
+                      style={getGraphBarStyle({ heightPrc: 0 })}
+                    />
                   ))}
                   {currentMonthTotals.totals.map(({ total, dateString }) => (
                     <S.GraphBar
                       key={dateString}
-                      $heightPrc={(total / currentMonthTotals.max) * 100}
                       $active={dateString === currentDateString}
-                      $hover={dateString === currentHoverDateString}
                       onClick={() => setCurrentDateString(dateString)}
                       onMouseEnter={() => setCurrentHoverDateString(dateString)}
                       onMouseLeave={() => setCurrentHoverDateString(null)}
+                      style={getGraphBarStyle({
+                        heightPrc: (total / currentMonthTotals.max) * 100,
+                        hover: dateString === currentHoverDateString,
+                      })}
                     />
                   ))}
                   {currentMonthFutureDates.map((date) => (
-                    <S.GraphBar key={date} $heightPrc={0} />
+                    <S.GraphBar
+                      key={date}
+                      style={getGraphBarStyle({ heightPrc: 0 })}
+                    />
                   ))}
                 </S.GraphWrap>
               </S.Stat>

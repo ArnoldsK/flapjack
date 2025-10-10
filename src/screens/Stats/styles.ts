@@ -166,16 +166,9 @@ export const GraphWrap = styled.div`
 `
 
 interface GraphBarProps {
-  $heightPrc: number
   $active?: boolean
-  $hover?: boolean
 }
-export const GraphBar = styled.div.attrs<GraphBarProps>((props) => ({
-  style: {
-    "--bar-background": props.$hover ? "#b492d488" : "#b492d433",
-    "--bar-height": `${props.$heightPrc}%`,
-  },
-}))<GraphBarProps>`
+export const GraphBar = styled.div<GraphBarProps>`
   flex-grow: 1;
   height: 100%;
   display: flex;

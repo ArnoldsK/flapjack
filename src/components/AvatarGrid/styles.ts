@@ -16,21 +16,16 @@ export const GridItem = styled.div<{ $x: number; $y: number }>`
   height: ${GRID_ITEM_SIZE}px;
   left: ${({ $x }) => $x}%;
   top: ${({ $y }) => $y}%;
-  transition: top 200ms ease-in-out, left 200ms ease-in-out;
+  transition:
+    top 200ms ease-in-out,
+    left 200ms ease-in-out;
   will-change: top, left;
 `
 
 interface AvatarProps {
   $animate: boolean
-  $x: number
-  $y: number
 }
-export const Avatar = styled.div.attrs(({ $x, $y }: AvatarProps) => ({
-  style: {
-    left: $x,
-    top: $y,
-  },
-}))<AvatarProps>`
+export const Avatar = styled.div<AvatarProps>`
   width: ${AVATAR_SIZE}px;
   height: ${AVATAR_SIZE}px;
   position: absolute;
