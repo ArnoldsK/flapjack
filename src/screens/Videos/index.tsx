@@ -6,11 +6,11 @@ import * as S from "./styles"
 import { Page } from "~/src/components/Page"
 import { ApiVideos } from "~/types/api"
 
-interface VideoSCreenProps {
+interface VideoScreenProps {
   videos: ApiVideos
 }
 
-export const VideosScreen = ({ videos }: VideoSCreenProps) => {
+export const VideosScreen = ({ videos }: VideoScreenProps) => {
   // #############################################################################
   // Render
   // #############################################################################
@@ -44,7 +44,7 @@ export const VideosScreen = ({ videos }: VideoSCreenProps) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<VideoSCreenProps> = async (
+export const getServerSideProps: GetServerSideProps<VideoScreenProps> = async (
   ctx,
 ) => {
   const { origin } = absoluteUrl(ctx.req)

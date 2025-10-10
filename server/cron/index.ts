@@ -1,6 +1,7 @@
 import { createDailyStats } from "~/server/cron/tasks/createDailyStats"
 import { createWeekRecap } from "~/server/cron/tasks/createWeekRecap"
 import { endReminders } from "~/server/cron/tasks/endReminders"
+import { getPoeScarabPrices } from "~/server/cron/tasks/getPoeScarabPrices"
 // import { handleCreditsLotteries } from "~/server/cron/tasks/handleCreditsLotteries"
 // import { mcStatus } from "~/server/cron/tasks/mcStatus"
 import { removeNonBoosterIcons } from "~/server/cron/tasks/removeNonBoosterIcons"
@@ -73,5 +74,12 @@ export const cronTasks: CronTask[] = [
     isRawExpression: false,
     productionOnly: true,
     task: createDailyStats,
+  },
+  {
+    description: "Get PoE scarab prices",
+    expression: "every hour",
+    isRawExpression: false,
+    productionOnly: true,
+    task: getPoeScarabPrices,
   },
 ]
