@@ -2,6 +2,7 @@ import { GetServerSideProps } from "next"
 import Image from "next/image"
 import absoluteUrl from "next-absolute-url"
 import { useMemo } from "react"
+import { useCopyToClipboard } from "react-use"
 
 import { mapping } from "./mapping"
 import * as S from "./styles"
@@ -67,8 +68,14 @@ const Scarab = ({ scarab }: { scarab: PoeScarab }) => {
   const bad = value < BAD_VALUE_MAX
   const good = value > GOOD_VALUE_MIN
 
+  const [, copyToClipboard] = useCopyToClipboard()
+
   return (
-    <S.Scarab $bad={bad} $good={good}>
+    <S.Scarab
+      $bad={bad}
+      $good={good}
+      onClick={() => copyToClipboard(scarab.name)}
+    >
       <S.ScarabIcon>
         <Image src={scarab.icon} alt="" fill />
       </S.ScarabIcon>

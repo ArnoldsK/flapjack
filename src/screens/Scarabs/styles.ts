@@ -118,6 +118,7 @@ export const Scarab = styled(BlankScarab)<ScarabProps>`
     }
     return "#333333"
   }};
+  cursor: pointer;
 
   &:hover {
     ${ScarabLabel} {
