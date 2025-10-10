@@ -4,7 +4,7 @@ import { z } from "zod"
 import { StaticDataModel } from "~/server/db/model/StaticData"
 import { assert } from "~/server/utils/error"
 import { StaticDataType } from "~/types/entity"
-import { PoeScarabData } from "~/types/poe"
+import { PoeScarab, PoeScarabData } from "~/types/poe"
 import { Task } from "~/types/tasks"
 
 export const getPoeScarabPrices: Task<PoeScarabData> = async (context) => {
@@ -33,6 +33,7 @@ export const getPoeScarabPrices: Task<PoeScarabData> = async (context) => {
       z.object({
         name: z.string(),
         chaosValue: z.number(),
+        icon: z.string().url(),
       }),
     )
     .parse(scarabDataRaw)
@@ -44,10 +45,14 @@ export const getPoeScarabPrices: Task<PoeScarabData> = async (context) => {
 
   const staticData: PoeScarabData = {
     league,
-    scarabs: scarabData.map((scarab) => ({
-      name: scarab["name"],
-      chaosValue: scarab["chaosValue"],
-    })),
+    scarabs: scarabData.map(
+      (scarab) =>
+        ({
+          name: scarab.name,
+          chaosValue: scarab.chaosValue,
+          icon: scarab.icon,
+        }) satisfies PoeScarab,
+    ),
   }
 
   await model.set(StaticDataType.PoeScarabs, staticData)

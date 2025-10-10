@@ -1,6 +1,7 @@
 export interface PoeScarab {
   name: string
   chaosValue: number
+  icon: string
 }
 
 export interface PoeScarabData {

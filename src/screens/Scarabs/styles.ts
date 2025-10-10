@@ -1,14 +1,18 @@
-import styled, { css } from "styled-components"
+import styled from "styled-components"
+
+import { checkUnreachable } from "~/server/utils/error"
 
 export const Wrap = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 16px;
+  gap: 28px;
 `
 
-export const Title = styled.h1``
+export const Title = styled.h1`
+  margin: 0;
+`
 
 export const Rows = styled.div`
   display: flex;
@@ -20,6 +24,30 @@ export const Row = styled.div`
   display: flex;
   justify-content: center;
   gap: 28px;
+`
+
+interface ColumnProps {
+  $align: "left" | "center"
+}
+export const Column = styled.div<ColumnProps>`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+
+  align-items: ${({ $align }) => {
+    switch ($align) {
+      case "left": {
+        return "flex-start"
+      }
+      case "center": {
+        return "center"
+      }
+      default: {
+        checkUnreachable($align)
+      }
+    }
+  }};
 `
 
 export const Group = styled.div`
@@ -58,7 +86,6 @@ export const Scarab = styled.div<ScarabProps>`
   height: 40px;
   position: relative;
   border-radius: 4px;
-  background: #333333;
 
   &:hover {
     ${ScarabLabel} {
@@ -66,21 +93,16 @@ export const Scarab = styled.div<ScarabProps>`
     }
   }
 
-  ${({ $blank }) =>
-    $blank &&
-    css`
-      background: none;
-    `}
-
-  ${({ $bad }) =>
-    $bad &&
-    css`
-      background: #4b1a1a;
-    `}
-
-  ${({ $good }) =>
-    $good &&
-    css`
-      background: #1a4b1a;
-    `}
+  background: ${({ $blank, $bad, $good }) => {
+    if ($blank) {
+      return "none"
+    }
+    if ($bad) {
+      return "#4b1a1a"
+    }
+    if ($good) {
+      return "#1a4b1a"
+    }
+    return "#333333"
+  }};
 `
