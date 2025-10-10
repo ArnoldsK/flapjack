@@ -22,6 +22,7 @@ import {
 import { BaseContext } from "~/types"
 
 export type SetupCommand = RESTPostAPIChatInputApplicationCommandsJSONBody & {
+  dynamicVersion: boolean
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>
 }
 
@@ -69,6 +70,8 @@ export const getSetupCommands = async (
       ...Command.command.toJSON(),
 
       description: parseDescription(Command),
+
+      dynamicVersion: Command.dynamicVersion,
 
       execute: async (interaction) => {
         assert(!!interaction.inGuild(), "Not in guild")
@@ -157,12 +160,11 @@ export const handleApiCommands = async (commands: SetupCommand[]) => {
   )) as APIApplicationCommand[]
 
   // Update is an override so there's a single update body with all API commands
-  const updateCommands: Omit<SetupCommand, "execute">[] = apiCommands.map(
-    (el) => ({
+  const updateCommands: Omit<SetupCommand, "execute" | "dynamicVersion">[] =
+    apiCommands.map((el) => ({
       ...el,
       type: el.type === ApplicationCommandType.ChatInput ? el.type : undefined,
-    }),
-  )
+    }))
 
   // Add new commands
   for (const command of commands) {
@@ -182,7 +184,11 @@ export const handleApiCommands = async (commands: SetupCommand[]) => {
 
     if (version === apiVersion) {
       // Do nothing
-    } else if (version > apiVersion || appConfig.dev) {
+    } else if (
+      version > apiVersion ||
+      command.dynamicVersion ||
+      appConfig.dev
+    ) {
       console.log("> Commands > Update >", command.name)
       updateCommands[apiCommandIndex] = command
     } else if (version < apiVersion) {

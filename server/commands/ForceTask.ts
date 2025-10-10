@@ -30,6 +30,8 @@ enum OptionName {
 export default class ForceTaskCommand extends BaseCommand {
   static version = version
 
+  static dynamicVersion = true
+
   static command = new SlashCommandBuilder()
     .setName("force-task")
     .setDescription("Force run a task")

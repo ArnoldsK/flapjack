@@ -27,6 +27,11 @@ export class BaseCommand {
   static version = 0
 
   /**
+   * Dynamic version ignores lower version inconsistency when checking for API differences
+   */
+  static dynamicVersion = false
+
+  /**
    * Command builder
    */
   static command:
