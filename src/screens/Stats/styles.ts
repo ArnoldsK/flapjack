@@ -170,6 +170,7 @@ interface GraphBarProps {
   $active?: boolean
 }
 export const GraphBar = styled.div<GraphBarProps>`
+  position: relative;
   flex-grow: 1;
   height: 100%;
   display: flex;
@@ -198,4 +199,12 @@ export const GraphBar = styled.div<GraphBarProps>`
             }
           }
         `}
+`
+
+export const GraphBarLabel = styled.div`
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  translate: -50%;
+  font-size: 10px;
 `

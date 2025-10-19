@@ -36,6 +36,9 @@ export const DatesColumn = ({
     string | null
   >(null)
 
+  // #############################################################################
+  // Totals by month
+  // #############################################################################
   const currentMonthTotals = useMemo(() => {
     const absoluteMax = Math.max(
       ...messagesPerDay.map((item) => item.messageCount),
@@ -52,21 +55,69 @@ export const DatesColumn = ({
   }, [currentMonthStats, messagesPerDay])
 
   // #############################################################################
+  // Combined trend
+  // #############################################################################
+  const yearMonthTrend = useMemo(() => {
+    if (currentYearMonth !== YEAR_MONTH_ALL) {
+      return {
+        entries: [],
+        max: 0,
+      }
+    }
+
+    const totalsPerYearMonth = new Map<string, number>([])
+
+    for (const item of messagesPerDay) {
+      const yearMonth = d(item.dateString).format("YYYY MMMM")
+
+      totalsPerYearMonth.set(
+        yearMonth,
+        (totalsPerYearMonth.get(yearMonth) ?? 0) + item.messageCount,
+      )
+    }
+
+    return {
+      entries: [...totalsPerYearMonth.entries()],
+      max: Math.max(...totalsPerYearMonth.values()),
+    }
+  }, [currentYearMonth, messagesPerDay])
+
+  // #############################################################################
   // Render
   // #############################################################################
   return (
     <S.StatColumn>
       {currentYearMonth === YEAR_MONTH_ALL ? (
-        <S.Stat>
-          <S.StatItemsWrap>
-            {commands.map((command) => (
-              <S.StatItem key={command.name}>
-                <S.CountBadge>{command.count}</S.CountBadge>
-                <S.StatText>/{command.name}</S.StatText>
-              </S.StatItem>
-            ))}
-          </S.StatItemsWrap>
-        </S.Stat>
+        <>
+          <S.Stat>
+            <S.GraphWrap>
+              {yearMonthTrend.entries.map(([yearMonth, total]) => (
+                <S.GraphBar
+                  key={yearMonth}
+                  title={String(total)}
+                  style={getGraphBarStyle({
+                    heightPrc: (total / yearMonthTrend.max) * 100,
+                  })}
+                >
+                  <S.GraphBarLabel>
+                    {/* {yearMonth.split(" ").at(1)?.slice(0, 3)} */}
+                    {yearMonth.slice(0, 8)}
+                  </S.GraphBarLabel>
+                </S.GraphBar>
+              ))}
+            </S.GraphWrap>
+          </S.Stat>
+          <S.Stat>
+            <S.StatItemsWrap>
+              {commands.map((command) => (
+                <S.StatItem key={command.name}>
+                  <S.CountBadge>{command.count}</S.CountBadge>
+                  <S.StatText>/{command.name}</S.StatText>
+                </S.StatItem>
+              ))}
+            </S.StatItemsWrap>
+          </S.Stat>
+        </>
       ) : (
         <S.Stat>
           <S.CalendarWrap>
@@ -110,6 +161,7 @@ export const DatesColumn = ({
                 onClick={() => setCurrentDateString(dateString)}
                 onMouseEnter={() => setCurrentHoverDateString(dateString)}
                 onMouseLeave={() => setCurrentHoverDateString(null)}
+                title={String(total)}
                 style={getGraphBarStyle({
                   heightPrc: (total / currentMonthTotals.max) * 100,
                   hover: dateString === currentHoverDateString,
