@@ -1,13 +1,17 @@
 import dayjs, { ManipulateType } from "dayjs"
+import locale from "dayjs/locale/en-gb"
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter"
 import relativeTime from "dayjs/plugin/relativeTime"
 import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
+import weekday from "dayjs/plugin/weekday"
 
 dayjs.extend(relativeTime)
 dayjs.extend(isSameOrAfter)
 dayjs.extend(utc)
 dayjs.extend(timezone)
+dayjs.extend(weekday)
+dayjs.locale(locale)
 
 export { default as d } from "dayjs"
 

@@ -1,7 +1,14 @@
 import { ChannelType } from "discord-api-types/v10"
 import { GetServerSideProps } from "next"
 import absoluteUrl from "next-absolute-url"
-import { CSSProperties, useCallback, useEffect, useMemo, useState } from "react"
+import {
+  CSSProperties,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 
 import TextIcon from "./icons/text.svg"
 import ThreadIcon from "./icons/thread.svg"
@@ -70,18 +77,23 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
         )
   }, [currentYearMonth, messagesPerDay])
 
-  const currentMonthPastDates = useMemo((): number[] => {
+  const currentMonthPastDates = useMemo((): ReactNode[] => {
     const firstStat = currentMonthStats.at(0)
     if (!firstStat) {
       return []
     }
 
-    const firstDate = d(firstStat.dateString).date()
+    const date = d(firstStat.dateString)
+    const firstDate = date.date()
+    const firstDay = date.weekday()
 
-    return Array.from({ length: firstDate - 1 }, (_, i) => i + 1)
+    return [
+      ...Array.from({ length: firstDay }, () => ""),
+      ...Array.from({ length: firstDate - 1 }, (_, i) => i + 1),
+    ]
   }, [currentMonthStats])
 
-  const currentMonthFutureDates = useMemo((): number[] => {
+  const currentMonthFutureDates = useMemo((): ReactNode[] => {
     const lastStat = currentMonthStats.at(-1)
     if (!lastStat) {
       return []
@@ -226,8 +238,8 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
             {currentYearMonth !== YEAR_MONTH_ALL && (
               <S.Stat>
                 <S.CalendarWrap>
-                  {currentMonthPastDates.map((date) => (
-                    <S.Day key={date} $disabled>
+                  {currentMonthPastDates.map((date, i) => (
+                    <S.Day key={i} $disabled>
                       {date}
                     </S.Day>
                   ))}
@@ -243,16 +255,16 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
                       {d(dateString).format("D")}
                     </S.Day>
                   ))}
-                  {currentMonthFutureDates.map((date) => (
-                    <S.Day key={date} $disabled>
+                  {currentMonthFutureDates.map((date, i) => (
+                    <S.Day key={i} $disabled>
                       {date}
                     </S.Day>
                   ))}
                 </S.CalendarWrap>
                 <S.GraphWrap>
-                  {currentMonthPastDates.map((date) => (
+                  {currentMonthPastDates.map((_, i) => (
                     <S.GraphBar
-                      key={date}
+                      key={i}
                       style={getGraphBarStyle({ heightPrc: 0 })}
                     />
                   ))}
@@ -269,9 +281,9 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
                       })}
                     />
                   ))}
-                  {currentMonthFutureDates.map((date) => (
+                  {currentMonthFutureDates.map((_, i) => (
                     <S.GraphBar
-                      key={date}
+                      key={i}
                       style={getGraphBarStyle({ heightPrc: 0 })}
                     />
                   ))}
