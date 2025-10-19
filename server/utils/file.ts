@@ -27,8 +27,9 @@ const getImportableDirectoryFiles = (dir: string) => {
  */
 export const importDirectoryDefaults = async <TDefault>(
   dir: string,
+  ...paths: string[]
 ): Promise<TDefault[]> => {
-  const files = getImportableDirectoryFiles(dir)
+  const files = getImportableDirectoryFiles(path.join(dir, ...paths))
   const imports = await Promise.all(
     files.map(async (file) => {
       try {
