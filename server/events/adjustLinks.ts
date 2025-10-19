@@ -73,7 +73,7 @@ export default createEvent(
       if (reelId) {
         message.suppressEmbeds(true)
 
-        const url = `https://eeinstagram.com/reel/${reelId}/`
+        const url = `https://kkinstagram.com/reel/${reelId}/`
 
         await message.reply(`[reel](${url}) embed fix`)
       }
