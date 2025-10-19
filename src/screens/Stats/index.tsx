@@ -262,12 +262,15 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
                   ))}
                 </S.CalendarWrap>
                 <S.GraphWrap>
-                  {currentMonthPastDates.map((_, i) => (
-                    <S.GraphBar
-                      key={i}
-                      style={getGraphBarStyle({ heightPrc: 0 })}
-                    />
-                  ))}
+                  {currentMonthPastDates.map(
+                    (date, i) =>
+                      typeof date === "number" && (
+                        <S.GraphBar
+                          key={i}
+                          style={getGraphBarStyle({ heightPrc: 0 })}
+                        />
+                      ),
+                  )}
                   {currentMonthTotals.totals.map(({ total, dateString }) => (
                     <S.GraphBar
                       key={dateString}
