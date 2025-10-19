@@ -8,15 +8,16 @@ export const Months = styled.div`
   flex-wrap: wrap;
 `
 
-export const Month = styled.div<{ active?: boolean }>`
+export const Month = styled.div<{ $active?: boolean }>`
   flex-shrink: 0;
-  cursor: ${({ active }) => (active ? "default" : "pointer")};
+  cursor: ${({ $active }) => ($active ? "default" : "pointer")};
   padding: 8px 12px;
-  border-bottom: 2px solid ${({ active }) => (active ? "#ddd" : "transparent")};
+  border-bottom: 2px solid
+    ${({ $active }) => ($active ? "#ddd" : "transparent")};
 
   &:hover {
-    ${({ active }) =>
-      !active &&
+    ${({ $active }) =>
+      !$active &&
       css`
         border-color: #444;
       `};

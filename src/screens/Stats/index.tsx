@@ -1,14 +1,7 @@
 import { ChannelType } from "discord-api-types/v10"
 import { GetServerSideProps } from "next"
 import absoluteUrl from "next-absolute-url"
-import {
-  CSSProperties,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react"
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react"
 
 import TextIcon from "./icons/text.svg"
 import ThreadIcon from "./icons/thread.svg"
@@ -16,35 +9,24 @@ import * as S from "./styles"
 
 import { d } from "~/server/utils/date"
 import { Page } from "~/src/components/Page"
+import { DatesColumn } from "~/src/screens/Stats/Columns/Dates"
+import {
+  DATE_STRING_FORMAT,
+  YEAR_MONTH_ALL,
+  YEAR_MONTH_FORMAT,
+} from "~/src/screens/Stats/constants"
 import { ApiStats, ApiStatsDay } from "~/types/api"
 
 interface StatsScreenProps {
   stats: ApiStats
 }
 
-const YEAR_MONTH_ALL = "all-year-months"
-const YEAR_MONTH_FORMAT = "YYYY MMMM"
-const DATE_STRING_FORMAT = "YYYY-MM-DD"
-
 const formatChannelName = (name: string) => {
   return name.replace("╰", "")
 }
 
-const getGraphBarStyle = ({
-  heightPrc,
-  hover,
-}: {
-  heightPrc: number
-  hover?: boolean
-}) => {
-  return {
-    "--bar-background": hover ? "#b492d488" : "#b492d433",
-    "--bar-height": `${heightPrc}%`,
-  } as CSSProperties
-}
-
 export const StatsScreen = ({ stats }: StatsScreenProps) => {
-  const { messagesPerDay, commands } = stats
+  const { messagesPerDay } = stats
 
   // #############################################################################
   // Top level separation
@@ -170,28 +152,6 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
     return messagesPerDay.find((item) => item.dateString === currentDateString)
   }, [currentDateString, currentYearMonth, messagesPerDay])
 
-  const currentMonthTotals = useMemo(() => {
-    const absoluteMax = Math.max(
-      ...messagesPerDay.map((item) => item.messageCount),
-    )
-    const perDateTotals = currentMonthStats.map((item) => ({
-      dateString: item.dateString,
-      total: item.messageCount,
-    }))
-
-    return {
-      max: absoluteMax,
-      totals: perDateTotals,
-    }
-  }, [currentMonthStats, messagesPerDay])
-
-  // #############################################################################
-  // Current hover
-  // #############################################################################
-  const [currentHoverDateString, setCurrentHoverDateString] = useState<
-    string | null
-  >(null)
-
   // #############################################################################
   // Channel icon
   // #############################################################################
@@ -217,14 +177,14 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
           {yearMonths.map((yearMonth) => (
             <S.Month
               key={yearMonth}
-              active={currentYearMonth === yearMonth}
+              $active={currentYearMonth === yearMonth}
               onClick={() => setCurrentYearMonth(yearMonth)}
             >
               {yearMonth}
             </S.Month>
           ))}
           <S.Month
-            active={currentYearMonth === YEAR_MONTH_ALL}
+            $active={currentYearMonth === YEAR_MONTH_ALL}
             onClick={() => setCurrentYearMonth(YEAR_MONTH_ALL)}
           >
             Combined
@@ -234,77 +194,16 @@ export const StatsScreen = ({ stats }: StatsScreenProps) => {
 
       {currentStats && (
         <S.Stats>
-          <S.StatColumn>
-            {currentYearMonth !== YEAR_MONTH_ALL && (
-              <S.Stat>
-                <S.CalendarWrap>
-                  {currentMonthPastDates.map((date, i) => (
-                    <S.Day key={i} $disabled>
-                      {date}
-                    </S.Day>
-                  ))}
-                  {dateStrings.map((dateString) => (
-                    <S.Day
-                      key={dateString}
-                      $active={dateString === currentDateString}
-                      $hover={dateString === currentHoverDateString}
-                      onClick={() => setCurrentDateString(dateString)}
-                      onMouseEnter={() => setCurrentHoverDateString(dateString)}
-                      onMouseLeave={() => setCurrentHoverDateString(null)}
-                    >
-                      {d(dateString).format("D")}
-                    </S.Day>
-                  ))}
-                  {currentMonthFutureDates.map((date, i) => (
-                    <S.Day key={i} $disabled>
-                      {date}
-                    </S.Day>
-                  ))}
-                </S.CalendarWrap>
-                <S.GraphWrap>
-                  {currentMonthPastDates.map(
-                    (date, i) =>
-                      typeof date === "number" && (
-                        <S.GraphBar
-                          key={i}
-                          style={getGraphBarStyle({ heightPrc: 0 })}
-                        />
-                      ),
-                  )}
-                  {currentMonthTotals.totals.map(({ total, dateString }) => (
-                    <S.GraphBar
-                      key={dateString}
-                      $active={dateString === currentDateString}
-                      onClick={() => setCurrentDateString(dateString)}
-                      onMouseEnter={() => setCurrentHoverDateString(dateString)}
-                      onMouseLeave={() => setCurrentHoverDateString(null)}
-                      style={getGraphBarStyle({
-                        heightPrc: (total / currentMonthTotals.max) * 100,
-                        hover: dateString === currentHoverDateString,
-                      })}
-                    />
-                  ))}
-                  {currentMonthFutureDates.map((_, i) => (
-                    <S.GraphBar
-                      key={i}
-                      style={getGraphBarStyle({ heightPrc: 0 })}
-                    />
-                  ))}
-                </S.GraphWrap>
-              </S.Stat>
-            )}
-            <S.Stat>
-              <S.CollapseCheckbox type="checkbox" />
-              <S.StatItemsWrap>
-                {commands.map((command) => (
-                  <S.StatItem key={command.name}>
-                    <S.CountBadge>{command.count}</S.CountBadge>
-                    <S.StatText>/{command.name}</S.StatText>
-                  </S.StatItem>
-                ))}
-              </S.StatItemsWrap>
-            </S.Stat>
-          </S.StatColumn>
+          <DatesColumn
+            stats={stats}
+            currentMonthStats={currentMonthStats}
+            dateStrings={dateStrings}
+            currentDateString={currentDateString}
+            setCurrentDateString={setCurrentDateString}
+            currentYearMonth={currentYearMonth}
+            currentMonthPastDates={currentMonthPastDates}
+            currentMonthFutureDates={currentMonthFutureDates}
+          />
           <S.Stat>
             <S.StatItemsWrap>
               {currentStats.topChannels.map((channel) => (
