@@ -292,14 +292,14 @@ export default class GearCommand extends BaseCommand {
     }
     if (
       slot === OsrsItemSlot.TwoHanded &&
-      !items.some((item) =>
+      items.some((item) =>
         [OsrsItemSlot.OneHanded, OsrsItemSlot.Shield].includes(item.itemSlot),
       )
     ) {
       return "Already using a weapon or a shield, sell them first to buy"
     } else if (
       [OsrsItemSlot.OneHanded, OsrsItemSlot.Shield].includes(slot) &&
-      !items.some((item) => item.itemSlot === OsrsItemSlot.TwoHanded)
+      items.some((item) => item.itemSlot === OsrsItemSlot.TwoHanded)
     ) {
       return "Already using a weapon, sell it first to buy"
     }
