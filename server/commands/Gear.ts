@@ -244,18 +244,20 @@ export default class GearCommand extends BaseCommand {
 
       await interaction.deferUpdate()
 
+      // Handle separately to catch error
+      await itemsModel.addItem({
+        userId: this.member.id,
+        itemId,
+        itemName: name,
+        itemBoughtPrice: BigInt(price),
+        itemSlot: slot,
+      })
+
       await Promise.all([
         interaction.editReply({
           components: this.#getBuyComponents({
             success: true,
           }),
-        }),
-        itemsModel.addItem({
-          userId: this.member.id,
-          itemId,
-          itemName: name,
-          itemBoughtPrice: BigInt(price),
-          itemSlot: slot,
         }),
         creditsModel.modifyCredits({
           userId: this.member.id,
