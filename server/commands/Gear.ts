@@ -220,7 +220,7 @@ export default class GearCommand extends BaseCommand {
           color: this.member.displayColor,
           title: name,
           description: joinAsLines(
-            formatCredits(price),
+            `**${formatCredits(price)}**`,
             !canAfford
               ? `You lack ${formatCredits(BigInt(price) - wallet.credits)}`
               : undefined,
@@ -236,38 +236,39 @@ export default class GearCommand extends BaseCommand {
 
     if (!canBuy || !response) return
 
-    const interaction = await response.awaitMessageComponent({
-      componentType: ComponentType.Button,
-      idle: 5 * 60_000, // 1 minute
-      filter: (i) => i.user.id === this.user.id,
-    })
+    try {
+      const interaction = await response.awaitMessageComponent({
+        componentType: ComponentType.Button,
+        time: 60_000, // 1 minute
+        filter: (i) => i.user.id === this.user.id,
+      })
 
-    await interaction.deferUpdate()
+      await interaction.deferUpdate()
 
-    if (interaction.customId !== CustomId.Buy) {
-      throw new Error("Unknown action")
+      await Promise.all([
+        interaction.editReply({
+          components: this.#getBuyComponents({
+            success: true,
+          }),
+        }),
+        itemsModel.addItem({
+          userId: this.member.id,
+          itemId,
+          itemName: name,
+          itemBoughtPrice: BigInt(price),
+          itemSlot: slot,
+        }),
+        creditsModel.modifyCredits({
+          userId: this.member.id,
+          byAmount: -price,
+          isCasino: false,
+        }),
+      ])
+    } catch {
+      await this.editReply({
+        components: [],
+      })
     }
-
-    interaction.editReply({
-      components: this.#getBuyComponents({
-        success: true,
-      }),
-    })
-
-    await Promise.all([
-      itemsModel.addItem({
-        userId: this.member.id,
-        itemId,
-        itemName: name,
-        itemBoughtPrice: BigInt(price),
-        itemSlot: slot,
-      }),
-      creditsModel.modifyCredits({
-        userId: this.member.id,
-        byAmount: -price,
-        isCasino: false,
-      }),
-    ])
   }
 
   #getBuyComponents(options?: { success?: boolean }) {
@@ -342,7 +343,7 @@ export default class GearCommand extends BaseCommand {
         {
           color: this.member.displayColor,
           title: item.itemName,
-          description: formatCredits(price),
+          description: `**${formatCredits(price)}**`,
           footer: !realPrice
             ? { text: `Real price not found, using purchase price` }
             : undefined,
@@ -356,37 +357,38 @@ export default class GearCommand extends BaseCommand {
 
     if (!response) return
 
-    const interaction = await response.awaitMessageComponent({
-      componentType: ComponentType.Button,
-      idle: 5 * 60_000, // 1 minute
-      filter: (i) => i.user.id === this.user.id,
-    })
+    try {
+      const interaction = await response.awaitMessageComponent({
+        componentType: ComponentType.Button,
+        time: 60_000, // 1 minute
+        filter: (i) => i.user.id === this.user.id,
+      })
 
-    await interaction.deferUpdate()
+      await interaction.deferUpdate()
 
-    if (interaction.customId !== CustomId.Sell) {
-      throw new Error("Unknown action")
+      const creditsModel = new CreditsModel(this.context)
+
+      await Promise.all([
+        interaction.editReply({
+          components: this.#getSellComponents({
+            success: true,
+          }),
+        }),
+        itemsModel.removeItem({
+          userId: this.member.id,
+          itemId: item.itemId,
+        }),
+        creditsModel.modifyCredits({
+          userId: this.member.id,
+          byAmount: price,
+          isCasino: false,
+        }),
+      ])
+    } catch {
+      await this.editReply({
+        components: [],
+      })
     }
-
-    interaction.editReply({
-      components: this.#getSellComponents({
-        success: true,
-      }),
-    })
-
-    const creditsModel = new CreditsModel(this.context)
-
-    await Promise.all([
-      itemsModel.removeItem({
-        userId: this.member.id,
-        itemId: item.itemId,
-      }),
-      creditsModel.modifyCredits({
-        userId: this.member.id,
-        byAmount: price,
-        isCasino: false,
-      }),
-    ])
   }
 
   #getSellComponents(options?: { success?: boolean }) {
