@@ -8,12 +8,6 @@ export enum OsrsItemSlot {
   OneHanded = "oneHanded",
   TwoHanded = "twoHanded",
 }
-
-export interface OsrsPriceItem {
-  id: number
-  price: number
-}
-
 export interface OsrsPriceData {
-  items: OsrsPriceItem[]
+  items: Array<[number, number]>
 }

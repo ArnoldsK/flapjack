@@ -163,14 +163,14 @@ export default class CreditsCommand extends BaseCommand {
     )
     const amount = parseCreditsAmount(rawAmount, wallet.credits)
 
-    await creditsModel.addCredits({
+    await creditsModel.modifyCredits({
       userId: targetMember.id,
-      amount,
+      byAmount: amount,
       isCasino: false,
     })
-    await creditsModel.addCredits({
+    await creditsModel.modifyCredits({
       userId: this.member.id,
-      amount: -amount,
+      byAmount: -amount,
       isCasino: false,
     })
 
@@ -231,9 +231,9 @@ export default class CreditsCommand extends BaseCommand {
     const amount = BigInt(rawAmount)
 
     const creditsModel = new CreditsModel(this.context)
-    await creditsModel.addCredits({
+    await creditsModel.modifyCredits({
       userId: targetMember.id,
-      amount,
+      byAmount: amount,
       isCasino: false,
     })
 

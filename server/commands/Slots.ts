@@ -3,6 +3,7 @@ import { SlashCommandBuilder } from "discord.js"
 import { OPTION_DESCRIPTION_AMOUNT } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { CreditsModel } from "~/server/db/model/Credits"
+import { OsrsItemsModel } from "~/server/db/model/OsrsItems"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
 import { randomValue } from "~/server/utils/random"
@@ -66,11 +67,14 @@ export default class SlotsCommand extends BaseCommand {
     const winAmount = amount * winMulti
     const creditsToAdd = winAmount - amount
 
-    const newWallet = await creditsModel.addCredits({
+    const newWallet = await creditsModel.modifyCredits({
       userId: this.member.id,
-      amount: creditsToAdd,
+      byAmount: creditsToAdd,
       isCasino: true,
     })
+
+    const osrsItemsModel = new OsrsItemsModel(this.context)
+    const { thumbnail, files } = await osrsItemsModel.getEmbedData(this.member)
 
     this.reply({
       ephemeral: !isCasinoChannel(this.channel),
@@ -83,8 +87,10 @@ export default class SlotsCommand extends BaseCommand {
               : `**You got nothing and lost ${formatCredits(amount)}**`,
             `You have ${formatCredits(newWallet.credits)} now`,
           ),
+          thumbnail,
         },
       ],
+      files,
     })
   }
 

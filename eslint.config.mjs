@@ -62,6 +62,7 @@ const config = [
       "unicorn/prefer-module": "off", // flapjack lives in the past
       "unicorn/no-array-method-this-argument": "off", // gets confused with MikroORM find()
       "unicorn/no-nested-ternary": "off", // prettier format conflict
+      "unicorn/no-negated-condition": "off", // not a fan of `canAfford ? null : "Buy"` look
     },
   },
   {

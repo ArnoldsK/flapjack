@@ -8,10 +8,10 @@ import { OsrsItemSlot } from "~/types/osrs"
 // Used for layer order
 const drawKeys = [
   "cape",
+  "legs",
+  "feet",
   "body",
   "neck",
-  "feet",
-  "legs",
   "avatar",
   "weapon",
   "shield",
@@ -26,13 +26,13 @@ const defaultImagePathBySlot = new Map<OsrsItemSlot, string>([
 // TODO: Use self hosting for used images
 export const getOsrsGearImage = async ({
   avatarUrl,
-  userItems,
+  items,
 }: {
   avatarUrl: string
-  userItems: OsrsItemsEntity[]
+  items: OsrsItemsEntity[]
 }): Promise<Buffer> => {
   const userItemBySlot = new Map<string, OsrsItemsEntity>(
-    userItems.map((item) => [item.itemSlot, item]),
+    items.map((item) => [item.itemSlot, item]),
   )
 
   // Sizes
@@ -137,7 +137,7 @@ export const getOsrsGearImage = async ({
   }
 
   // Weapon
-  const weaponItem = userItems.find((el) =>
+  const weaponItem = items.find((el) =>
     [OsrsItemSlot.OneHanded, OsrsItemSlot.TwoHanded].includes(el.itemSlot),
   )
   let weaponWidth = 100

@@ -3,6 +3,7 @@ import { SlashCommandBuilder } from "discord.js"
 import { Color, OPTION_DESCRIPTION_AMOUNT } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { CreditsModel } from "~/server/db/model/Credits"
+import { OsrsItemsModel } from "~/server/db/model/OsrsItems"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
 import { randomValue } from "~/server/utils/random"
@@ -65,11 +66,14 @@ export default class RouletteCommand extends BaseCommand {
     }
 
     const winAmount = amount * winMulti
-    const newWallet = await creditsModel.addCredits({
+    const newWallet = await creditsModel.modifyCredits({
       userId: this.member.id,
-      amount: winAmount,
+      byAmount: winAmount,
       isCasino: true,
     })
+
+    const osrsItemsModel = new OsrsItemsModel(this.context)
+    const { thumbnail, files } = await osrsItemsModel.getEmbedData(this.member)
 
     this.reply({
       ephemeral: !isCasinoChannel(this.channel),
@@ -82,8 +86,10 @@ export default class RouletteCommand extends BaseCommand {
             `You have ${formatCredits(newWallet.credits)} now`,
           ),
           color: Color[rolledColor],
+          thumbnail,
         },
       ],
+      files,
     })
   }
 

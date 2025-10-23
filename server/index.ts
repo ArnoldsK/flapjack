@@ -106,7 +106,7 @@ nextApp.prepare().then(async () => {
         forceStatic: true,
         size: 64,
       }),
-      userItems,
+      items: userItems,
     })
   })
 
@@ -185,6 +185,8 @@ nextApp.prepare().then(async () => {
   // Graceful exit
   // #############################################################################
   process.on("SIGINT", async () => {
+    console.log("\n")
+
     await db.close()
 
     if (appConfig.dev) {

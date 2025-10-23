@@ -15,7 +15,7 @@ export const DATA_SCHEMA = z.object({
   ),
 })
 
-export const getOsrsPrices: Task<OsrsPriceData> = async (context) => {
+export const getOsrsPrices: Task<Map<number, number>> = async (context) => {
   // Get API prices
   let data: z.TypeOf<typeof DATA_SCHEMA>
   try {
@@ -30,7 +30,7 @@ export const getOsrsPrices: Task<OsrsPriceData> = async (context) => {
     data = DATA_SCHEMA.parse(await res.json())
   } catch {
     // Shrug
-    return { items: [] }
+    return new Map()
   }
 
   // Parse data items
@@ -40,15 +40,12 @@ export const getOsrsPrices: Task<OsrsPriceData> = async (context) => {
     const price = Number(item.high ?? item.low ?? 0)
     if (!price) continue
 
-    items.push({
-      id: Number(id),
-      price,
-    })
+    items.push([Number(id), price])
   }
 
   // Save data items
   const model = new StaticDataModel(context)
   model.set(StaticDataType.OsrsPrices, { items })
 
-  return { items }
+  return new Map(items)
 }

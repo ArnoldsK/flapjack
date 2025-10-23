@@ -23,6 +23,7 @@ import { OPTION_DESCRIPTION_AMOUNT, Unicode } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { CacheKey } from "~/server/cache"
 import { CreditsModel } from "~/server/db/model/Credits"
+import { OsrsItemsEmbedData, OsrsItemsModel } from "~/server/db/model/OsrsItems"
 import { isNonNullish } from "~/server/utils/boolean"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
@@ -68,12 +69,15 @@ export default class BlackjackCommand extends BaseCommand {
     )
 
   #_creditsModel: CreditsModel
+
   get #creditsModel() {
     if (!this.#_creditsModel) {
       this.#_creditsModel = new CreditsModel(this.context)
     }
     return this.#_creditsModel
   }
+
+  #embedData: OsrsItemsEmbedData | undefined
 
   #getRunningGameUrl(): string | undefined {
     const manager = this.context.cache.get(CacheKey.Blackjack)
@@ -118,9 +122,9 @@ export default class BlackjackCommand extends BaseCommand {
 
     game.dispatch(actions.deal({ bet: amount }))
 
-    const newWallet = await this.#creditsModel.addCredits({
+    const newWallet = await this.#creditsModel.modifyCredits({
       userId: this.member.id,
-      amount: -amount,
+      byAmount: -amount,
       isCasino: true,
     })
     const canDouble = newWallet.credits >= amount
@@ -132,6 +136,9 @@ export default class BlackjackCommand extends BaseCommand {
     const description = gameOver
       ? await this.#handleGameOver(game, wonAmount)
       : undefined
+
+    const osrsItemsModel = new OsrsItemsModel(this.context)
+    this.#embedData = await osrsItemsModel.getEmbedData(this.member)
 
     const ephemeral = !isCasinoChannel(this.channel)
     const response = await this.reply({
@@ -146,8 +153,10 @@ export default class BlackjackCommand extends BaseCommand {
                   text: "Dismissing message counts as a loss",
                 }
               : undefined,
+          thumbnail: this.#embedData?.thumbnail,
         },
       ],
+      files: this.#embedData?.files,
       components,
     })
 
@@ -212,9 +221,9 @@ export default class BlackjackCommand extends BaseCommand {
       // Modify credits
       // #############################################################################
       if (["double", "split"].includes(action)) {
-        await this.#creditsModel.addCredits({
+        await this.#creditsModel.modifyCredits({
           userId: this.member.id,
-          amount: -state.initialBet,
+          byAmount: -state.initialBet,
           isCasino: true,
         })
       }
@@ -271,9 +280,9 @@ export default class BlackjackCommand extends BaseCommand {
   }
 
   async #handleGameOver(game: Game, wonAmount: number): Promise<string> {
-    const wallet = await this.#creditsModel.addCredits({
+    const wallet = await this.#creditsModel.modifyCredits({
       userId: this.member.id,
-      amount: wonAmount,
+      byAmount: wonAmount,
       isCasino: true,
     })
     const state = game.getState()
@@ -361,6 +370,7 @@ export default class BlackjackCommand extends BaseCommand {
             ),
           },
         ].filter(isNonNullish),
+        thumbnail: this.#embedData?.thumbnail,
       },
       components: [actionRow].filter(isNonNullish),
       gameOver,

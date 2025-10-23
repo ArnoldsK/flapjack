@@ -45,22 +45,22 @@ export class CreditsModel extends BaseModel {
     }
   }
 
-  async addBotCredits(amount: bigint) {
+  async modifyBotCredits(byAmount: bigint) {
     const userId = this.context.guild().client.user.id
     const entity = await this.em.findOne(this.Entity, { userId })
 
-    const newCredits = parseEntityCredits(entity) + amount
+    const newCredits = parseEntityCredits(entity) + byAmount
 
     await this.em.upsert(this.Entity, getUpsertData(userId, newCredits))
   }
 
-  async addCredits({
+  async modifyCredits({
     userId,
-    amount,
+    byAmount,
     isCasino,
   }: {
     userId: string
-    amount: bigint | number
+    byAmount: bigint | number
     /**
      * Is this credits transaction done in the casino?
      * Will modify bot credits with the opposite amount.
@@ -70,7 +70,7 @@ export class CreditsModel extends BaseModel {
     const { member, credits } = await this.getWallet(userId)
 
     const bigAmount: bigint =
-      typeof amount === "bigint" ? amount : BigInt(Math.floor(amount))
+      typeof byAmount === "bigint" ? byAmount : BigInt(Math.floor(byAmount))
 
     const newCredits = credits + bigAmount
 
@@ -82,7 +82,7 @@ export class CreditsModel extends BaseModel {
     // Modify bot credits with the opposite amount
     if (isCasino) {
       try {
-        await this.addBotCredits(-bigAmount)
+        await this.modifyBotCredits(-bigAmount)
       } catch {
         // Should not fail the user credits add
         console.error("Failed to add bot credits")

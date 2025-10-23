@@ -72,9 +72,9 @@ export const handleCreditsLotteries: Task = async (context) => {
     const member = randomValue(members)!
 
     const creditsModel = new CreditsModel(context)
-    await creditsModel.addCredits({
+    await creditsModel.modifyCredits({
       userId: member.id,
-      amount: amount,
+      byAmount: amount,
       isCasino: false,
     })
 
