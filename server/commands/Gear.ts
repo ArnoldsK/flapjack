@@ -137,33 +137,21 @@ export default class GearCommand extends BaseCommand {
     const model = new OsrsItemsModel(this.context)
     const { items, thumbnail, files } = await model.getEmbedData(member)
 
-    if (items.length === 0) {
-      this.reply({
-        ephemeral: this.#isEphemeral,
-        embeds: [
-          {
-            title: member.displayName,
-            color: member.displayColor,
-            description: "No items",
-            thumbnail,
-          },
-        ],
-        files,
-      })
-      return
-    }
-
     this.reply({
       ephemeral: this.#isEphemeral,
       embeds: [
         {
           title: member.displayName,
           color: member.displayColor,
-          fields: items.map((item) => ({
-            name: item.itemName,
-            value: `Bought for ${formatCredits(item.itemBoughtPrice)}`, // TODO: use price data to show change
-            inline: true,
-          })),
+          description: items.length === 0 ? "No items" : undefined,
+          fields:
+            items.length > 0
+              ? items.map((item) => ({
+                  name: item.itemName,
+                  value: `Bought for ${formatCredits(item.itemBoughtPrice)}`, // TODO: use price data to show change
+                  inline: true,
+                }))
+              : undefined,
           thumbnail,
         },
       ],
