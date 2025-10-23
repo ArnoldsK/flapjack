@@ -1,7 +1,7 @@
 import { createCanvas, loadImage } from "@napi-rs/canvas"
 
 import { DISCORD_BACKGROUND_COLOR_HEX } from "~/constants"
-import { canvasFont, clipEllipse } from "~/server/utils/canvas"
+import { canvasFont, canvasDrawImage } from "~/server/utils/canvas"
 
 export const getUserColorPreviewImage = async ({
   avatarUrl,
@@ -31,15 +31,14 @@ export const getUserColorPreviewImage = async ({
 
   for (const [i, hexColor] of hexColors.entries()) {
     // Avatar
-    clipEllipse(
+    canvasDrawImage(
       ctx,
+      avatarImage,
       sectionPadding,
       sectionHeight * i + sectionPadding,
       sectionAvatarSize,
       sectionAvatarSize,
-      (x, y, w, h) => {
-        ctx.drawImage(avatarImage, x, y, w, h)
-      },
+      { ellipse: true },
     )
 
     // Name

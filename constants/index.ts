@@ -64,7 +64,7 @@ export const DISCORD_IDS = {
     rs: "1429400331640639578",
   },
   users: {
-    owner: "221755442513051649",
+    owner: "221755442513051649", // Bot owner
   },
   categories: {
     archive: "525995353821151242",

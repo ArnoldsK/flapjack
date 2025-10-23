@@ -2,10 +2,9 @@ import { createCanvas, loadImage } from "@napi-rs/canvas"
 import type { GuildMember } from "discord.js"
 import colorPalette from "get-image-colors"
 
-import { canvasFont, clipEllipse } from "~/server/utils/canvas"
+import { canvasFont, canvasDrawImage } from "~/server/utils/canvas"
 import { getBackgroundTextColor } from "~/server/utils/color"
 import { getMemberInfo } from "~/server/utils/member"
-
 
 export const getUserInfoImage = async (
   member: GuildMember,
@@ -45,9 +44,15 @@ export const getUserInfoImage = async (
   const avatarY = margin
   const avatarWidth = 64
 
-  clipEllipse(ctx, avatarX, avatarY, avatarWidth, avatarWidth, (x, y, w, h) => {
-    ctx.drawImage(avatarImage, x, y, w, h)
-  })
+  canvasDrawImage(
+    ctx,
+    avatarImage,
+    avatarX,
+    avatarY,
+    avatarWidth,
+    avatarWidth,
+    { ellipse: true },
+  )
 
   // Position
   ctx.font = canvasFont("bold 26px")

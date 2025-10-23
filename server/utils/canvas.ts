@@ -1,17 +1,38 @@
-import type { SKRSContext2D } from "@napi-rs/canvas"
+import type { Image, SKRSContext2D } from "@napi-rs/canvas"
 
-export const clipEllipse = (
+export interface CanvasDrawImageOptions {
+  rotate?: number
+  mirror?: boolean
+  ellipse?: boolean
+}
+
+export const canvasDrawImage = (
   ctx: SKRSContext2D,
+  image: Image,
   x: number,
   y: number,
   w: number,
   h: number,
-  draw: (x: number, y: number, w: number, h: number) => void,
+  options?: CanvasDrawImageOptions,
 ) => {
   ctx.save()
-  ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2)
-  ctx.clip()
-  draw(x, y, w, h)
+
+  ctx.translate(x + w / 2, y + h / 2)
+  if (options?.rotate) {
+    ctx.rotate((options.rotate * Math.PI) / 180)
+  }
+  if (options?.mirror) {
+    ctx.scale(-1, 1)
+  }
+  ctx.translate(-x, -y)
+
+  if (options?.ellipse) {
+    ctx.ellipse(x, y, w / 2, h / 2, 0, 0, Math.PI * 2)
+    ctx.clip()
+  }
+
+  ctx.drawImage(image, -(w / 2) + x, -(h / 2) + y, w, h)
+
   ctx.restore()
 }
 

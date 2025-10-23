@@ -4,7 +4,7 @@ import colorPalette from "get-image-colors"
 
 import { Unicode } from "~/constants"
 import { ExperienceRankData } from "~/server/db/model/Experience"
-import { canvasFont, clipEllipse } from "~/server/utils/canvas"
+import { canvasFont, canvasDrawImage } from "~/server/utils/canvas"
 import { getBackgroundTextColor } from "~/server/utils/color"
 import { interpolate } from "~/server/utils/number"
 
@@ -48,9 +48,15 @@ export const getRankImage = async (
   const avatarY = margin
   const avatarWidth = height - margin * 2
 
-  clipEllipse(ctx, avatarX, avatarY, avatarWidth, avatarWidth, (x, y, w, h) => {
-    ctx.drawImage(avatarImage, x, y, w, h)
-  })
+  canvasDrawImage(
+    ctx,
+    avatarImage,
+    avatarX,
+    avatarY,
+    avatarWidth,
+    avatarWidth,
+    { ellipse: true },
+  )
 
   // Rank and level
   ctx.font = canvasFont("16px")
