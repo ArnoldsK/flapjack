@@ -121,7 +121,7 @@ export default class GearCommand extends BaseCommand {
 
   get #isEphemeral() {
     return (
-      !isCasinoChannel(this.channel) ||
+      !isCasinoChannel(this.channel) &&
       this.channel.id !== DISCORD_IDS.channels.runescape
     )
   }
