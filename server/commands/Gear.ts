@@ -139,8 +139,10 @@ export default class GearCommand extends BaseCommand {
             title: member.displayName,
             color: member.displayColor,
             description: "No items",
+            thumbnail,
           },
         ],
+        files,
       })
       return
     }
