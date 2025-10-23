@@ -15,6 +15,7 @@ import { OsrsItemsModel } from "~/server/db/model/OsrsItems"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits } from "~/server/utils/credits"
 import { checkUnreachable } from "~/server/utils/error"
+import { getPercentageChangeString } from "~/server/utils/number"
 import { joinAsLines } from "~/server/utils/string"
 import { OsrsItemSlot } from "~/types/osrs"
 
@@ -136,6 +137,7 @@ export default class GearCommand extends BaseCommand {
 
     const model = new OsrsItemsModel(this.context)
     const { items, thumbnail, files } = await model.getEmbedData(member)
+    const priceByItemId = await model.getPriceByItemIdMap()
 
     this.reply({
       ephemeral: this.#isEphemeral,
@@ -146,11 +148,20 @@ export default class GearCommand extends BaseCommand {
           description: items.length === 0 ? "No items" : undefined,
           fields:
             items.length > 0
-              ? items.map((item) => ({
-                  name: item.itemName,
-                  value: `Bought for ${formatCredits(item.itemBoughtPrice)}`, // TODO: use price data to show change
-                  inline: true,
-                }))
+              ? items.map((item) => {
+                  const price = priceByItemId.get(item.itemId)
+                  const change = getPercentageChangeString({
+                    initial: Number(item.itemBoughtPrice),
+                    current: Number(price ?? item.itemBoughtPrice),
+                  })
+                  const changeStr = change !== "0%" ? ` (${change})` : ""
+
+                  return {
+                    name: item.itemName,
+                    value: `Bought for ${formatCredits(item.itemBoughtPrice)}${changeStr}`,
+                    inline: true,
+                  }
+                })
               : undefined,
           thumbnail,
         },

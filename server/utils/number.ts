@@ -15,3 +15,19 @@ export const interpolate = (
     maxB,
   )
 }
+
+/**
+ * Returns increase/reduction percentage, e.g. "+20%"
+ */
+export const getPercentageChangeString = ({
+  initial,
+  current,
+}: {
+  initial: number
+  current: number
+}): string => {
+  const percentageChange = Math.round(((current - initial) / initial) * 100)
+  const sign = percentageChange > 0 ? "+" : ""
+
+  return `${sign}${percentageChange}%`
+}
