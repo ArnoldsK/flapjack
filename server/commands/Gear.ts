@@ -9,9 +9,8 @@ import {
 import { DISCORD_IDS } from "~/constants"
 import { osrsItemIdByName } from "~/constants/osrs"
 import { BaseCommand } from "~/server/base/Command"
-import { OsrsItemsEntity } from "~/server/db/entity/OsrsItems"
 import { CreditsModel } from "~/server/db/model/Credits"
-import { OsrsItemsModel } from "~/server/db/model/OsrsItems"
+import { OsrsItemSlotError, OsrsItemsModel } from "~/server/db/model/OsrsItems"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits } from "~/server/utils/credits"
 import { checkUnreachable } from "~/server/utils/error"
@@ -206,7 +205,7 @@ export default class GearCommand extends BaseCommand {
     const wallet = await creditsModel.getWallet(this.member.id)
 
     const canAfford = price <= wallet.credits
-    const slotError = this.#getSlotError({
+    const slotError = itemsModel.getSlotError({
       slot,
       items,
     })
@@ -264,7 +263,16 @@ export default class GearCommand extends BaseCommand {
           isCasino: false,
         }),
       ])
-    } catch {
+    } catch (error) {
+      if (error instanceof OsrsItemSlotError) {
+        await this.editReply({
+          content: error.message,
+          embeds: [],
+          components: [],
+        })
+        return
+      }
+
       await this.editReply({
         components: [],
       })
@@ -290,32 +298,6 @@ export default class GearCommand extends BaseCommand {
     actionRow.addComponents(button)
 
     return [actionRow]
-  }
-
-  #getSlotError({
-    slot,
-    items,
-  }: {
-    slot: OsrsItemSlot
-    items: OsrsItemsEntity[]
-  }): string | undefined {
-    if (items.some((item) => item.itemSlot === slot)) {
-      return "Sell your current item to buy"
-    }
-    if (
-      slot === OsrsItemSlot.TwoHanded &&
-      items.some((item) =>
-        [OsrsItemSlot.OneHanded, OsrsItemSlot.Shield].includes(item.itemSlot),
-      )
-    ) {
-      return "Already using a weapon or a shield, sell them first to buy"
-    } else if (
-      [OsrsItemSlot.OneHanded, OsrsItemSlot.Shield].includes(slot) &&
-      items.some((item) => item.itemSlot === OsrsItemSlot.TwoHanded)
-    ) {
-      return "Already using a weapon, sell it first to buy"
-    }
-    return undefined
   }
 
   async #handleSell() {

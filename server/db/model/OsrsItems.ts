@@ -7,11 +7,14 @@ import { getOsrsPrices } from "~/server/cron/tasks/getOsrsPrices"
 import { OsrsItemsEntity } from "~/server/db/entity/OsrsItems"
 import { StaticDataModel } from "~/server/db/model/StaticData"
 import { StaticDataType } from "~/types/entity"
+import { OsrsItemSlot } from "~/types/osrs"
 
 export interface OsrsItemsEmbedData {
   thumbnail: APIEmbedThumbnail
   files: AttachmentBuilder[]
 }
+
+export class OsrsItemSlotError extends Error {}
 
 export class OsrsItemsModel extends BaseModel {
   protected override Entity = OsrsItemsEntity
@@ -21,6 +24,16 @@ export class OsrsItemsModel extends BaseModel {
   }
 
   async addItem(input: RequiredEntityData<OsrsItemsEntity>) {
+    const items = await this.getUserItems(input.userId)
+    const slotError = this.getSlotError({
+      slot: input.itemSlot,
+      items,
+    })
+
+    if (slotError) {
+      throw new OsrsItemSlotError(slotError)
+    }
+
     await this.em.create(this.Entity, input)
     await this.em.flush()
   }
@@ -62,5 +75,36 @@ export class OsrsItemsModel extends BaseModel {
       },
       files: [new AttachmentBuilder(image, { name: "gear.png" })],
     }
+  }
+
+  getSlotError({
+    slot,
+    items,
+  }: {
+    slot: OsrsItemSlot
+    items: OsrsItemsEntity[]
+  }): string | undefined {
+    const itemBySlot = new Map(items.map((item) => [item.itemSlot, true]))
+
+    if (itemBySlot.has(slot)) {
+      return "Sell your current item to replace"
+    }
+
+    if (
+      slot === OsrsItemSlot.TwoHanded &&
+      (itemBySlot.has(OsrsItemSlot.OneHanded) ||
+        itemBySlot.has(OsrsItemSlot.Shield))
+    ) {
+      return "Already using a weapon or a shield"
+    }
+
+    if (
+      (slot === OsrsItemSlot.Shield || slot === OsrsItemSlot.OneHanded) &&
+      itemBySlot.has(OsrsItemSlot.TwoHanded)
+    ) {
+      return "You're using a two-handed weapon"
+    }
+
+    return undefined
   }
 }
