@@ -6,6 +6,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js"
 
+import { DISCORD_IDS } from "~/constants"
 import { osrsItemIdByName } from "~/constants/osrs"
 import { BaseCommand } from "~/server/base/Command"
 import { OsrsItemsEntity } from "~/server/db/entity/OsrsItems"
@@ -118,6 +119,13 @@ export default class GearCommand extends BaseCommand {
     }
   }
 
+  get #isEphemeral() {
+    return (
+      !isCasinoChannel(this.channel) ||
+      this.channel.id === DISCORD_IDS.channels.runescape
+    )
+  }
+
   async #handleView() {
     const user = this.interaction.options.getUser(OptionName.User)
     const member = user ? this.guild.members.cache.get(user.id) : this.member
@@ -126,14 +134,12 @@ export default class GearCommand extends BaseCommand {
       throw new Error("User not found")
     }
 
-    const ephemeral = !isCasinoChannel(this.channel)
-
     const model = new OsrsItemsModel(this.context)
     const { items, thumbnail, files } = await model.getEmbedData(member)
 
     if (items.length === 0) {
       this.reply({
-        ephemeral,
+        ephemeral: this.#isEphemeral,
         embeds: [
           {
             title: member.displayName,
@@ -148,7 +154,7 @@ export default class GearCommand extends BaseCommand {
     }
 
     this.reply({
-      ephemeral,
+      ephemeral: this.#isEphemeral,
       embeds: [
         {
           title: member.displayName,
@@ -209,7 +215,7 @@ export default class GearCommand extends BaseCommand {
     const canBuy = canAfford && !slotError
 
     const response = await this.reply({
-      ephemeral: !isCasinoChannel(this.channel),
+      ephemeral: this.#isEphemeral,
       embeds: [
         {
           color: this.member.displayColor,
@@ -332,7 +338,7 @@ export default class GearCommand extends BaseCommand {
     const price = realPrice ?? item.itemBoughtPrice
 
     const response = await this.reply({
-      ephemeral: !isCasinoChannel(this.channel),
+      ephemeral: this.#isEphemeral,
       embeds: [
         {
           color: this.member.displayColor,
