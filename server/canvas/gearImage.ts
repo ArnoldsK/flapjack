@@ -240,14 +240,16 @@ export const getGearImage = async ({
 }
 
 const getItemImage = async (slot: GearSlot, itemId: number | undefined) => {
-  const defaultImagePath = defaultImageBySlot.get(slot)
+  const defaultImageName = defaultImageBySlot.get(slot)
   let image: string | undefined
 
   if (itemId) {
     image = `https://secure.runescape.com/m=itemdb_oldschool/obj_big.gif?id=${itemId}`
-  } else if (defaultImagePath) {
-    image = path.join(__dirname, "assets", defaultImagePath)
-    console.log("Gear default image path:", image, existsSync(image))
+  } else if (defaultImageName) {
+    const defaultImage = path.join("public", "static", "gear", defaultImageName)
+    if (existsSync(defaultImage)) {
+      image = defaultImage
+    }
   }
 
   if (!image) {
