@@ -5,7 +5,7 @@ import { Unicode } from "~/constants"
 import { DISCORD_IDS } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { RsLeagueModel } from "~/server/db/model/RsLeague"
-import { checkUnreachable } from "~/server/utils/error"
+import { assert, checkUnreachable } from "~/server/utils/error"
 
 enum SubcommandName {
   Set = "set",
@@ -38,10 +38,10 @@ export default class RsLeagueCommand extends BaseCommand {
     )
 
   async execute() {
-    if (this.channel.id !== DISCORD_IDS.channels.runescape) {
-      this.fail("Not allowed in this channel")
-      return
-    }
+    assert(
+      this.channel.id === DISCORD_IDS.channels.runescape,
+      "Not allowed in this channel",
+    )
 
     const subcommand = this.getSubcommand<SubcommandName>()
 
@@ -66,12 +66,9 @@ export default class RsLeagueCommand extends BaseCommand {
     const name = this.interaction.options.getString(OptionName.Name, true)
     const model = new RsLeagueModel(this.context)
 
-    try {
-      await model.setName(this.member.id, name)
-      this.success()
-    } catch {
-      this.fail()
-    }
+    await model.setName(this.member.id, name)
+
+    this.success()
   }
 
   async #handleRanks() {
@@ -100,11 +97,7 @@ export default class RsLeagueCommand extends BaseCommand {
 
     // Remove no rank players
     players = players.filter((player) => !!player.rank)
-
-    if (players.length === 0) {
-      this.fail("No ranks")
-      return
-    }
+    assert(players.length > 0, "No ranks")
 
     // Sort by rank
     players.sort((a, b) => a.rank - b.rank)

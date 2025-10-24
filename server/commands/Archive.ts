@@ -3,6 +3,7 @@ import { SlashCommandBuilder } from "discord.js"
 import { Color, DISCORD_IDS } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { isTextChannel } from "~/server/utils/channel"
+import { assert } from "~/server/utils/error"
 import { PermissionFlags, permission } from "~/server/utils/permission"
 
 export default class ArchiveCommand extends BaseCommand {
@@ -18,10 +19,7 @@ export default class ArchiveCommand extends BaseCommand {
   })
 
   async execute() {
-    if (!isTextChannel(this.channel)) {
-      this.fail("Unable to archive this channel")
-      return
-    }
+    assert(isTextChannel(this.channel), "Unable to archive this channel")
 
     await this.channel.setParent(DISCORD_IDS.categories.archive, {
       // Sync permissions

@@ -2,7 +2,7 @@ import { GuildMember, SlashCommandBuilder } from "discord.js"
 
 import { BaseCommand } from "~/server/base/Command"
 import { getUserInfoImage } from "~/server/canvas/userInfoImage"
-import { checkUnreachable } from "~/server/utils/error"
+import { assert, checkUnreachable } from "~/server/utils/error"
 import { getMemberByJoinPosition } from "~/server/utils/member"
 
 enum SubcommandName {
@@ -53,11 +53,7 @@ export default class UserInfoCommand extends BaseCommand {
 
   async execute() {
     const member = await this.#findMember()
-
-    if (!member) {
-      this.fail("User not found")
-      return
-    }
+    assert(!!member, "User not found")
 
     this.reply({
       files: [await getUserInfoImage(member)],

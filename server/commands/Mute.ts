@@ -164,15 +164,8 @@ export default class MuteCommand extends BaseCommand {
     const user = this.interaction.options.getUser(OptionName.User, true)
     const member = this.guild.members.cache.get(user.id)
 
-    if (!member) {
-      this.fail("User not found")
-      return
-    }
-
-    if (isTimedOut(member)) {
-      this.fail("User is already timed out")
-      return
-    }
+    assert(!!member, "User not found")
+    assert(!isTimedOut(member), "User is already timed out")
 
     // Parse input date
     const durationType = this.interaction.options.getString(
@@ -203,15 +196,8 @@ export default class MuteCommand extends BaseCommand {
     const user = this.interaction.options.getUser(OptionName.User, true)
     const member = this.guild.members.cache.get(user.id)
 
-    if (!member) {
-      this.fail("User not found")
-      return
-    }
-
-    if (!isTimedOut(member)) {
-      this.fail("User is not timed out")
-      return
-    }
+    assert(!!member, "User not found")
+    assert(isTimedOut(member), "User is not timed out")
 
     // Remove timeout
     await member.disableCommunicationUntil(null)

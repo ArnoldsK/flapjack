@@ -3,6 +3,7 @@ import { SlashCommandBuilder } from "discord.js"
 import { BaseCommand } from "~/server/base/Command"
 import { CacheKey } from "~/server/cache"
 import { RedgifsModel } from "~/server/db/model/Redgifs"
+import { assert } from "~/server/utils/error"
 import { RedGifsGif } from "~/types/redgifs"
 
 export default class NsfwCommand extends BaseCommand {
@@ -16,10 +17,7 @@ export default class NsfwCommand extends BaseCommand {
   async execute() {
     // Get the next post
     const post = await this.#getPost()
-    if (!post) {
-      this.fail("Couldn't find a post")
-      return
-    }
+    assert(!!post, "Couldn't find a post")
 
     // Send the post
     this.reply({

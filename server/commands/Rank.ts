@@ -7,7 +7,7 @@ import {
   ExperienceModel,
   ExperienceRankData,
 } from "~/server/db/model/Experience"
-import { checkUnreachable } from "~/server/utils/error"
+import { assert, checkUnreachable } from "~/server/utils/error"
 import { makeEqualLengths } from "~/server/utils/string"
 
 enum SubcommandName {
@@ -81,10 +81,7 @@ export default class RankCommand extends BaseCommand {
     const user = this.interaction.options.getUser(OptionName.User, true)
     const member = this.guild.members.cache.get(user.id)
 
-    if (!member) {
-      this.fail("User not found")
-      return
-    }
+    assert(!!member, "User not found")
 
     await this.#handleMember(member)
   }
@@ -94,10 +91,7 @@ export default class RankCommand extends BaseCommand {
     const allRankData = await model.getAllRankData()
     const rankData = allRankData.find((el) => el.member.id === member.id)
 
-    if (!rankData) {
-      this.fail("You don't have a rank yet")
-      return
-    }
+    assert(!!rankData, "You don't have a rank yet")
 
     this.reply({
       files: [await getRankImage(rankData)],

@@ -144,7 +144,7 @@ export default class BoosterIconCommand extends BaseCommand {
 
       this.success()
     } catch {
-      this.fail(
+      throw new Error(
         "Emoji not found, or it's not in this server. Try selecting from the emoji picker.",
       )
     }
@@ -169,7 +169,7 @@ export default class BoosterIconCommand extends BaseCommand {
 
       this.success()
     } catch {
-      this.fail("Not an image, or the image is not supported.")
+      throw new Error("Not an image, or the image is not supported.")
     }
   }
 

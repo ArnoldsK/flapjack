@@ -15,7 +15,7 @@ import {
   parseHexColor,
   setColorInteractionId,
 } from "~/server/utils/color"
-import { checkUnreachable } from "~/server/utils/error"
+import { assert, checkUnreachable } from "~/server/utils/error"
 import {
   getMemberColorRole,
   purgeRole,
@@ -148,10 +148,10 @@ export default class ColorCommand extends BaseCommand {
       .slice(0, 4)
       .map((el) => el.hex)
 
-    if (hexColors.length === 0) {
-      this.fail("Not enough colors with a good name visibility")
-      return
-    }
+    assert(
+      hexColors.length > 0,
+      "Not enough colors with a good name visibility",
+    )
 
     const previewImage = await getUserColorPreviewImage({
       avatarUrl,
@@ -177,12 +177,9 @@ export default class ColorCommand extends BaseCommand {
 
   async #handleCustom() {
     const input = this.interaction.options.getString(OptionName.Hex, true)
-    const hex = parseHexColor(input)
 
-    if (!hex) {
-      this.fail("Not a valid hex color.")
-      return
-    }
+    const hex = parseHexColor(input)
+    assert(!!hex, "Not a valid hex color")
 
     await setMemberColorRole(this.member, [hex, null])
 
@@ -195,26 +192,22 @@ export default class ColorCommand extends BaseCommand {
     const input1 = this.interaction.options.getString(OptionName.Hex1)
     const input2 = this.interaction.options.getString(OptionName.Hex2)
 
-    if (!input1 && !input2) {
-      this.reply({
-        content:
-          "You can get and preview colors at <https://pepsidog.lv/color>",
-      })
-      return
-    } else if (!input1 || !input2) {
-      this.fail("You need to provide both colors for a gradient.")
-      return
-    }
+    assert(
+      !!input1 || !!input2,
+      "You can get and preview colors at <https://pepsidog.lv/color>",
+    )
+    assert(
+      !!input1 && !!input2,
+      "You need to provide both colors for a gradient.",
+    )
 
     const hex1 = parseHexColor(input1)
     const hex2 = parseHexColor(input2)
 
-    if (!hex1 || !hex2) {
-      this.fail(
-        "Not a valid hex color. You can get and preview colors at <https://pepsidog.lv/color>",
-      )
-      return
-    }
+    assert(
+      !!hex1 && !!hex2,
+      "Not a valid hex color. You can get and preview colors at <https://pepsidog.lv/color>",
+    )
 
     await setMemberColorRole(this.member, [hex1, hex2])
 

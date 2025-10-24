@@ -36,14 +36,10 @@ export default class AvatarCommand extends BaseCommand {
       size: 2048,
     })
 
-    try {
-      assert(!!avatarUrl, "User has no avatar")
+    assert(!!avatarUrl, "User has no avatar")
 
-      this.reply({
-        files: [avatarUrl],
-      })
-    } catch (error) {
-      this.fail((error as Error).message)
-    }
+    this.reply({
+      files: [avatarUrl],
+    })
   }
 }

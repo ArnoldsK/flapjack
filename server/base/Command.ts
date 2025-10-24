@@ -93,14 +93,12 @@ export class BaseCommand {
     }
   }
 
-  fail(message?: string) {
-    // This error is handled in the top level execute try catch
-    throw new Error(message ?? "Unable to execute the command")
-  }
-
-  success(message?: string) {
+  /**
+   * Generic success message
+   */
+  success() {
     return this.reply({
-      content: message ?? "Success!",
+      content: "Success!",
     })
   }
 

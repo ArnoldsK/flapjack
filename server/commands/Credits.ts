@@ -7,7 +7,7 @@ import { CreditsModel } from "~/server/db/model/Credits"
 import { sortBigInt } from "~/server/utils/array"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
-import { checkUnreachable } from "~/server/utils/error"
+import { assert, checkUnreachable } from "~/server/utils/error"
 
 enum SubcommandName {
   View = "view",
@@ -124,10 +124,7 @@ export default class CreditsCommand extends BaseCommand {
     const user = this.interaction.options.getUser(OptionName.User) ?? this.user
 
     const member = this.guild.members.cache.get(user.id)
-    if (!member) {
-      this.fail("User not found")
-      return
-    }
+    assert(!!member, "Member not found")
 
     const isSelf = user.id === this.user.id
     const intro = isSelf ? "You have" : `${member.displayName} has`
@@ -148,17 +145,13 @@ export default class CreditsCommand extends BaseCommand {
   async #handleGive() {
     const targetUser = this.interaction.options.getUser(OptionName.User, true)
     const targetMember = this.guild.members.cache.get(targetUser.id)
-    if (!targetMember) {
-      this.fail("User not found")
-      return
-    }
+    assert(!!targetMember, "User not found")
 
     const isSelf = targetUser.id === this.user.id
+    assert(!isSelf, "Can't give to yourself")
+
     const isBot = targetUser.bot
-    if (isSelf || isBot) {
-      this.fail(isBot ? "Can't give to bots" : "Can't give to yourself")
-      return
-    }
+    assert(!isBot, "Can't give to bots")
 
     const creditsModel = new CreditsModel(this.context)
     const wallet = await creditsModel.getWallet(this.member.id)
@@ -217,17 +210,11 @@ export default class CreditsCommand extends BaseCommand {
   }
 
   async #handleAdjust() {
-    if (!appConfig.dev) {
-      this.fail("Not on local dev env")
-      return
-    }
+    assert(appConfig.dev, "Not on dev env")
 
     const targetUser = this.interaction.options.getUser(OptionName.User, true)
     const targetMember = this.guild.members.cache.get(targetUser.id)
-    if (!targetMember) {
-      this.fail("User not found")
-      return
-    }
+    assert(!!targetMember, "User not found")
 
     const rawAmount = this.interaction.options.getNumber(
       OptionName.Amount,

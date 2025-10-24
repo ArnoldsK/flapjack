@@ -3,6 +3,7 @@ import { SlashCommandBuilder, codeBlock } from "discord.js"
 import { DISCORD_IDS } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { isTextChannel } from "~/server/utils/channel"
+import { assert } from "~/server/utils/error"
 import { joinAsLines } from "~/server/utils/string"
 
 export default class RsLootCommand extends BaseCommand {
@@ -17,13 +18,11 @@ export default class RsLootCommand extends BaseCommand {
   }
 
   async execute() {
-    if (
-      this.channel.id !== DISCORD_IDS.channels.runescape ||
-      !isTextChannel(this.channel)
-    ) {
-      this.fail("Not allowed in this channel")
-      return
-    }
+    assert(isTextChannel(this.channel), "Not a valid channel")
+    assert(
+      this.channel.id === DISCORD_IDS.channels.runescape,
+      "Not allowed in this channel",
+    )
 
     // TODO add cleanup to remove unused webhooks (e.g. username change)
     const webhooks = await this.channel.fetchWebhooks()

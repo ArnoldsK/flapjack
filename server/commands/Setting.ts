@@ -110,7 +110,7 @@ export default class SettingCommand extends BaseCommand {
 
       this.success()
     } catch {
-      this.fail("Unable to set the setting... incorrect value type?")
+      throw new Error("Unable to set the setting... incorrect value type?")
     }
   }
 
