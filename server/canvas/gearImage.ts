@@ -120,10 +120,10 @@ export const getGearImage = async ({
 
   // Legs
   const legsItem = userItemBySlot.get(GearSlot.Legs)
-  const legsWidth = 120
-  const legsHeight = 96
+  const legsWidth = 130
+  const legsHeight = 120
   const legsX = WIDTH / 2 - legsWidth / 2
-  const legsY = bodyY + bodyHeight - 30
+  const legsY = bodyY + bodyHeight - 40
   drawQueue.set("legs", {
     image: await getItemImage(GearSlot.Legs, legsItem?.itemId),
     itemName: legsItem?.itemName,
@@ -143,7 +143,7 @@ export const getGearImage = async ({
   const feetWidth = 48
   const feetHeight = 48
   const feetX = WIDTH / 2 - feetWidth / 2
-  const feetY = legsY + legsHeight - 20
+  const feetY = legsY + legsHeight - 35
   drawQueue.set("feet", {
     image: await getItemImage(GearSlot.Feet, feetItem?.itemId),
     itemName: feetItem?.itemName,
@@ -311,11 +311,6 @@ const mutateDrawItemByName = (name: string, el: DrawItem) => {
     el.x = WIDTH / 2 - el.width / 2
     el.y *= 1.2
     el.y -= 10
-  } else if (has(" robe")) {
-    el.width *= 1.2
-    el.height *= 1.2
-    el.x = WIDTH / 2 - el.width / 2
-    el.y *= 0.8
   } else if (has(" skirt")) {
     el.height *= 1.2
     el.y *= 0.8
