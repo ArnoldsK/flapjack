@@ -20,12 +20,53 @@ export class OsrsItemSlotError extends Error {}
 export class GearModel extends BaseModel {
   protected override Entity = OsrsItemsEntity
 
-  async getUserItems(userId: string): Promise<OsrsItemsEntity[]> {
+  async getItems(userId: string): Promise<OsrsItemsEntity[]> {
     return await this.em.find(this.Entity, { userId })
   }
 
+  async getItemsWithEmbed(
+    member: GuildMember,
+  ): Promise<OsrsItemsEmbedData & { items: OsrsItemsEntity[] }> {
+    const items = await this.getItems(member.id)
+    const image = await this.#getCachedGearImage(member, items)
+
+    return {
+      items,
+      thumbnail: {
+        url: "attachment://gear.png",
+      },
+      files: [new AttachmentBuilder(image, { name: "gear.png" })],
+    }
+  }
+
+  async #getCachedGearImage(
+    member: GuildMember,
+    items: OsrsItemsEntity[],
+  ): Promise<Buffer> {
+    const cachedImageByUserId = this.context.cache.get(CacheKey.UserGearImage)
+
+    // Use cached
+    const cachedImage = cachedImageByUserId.get(member.id)
+    if (cachedImage) {
+      return cachedImage
+    }
+
+    const image = await getGearImage({
+      avatarUrl: member.displayAvatarURL({
+        extension: "png",
+        size: 64,
+      }),
+      items,
+    })
+
+    // Update user cache
+    cachedImageByUserId.set(member.id, image)
+
+    return image
+  }
+
   async addItem(input: RequiredEntityData<OsrsItemsEntity>) {
-    const items = await this.getUserItems(input.userId)
+    const items = await this.getItems(input.userId)
     const slotError = this.getSlotError({
       slot: input.itemSlot,
       items,
@@ -63,47 +104,6 @@ export class GearModel extends BaseModel {
     }
 
     return new Map(data.items)
-  }
-
-  async #getCachedGearImage(
-    member: GuildMember,
-    items: OsrsItemsEntity[],
-  ): Promise<Buffer> {
-    const cachedImageByUserId = this.context.cache.get(CacheKey.UserGearImage)
-
-    // Use cached
-    const cachedImage = cachedImageByUserId.get(member.id)
-    if (cachedImage) {
-      return cachedImage
-    }
-
-    const image = await getGearImage({
-      avatarUrl: member.displayAvatarURL({
-        extension: "png",
-        size: 64,
-      }),
-      items,
-    })
-
-    // Update user cache
-    cachedImageByUserId.set(member.id, image)
-
-    return image
-  }
-
-  async getEmbedData(
-    member: GuildMember,
-  ): Promise<OsrsItemsEmbedData & { items: OsrsItemsEntity[] }> {
-    const items = await this.getUserItems(member.id)
-    const image = await this.#getCachedGearImage(member, items)
-
-    return {
-      items,
-      thumbnail: {
-        url: "attachment://gear.png",
-      },
-      files: [new AttachmentBuilder(image, { name: "gear.png" })],
-    }
   }
 
   getSlotError({

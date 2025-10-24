@@ -44,6 +44,10 @@ export default class RankCommand extends BaseCommand {
       subcommand.setName(SubcommandName.Top).setDescription("Get rank top"),
     )
 
+  get isEphemeral(): boolean {
+    return this.getSubcommand() === SubcommandName.Top
+  }
+
   async execute() {
     const subcommand = this.getSubcommand<SubcommandName>()
 
@@ -106,7 +110,6 @@ export default class RankCommand extends BaseCommand {
     const allRankDataText = this.#allRankDataToText(allRankData)
 
     this.reply({
-      ephemeral: true,
       files: [
         {
           name: "ranks.txt",

@@ -13,7 +13,7 @@ import { CreditsModel } from "~/server/db/model/Credits"
 import { OsrsItemSlotError, GearModel } from "~/server/db/model/Gear"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits } from "~/server/utils/credits"
-import { checkUnreachable } from "~/server/utils/error"
+import { assert, checkUnreachable } from "~/server/utils/error"
 import { getPercentageChangeString } from "~/server/utils/number"
 import { joinAsLines } from "~/server/utils/string"
 import { GearSlot } from "~/types/osrs"
@@ -119,7 +119,7 @@ export default class GearCommand extends BaseCommand {
     }
   }
 
-  get #isEphemeral() {
+  get isEphemeral(): boolean {
     return (
       !isCasinoChannel(this.channel) &&
       this.channel.id !== DISCORD_IDS.channels.runescape
@@ -129,17 +129,13 @@ export default class GearCommand extends BaseCommand {
   async #handleView() {
     const user = this.interaction.options.getUser(OptionName.User)
     const member = user ? this.guild.members.cache.get(user.id) : this.member
-
-    if (!member) {
-      throw new Error("User not found")
-    }
+    assert(!!member, "Member not found")
 
     const model = new GearModel(this.context)
-    const { items, thumbnail, files } = await model.getEmbedData(member)
+    const { items, thumbnail, files } = await model.getItemsWithEmbed(member)
     const priceByItemId = await model.getPriceByItemIdMap()
 
     this.reply({
-      ephemeral: this.#isEphemeral,
       embeds: [
         {
           title: member.displayName,
@@ -177,29 +173,24 @@ export default class GearCommand extends BaseCommand {
     const nameInput = this.interaction.options.getString(OptionName.Name, true)
 
     const itemsBySlot = osrsItemIdByName[slot]
-    if (!itemsBySlot?.size) {
-      throw new Error("Unknown slot")
-    }
+    assert(itemsBySlot.size > 0, "Unknown slot")
 
     const name = [...itemsBySlot.keys()].find(
       (el) => el.toLowerCase() === nameInput.toLowerCase(),
     )
     const itemId = name ? itemsBySlot.get(name) : null
-    if (!name || !itemId) {
-      throw new Error("Unknown OSRS item or it's not tradeable in the GE")
-    }
+    assert(
+      !!name && !!itemId,
+      "Unknown OSRS item or it's not tradeable in the GE",
+    )
 
     const gearModel = new GearModel(this.context)
     const priceByItemId = await gearModel.getPriceByItemIdMap()
 
     const price = priceByItemId.get(itemId)
-    if (!price) {
-      throw new Error(
-        "Item was found but it seems to not be tradeable in the GE",
-      )
-    }
+    assert(!!price, "Item was found but it seems to not be tradeable in the GE")
 
-    const items = await gearModel.getUserItems(this.member.id)
+    const items = await gearModel.getItems(this.member.id)
 
     const creditsModel = new CreditsModel(this.context)
     const wallet = await creditsModel.getWallet(this.member.id)
@@ -213,7 +204,6 @@ export default class GearCommand extends BaseCommand {
     const canBuy = canAfford && !slotError
 
     const response = await this.reply({
-      ephemeral: this.#isEphemeral,
       embeds: [
         {
           color: this.member.displayColor,
@@ -267,17 +257,16 @@ export default class GearCommand extends BaseCommand {
       ])
     } catch (error) {
       if (error instanceof OsrsItemSlotError) {
-        await this.editReply({
+        await this.reply({
           content: error.message,
           embeds: [],
           components: [],
         })
-        return
+      } else {
+        await this.reply({
+          components: [],
+        })
       }
-
-      await this.editReply({
-        components: [],
-      })
     }
   }
 
@@ -309,12 +298,10 @@ export default class GearCommand extends BaseCommand {
     ) as GearSlot
 
     const gearModel = new GearModel(this.context)
-    const items = await gearModel.getUserItems(this.member.id)
+    const items = await gearModel.getItems(this.member.id)
 
     const item = items.find((item) => item.itemSlot === slot)
-    if (!item) {
-      throw new Error("Item not found or you don't own any")
-    }
+    assert(!!item, "Item not found or you don't own any")
 
     const priceByItemId = await gearModel.getPriceByItemIdMap()
     // Sell for the bought price as a fallback
@@ -322,7 +309,6 @@ export default class GearCommand extends BaseCommand {
     const price = realPrice ?? item.itemBoughtPrice
 
     const response = await this.reply({
-      ephemeral: this.#isEphemeral,
       embeds: [
         {
           color: this.member.displayColor,
@@ -369,7 +355,7 @@ export default class GearCommand extends BaseCommand {
         }),
       ])
     } catch {
-      await this.editReply({
+      await this.reply({
         components: [],
       })
     }

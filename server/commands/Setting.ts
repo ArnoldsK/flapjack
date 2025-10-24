@@ -61,6 +61,10 @@ export default class SettingCommand extends BaseCommand {
         .setDescription("List all settings and values"),
     )
 
+  get isEphemeral(): boolean {
+    return true
+  }
+
   static permissions = permission({
     type: "either",
     permissions: [PermissionFlags.ClientOwner, PermissionFlags.Administrator],
@@ -115,7 +119,6 @@ export default class SettingCommand extends BaseCommand {
     const settings = await model.getAll()
 
     this.reply({
-      ephemeral: true,
       content: codeBlock(
         Object.entries(settings)
           .map(

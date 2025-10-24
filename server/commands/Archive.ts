@@ -23,9 +23,6 @@ export default class ArchiveCommand extends BaseCommand {
       return
     }
 
-    // ! Defer
-    await this.interaction.deferReply()
-
     await this.channel.setParent(DISCORD_IDS.categories.archive, {
       // Sync permissions
       lockPermissions: true,
@@ -33,7 +30,7 @@ export default class ArchiveCommand extends BaseCommand {
 
     await this.channel.setPosition(0)
 
-    this.editReply({
+    this.reply({
       embeds: [
         {
           description: "Channel has been archived",

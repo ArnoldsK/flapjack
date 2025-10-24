@@ -83,6 +83,13 @@ export default class CreditsCommand extends BaseCommand {
         .setDescription("Get credits top list"),
     )
 
+  get isEphemeral(): boolean {
+    return (
+      !isCasinoChannel(this.channel) ||
+      this.getSubcommand() === SubcommandName.Adjust
+    )
+  }
+
   async execute() {
     const subcommand = this.getSubcommand<SubcommandName>()
 
@@ -129,7 +136,6 @@ export default class CreditsCommand extends BaseCommand {
     const wallet = await creditsModel.getWallet(member.id)
 
     this.reply({
-      ephemeral: !isCasinoChannel(this.channel),
       embeds: [
         {
           color: member.displayColor,
@@ -191,7 +197,6 @@ export default class CreditsCommand extends BaseCommand {
     const wallets = await creditsModel.getAllWallets()
 
     this.reply({
-      ephemeral: !isCasinoChannel(this.channel),
       embeds: [
         {
           fields: wallets
@@ -238,7 +243,6 @@ export default class CreditsCommand extends BaseCommand {
     })
 
     this.reply({
-      ephemeral: true,
       embeds: [
         {
           color: this.member.displayColor,

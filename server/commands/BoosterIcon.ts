@@ -5,7 +5,7 @@ import {
   getEmojiIdFromString,
   getNativeEmojiFromString,
 } from "~/server/utils/emoji"
-import { checkUnreachable } from "~/server/utils/error"
+import { assert, checkUnreachable } from "~/server/utils/error"
 import { PermissionFlags, permission } from "~/server/utils/permission"
 import {
   getMemberBoosterIconRoleName,
@@ -131,16 +131,16 @@ export default class BoosterIconCommand extends BaseCommand {
 
     try {
       const emojiOption = this.#parseEmojiString(value)
-      if (!emojiOption) {
-        throw new Error("Unable to get the emoji")
-      }
+      assert(!!emojiOption, "Failed to parse the emoji")
 
       const role = await getOrCreateRole(this.guild, {
         name: getMemberBoosterIconRoleName(this.member),
         ...emojiOption,
       })
 
-      await (this.member.roles.cache.has(role.id) ? role.edit(emojiOption) : this.member.roles.add(role));
+      await (this.member.roles.cache.has(role.id)
+        ? role.edit(emojiOption)
+        : this.member.roles.add(role))
 
       this.success()
     } catch {
@@ -154,18 +154,18 @@ export default class BoosterIconCommand extends BaseCommand {
     const value = this.interaction.options.getAttachment(OptionName.Value, true)
 
     try {
-      if (!value.contentType?.startsWith("image/")) {
-        throw new Error("Not an image")
-      }
+      assert(!!value.contentType?.startsWith("image/"), "Not an image")
 
       const role = await getOrCreateRole(this.guild, {
         name: getMemberBoosterIconRoleName(this.member),
         icon: value.url,
       })
 
-      await (this.member.roles.cache.has(role.id) ? role.edit({
-          icon: value.url,
-        }) : this.member.roles.add(role));
+      await (this.member.roles.cache.has(role.id)
+        ? role.edit({
+            icon: value.url,
+          })
+        : this.member.roles.add(role))
 
       this.success()
     } catch {

@@ -14,9 +14,6 @@ export default class NsfwCommand extends BaseCommand {
     .setNSFW(true)
 
   async execute() {
-    // ! Defer
-    await this.interaction.deferReply()
-
     // Get the next post
     const post = await this.#getPost()
     if (!post) {
@@ -25,7 +22,7 @@ export default class NsfwCommand extends BaseCommand {
     }
 
     // Send the post
-    this.editReply({
+    this.reply({
       files: [post.urls.sd],
     })
   }

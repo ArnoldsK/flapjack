@@ -15,16 +15,19 @@ export default class PingCommand extends BaseCommand {
     permissions: [PermissionFlags.Administrator],
   })
 
+  get isEphemeral(): boolean {
+    return true
+  }
+
   async execute() {
     const sent = await this.reply({
       content: "Pinging...",
       fetchReply: true,
-      ephemeral: true,
     })
 
     if (sent) {
       const latency = sent.createdTimestamp - this.interaction.createdTimestamp
-      this.editReply(`Roundtrip latency: ${latency}ms`)
+      this.reply(`Roundtrip latency: ${latency}ms`)
     }
   }
 }

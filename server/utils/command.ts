@@ -23,7 +23,7 @@ import { BaseContext } from "~/types"
 
 export type SetupCommand = RESTPostAPIChatInputApplicationCommandsJSONBody & {
   dynamicVersion: boolean
-  execute: (interaction: ChatInputCommandInteraction) => Promise<void>
+  handleExecute: (interaction: ChatInputCommandInteraction) => Promise<void>
 }
 
 const getCommandVersion = (command: {
@@ -73,12 +73,14 @@ export const getSetupCommands = async (
 
       dynamicVersion: Command.dynamicVersion,
 
-      execute: async (interaction) => {
-        assert(!!interaction.inGuild(), "Not in guild")
+      handleExecute: async (interaction) => {
+        const command = new Command(context, interaction)
 
         // #############################################################################
         // Validate
         // #############################################################################
+        assert(!!interaction.inGuild(), "Not in guild")
+
         const guild = interaction.client.guilds.cache.get(interaction.guildId)
         assert(!!guild, "Guild not found")
 
@@ -88,33 +90,23 @@ export const getSetupCommands = async (
         const member = interaction.member
         assert(!!member, "Member not found")
 
-        // #############################################################################
-        // Initialize
-        // #############################################################################
-        const command = new Command(context, interaction)
+        // Permission
+        assert(
+          memberHasPermission(member as GuildMember, Command.permissions),
+          "No permission to use the command",
+        )
 
-        // #############################################################################
-        // Permissions
-        // #############################################################################
-        if (!memberHasPermission(member as GuildMember, Command.permissions)) {
-          await command.deny()
-          return
-        }
-
-        // #############################################################################
         // Channel
-        // #############################################################################
-        if (
-          Command.channels.length > 0 &&
-          !Command.channels.includes(interaction.channelId)
-        ) {
-          await command.fail("Can't use in this channel")
-          return
-        }
+        assert(
+          Command.channels.length === 0 ||
+            Command.channels.includes(interaction.channelId),
+          "Can't use the command in this channel",
+        )
 
-        // #############################################################################
+        // Always defer
+        await interaction.deferReply({ ephemeral: command.isEphemeral })
+
         // Execute
-        // #############################################################################
         await command.execute()
 
         // #############################################################################
@@ -160,11 +152,13 @@ export const handleApiCommands = async (commands: SetupCommand[]) => {
   )) as APIApplicationCommand[]
 
   // Update is an override so there's a single update body with all API commands
-  const updateCommands: Omit<SetupCommand, "execute" | "dynamicVersion">[] =
-    apiCommands.map((el) => ({
-      ...el,
-      type: el.type === ApplicationCommandType.ChatInput ? el.type : undefined,
-    }))
+  const updateCommands: Omit<
+    SetupCommand,
+    "handleExecute" | "dynamicVersion"
+  >[] = apiCommands.map((el) => ({
+    ...el,
+    type: el.type === ApplicationCommandType.ChatInput ? el.type : undefined,
+  }))
 
   // Add new commands
   for (const command of commands) {

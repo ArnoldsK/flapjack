@@ -47,10 +47,11 @@ export default class SlotsCommand extends BaseCommand {
         .setRequired(true),
     )
 
-  async execute() {
-    const ephemeral = !isCasinoChannel(this.channel)
-    await this.interaction.deferReply({ ephemeral })
+  get isEphemeral(): boolean {
+    return !isCasinoChannel(this.channel)
+  }
 
+  async execute() {
     const creditsModel = new CreditsModel(this.context)
     const wallet = await creditsModel.getWallet(this.member.id)
 
@@ -77,9 +78,9 @@ export default class SlotsCommand extends BaseCommand {
     })
 
     const gearModel = new GearModel(this.context)
-    const { thumbnail, files } = await gearModel.getEmbedData(this.member)
+    const { thumbnail, files } = await gearModel.getItemsWithEmbed(this.member)
 
-    this.editReply({
+    this.reply({
       embeds: [
         {
           color: this.member.displayColor,

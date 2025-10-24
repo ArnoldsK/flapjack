@@ -86,6 +86,10 @@ export default class ColorCommand extends BaseCommand {
         .setDescription("Remove existing custom color"),
     )
 
+  get isEphemeral(): boolean {
+    return true
+  }
+
   async execute() {
     const subcommand = this.getSubcommand<SubcommandName>()
 
@@ -166,7 +170,6 @@ export default class ColorCommand extends BaseCommand {
     )
 
     this.reply({
-      ephemeral: true,
       files: [previewImage],
       components: [row],
     })
@@ -184,7 +187,6 @@ export default class ColorCommand extends BaseCommand {
     await setMemberColorRole(this.member, [hex, null])
 
     this.reply({
-      ephemeral: true,
       content: `Changed your color to ${hex}`,
     })
   }
@@ -195,7 +197,6 @@ export default class ColorCommand extends BaseCommand {
 
     if (!input1 && !input2) {
       this.reply({
-        ephemeral: true,
         content:
           "You can get and preview colors at <https://pepsidog.lv/color>",
       })
@@ -218,7 +219,6 @@ export default class ColorCommand extends BaseCommand {
     await setMemberColorRole(this.member, [hex1, hex2])
 
     this.reply({
-      ephemeral: true,
       content: `Changed your color to ${hex1} and ${hex2} gradient`,
     })
   }
@@ -231,7 +231,6 @@ export default class ColorCommand extends BaseCommand {
     await purgeRole(role)
 
     this.reply({
-      ephemeral: true,
       content: "Color removed.",
     })
   }

@@ -11,11 +11,14 @@ export default class RecapCommand extends BaseCommand {
     .setName("recap")
     .setDescription("Get your yearly recap")
 
+  get isEphemeral(): boolean {
+    return true
+  }
+
   async execute() {
     const url = `https://pepsidog.lv/year-recap/${this.user.username}`
 
     this.reply({
-      ephemeral: true,
       embeds: [
         {
           color: this.member.displayColor,

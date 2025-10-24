@@ -42,10 +42,11 @@ export default class RouletteCommand extends BaseCommand {
         .setRequired(true),
     )
 
-  async execute() {
-    const ephemeral = !isCasinoChannel(this.channel)
-    await this.interaction.deferReply({ ephemeral })
+  get isEphemeral(): boolean {
+    return !isCasinoChannel(this.channel)
+  }
 
+  async execute() {
     const color = this.interaction.options.getString(
       OptionName.Color,
       true,
@@ -76,7 +77,7 @@ export default class RouletteCommand extends BaseCommand {
     })
 
     const gearModel = new GearModel(this.context)
-    const { thumbnail, files } = await gearModel.getEmbedData(this.member)
+    const { thumbnail, files } = await gearModel.getItemsWithEmbed(this.member)
 
     this.reply({
       embeds: [

@@ -12,6 +12,10 @@ export default class RsLootCommand extends BaseCommand {
     .setName("rs-loot")
     .setDescription("Get the RS channel webhook URL for use with plugins")
 
+  get isEphemeral(): boolean {
+    return true
+  }
+
   async execute() {
     if (
       this.channel.id !== DISCORD_IDS.channels.runescape ||
@@ -41,7 +45,6 @@ export default class RsLootCommand extends BaseCommand {
 
     this.reply({
       content: joinAsLines("Your webhook URL is:", codeBlock(userWebhook.url)),
-      ephemeral: true,
     })
   }
 }

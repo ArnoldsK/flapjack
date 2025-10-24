@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from "discord.js"
 
 import { BaseCommand } from "~/server/base/Command"
+import { assert } from "~/server/utils/error"
 
 enum OptionName {
   User = "user",
@@ -24,21 +25,21 @@ export default class AvatarCommand extends BaseCommand {
         .setDescription("Only you will see the avatar, no one will know"),
     )
 
+  get isEphemeral(): boolean {
+    return !!this.interaction.options.getBoolean(OptionName.Spying)
+  }
+
   async execute() {
     const user = this.interaction.options.getUser(OptionName.User) ?? this.user
-    const spying = this.interaction.options.getBoolean(OptionName.Spying)
 
     const avatarUrl = user.avatarURL({
       size: 2048,
     })
 
     try {
-      if (!avatarUrl) {
-        throw new Error("No avatar")
-      }
+      assert(!!avatarUrl, "User has no avatar")
 
       this.reply({
-        ephemeral: !!spying,
         files: [avatarUrl],
       })
     } catch (error) {

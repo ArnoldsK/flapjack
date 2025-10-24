@@ -1,4 +1,5 @@
 import { Unicode } from "~/constants"
+import { assert } from "~/server/utils/error"
 
 export const getCreditsEmoji = (value: bigint | number): string => {
   const minValueMap = {
@@ -149,13 +150,9 @@ export const parseCreditsAmount = (
   amount = Math.floor(amount)
   amount = Math.max(0, Math.min(Math.floor(amount), Number(max)))
 
-  if (Number.isNaN(amount)) {
-    throw new TypeError("Invalid amount format")
-  }
-
-  if (amount <= 0) {
-    throw new Error("The amount is not positive")
-  }
+  assert(!Number.isNaN(amount), "Invalid amount format")
+  assert(amount !== 0, "No credits")
+  assert(amount > 0, "The amount is not positive")
 
   return amount
 }

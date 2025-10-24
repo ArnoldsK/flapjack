@@ -75,9 +75,6 @@ export default class RsLeagueCommand extends BaseCommand {
   }
 
   async #handleRanks() {
-    // ! Defer
-    await this.interaction.deferReply()
-
     const model = new RsLeagueModel(this.context)
     const entities = await model.getAll()
 
@@ -112,7 +109,7 @@ export default class RsLeagueCommand extends BaseCommand {
     // Sort by rank
     players.sort((a, b) => a.rank - b.rank)
 
-    this.editReply({
+    this.reply({
       content: players
         .map((player, i) => {
           const url = new URL(

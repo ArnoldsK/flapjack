@@ -1,5 +1,3 @@
-import assert from "node:assert"
-
 import {
   APIEmbed,
   ActionRowBuilder,
@@ -27,6 +25,7 @@ import { OsrsItemsEmbedData, GearModel } from "~/server/db/model/Gear"
 import { isNonNullish } from "~/server/utils/boolean"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
+import { assert } from "~/server/utils/error"
 import { joinAsLines, ucFirst } from "~/server/utils/string"
 
 type Action = keyof typeof actions
@@ -68,6 +67,10 @@ export default class BlackjackCommand extends BaseCommand {
         .setRequired(true),
     )
 
+  get isEphemeral(): boolean {
+    return !isCasinoChannel(this.channel)
+  }
+
   #_creditsModel: CreditsModel
 
   get #creditsModel() {
@@ -99,12 +102,7 @@ export default class BlackjackCommand extends BaseCommand {
 
   async execute() {
     const gameUrl = this.#getRunningGameUrl()
-    if (gameUrl) {
-      throw new Error(`You already have a running game at ${gameUrl}`)
-    }
-
-    const ephemeral = !isCasinoChannel(this.channel)
-    await this.interaction.deferReply({ ephemeral })
+    assert(!gameUrl, `You already have a running game at ${gameUrl}`)
 
     // #############################################################################
     // Prepare credits
@@ -140,15 +138,15 @@ export default class BlackjackCommand extends BaseCommand {
       : undefined
 
     const gearModel = new GearModel(this.context)
-    this.#embedData = await gearModel.getEmbedData(this.member)
+    this.#embedData = await gearModel.getItemsWithEmbed(this.member)
 
-    const response = await this.editReply({
+    const response = await this.reply({
       embeds: [
         {
           ...embed,
           description,
           footer:
-            ephemeral && !gameOver
+            this.isEphemeral && !gameOver
               ? {
                   text: "Dismissing message counts as a loss",
                 }
@@ -262,7 +260,7 @@ export default class BlackjackCommand extends BaseCommand {
 
       console.error("> Blackjack >", error)
 
-      await this.editReply({
+      await this.reply({
         embeds: [
           {
             color: this.member.displayColor,
@@ -400,7 +398,7 @@ export default class BlackjackCommand extends BaseCommand {
     const leftHand: Hand | undefined = _leftHand.cards ? _leftHand : undefined
 
     const currentHand = currentHandSide === "right" ? rightHand : leftHand
-    assert.ok(!!currentHand)
+    assert(!!currentHand, "Current hand not found")
 
     const actions: Action[] = []
     for (const [action, available] of Object.entries(

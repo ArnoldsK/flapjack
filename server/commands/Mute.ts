@@ -3,7 +3,7 @@ import { SlashCommandBuilder } from "discord.js"
 import { DISCORD_IDS, Unicode } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { d } from "~/server/utils/date"
-import { checkUnreachable } from "~/server/utils/error"
+import { assert, checkUnreachable } from "~/server/utils/error"
 import { isTimedOut } from "~/server/utils/member"
 import {
   getTimeoutAddedEmbed,
@@ -94,7 +94,11 @@ export default class MuteCommand extends BaseCommand {
     ],
   })
 
-  #canModerate() {
+  get isEphemeral(): boolean {
+    return true
+  }
+
+  get #canModerate() {
     return memberHasPermission(this.member, {
       type: "allow",
       permissions: [PermissionFlags.ModerateMembers],
@@ -111,19 +115,13 @@ export default class MuteCommand extends BaseCommand {
       }
 
       case SubcommandName.Add: {
-        if (!this.#canModerate()) {
-          this.deny()
-          return
-        }
+        assert(this.#canModerate, "You can't moderate members")
         await this.#handleAdd()
         break
       }
 
       case SubcommandName.Remove: {
-        if (!this.#canModerate()) {
-          this.deny()
-          return
-        }
+        assert(this.#canModerate, "You can't moderate members")
         await this.#handleRemove()
         break
       }
@@ -138,26 +136,26 @@ export default class MuteCommand extends BaseCommand {
     const timedOutMembers = this.guild.members.cache.filter(isTimedOut)
 
     this.reply({
-      ephemeral: true,
       content: timedOutMembers.size === 0 ? "No one is timed out" : undefined,
-      embeds: timedOutMembers.size > 0
-        ? [
-            {
-              description: timedOutMembers
-                .sort(
-                  (a, b) =>
-                    a.communicationDisabledUntilTimestamp! -
-                    b.communicationDisabledUntilTimestamp!,
-                )
-                .map(({ displayName, communicationDisabledUntil }) => {
-                  return `**${displayName}** ${Unicode.longDash} expires ${d(
-                    communicationDisabledUntil,
-                  ).fromNow()}`
-                })
-                .join("\n"),
-            },
-          ]
-        : undefined,
+      embeds:
+        timedOutMembers.size > 0
+          ? [
+              {
+                description: timedOutMembers
+                  .sort(
+                    (a, b) =>
+                      a.communicationDisabledUntilTimestamp! -
+                      b.communicationDisabledUntilTimestamp!,
+                  )
+                  .map(({ displayName, communicationDisabledUntil }) => {
+                    return `**${displayName}** ${Unicode.longDash} expires ${d(
+                      communicationDisabledUntil,
+                    ).fromNow()}`
+                  })
+                  .join("\n"),
+              },
+            ]
+          : undefined,
     })
   }
 
@@ -191,7 +189,6 @@ export default class MuteCommand extends BaseCommand {
     await member.disableCommunicationUntil(timeoutUntil)
 
     this.reply({
-      ephemeral: true,
       embeds: [
         {
           ...getTimeoutAddedEmbed({ member, timeoutUntil }),
@@ -220,7 +217,6 @@ export default class MuteCommand extends BaseCommand {
     await member.disableCommunicationUntil(null)
 
     this.reply({
-      ephemeral: true,
       embeds: [getTimeoutRemovedEmbed({ member })],
     })
   }

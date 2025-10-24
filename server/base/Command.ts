@@ -5,7 +5,6 @@ import {
   GuildMember,
   GuildTextBasedChannel,
   InteractionReplyOptions,
-  MessagePayload,
   SlashCommandBuilder,
   SlashCommandSubcommandsOnlyBuilder,
   User,
@@ -17,7 +16,7 @@ import { BaseContext } from "~/types"
 export class BaseCommand {
   constructor(
     protected context: BaseContext,
-    protected interaction: ChatInputCommandInteraction,
+    protected interaction: Omit<ChatInputCommandInteraction, "deferReply">,
   ) {}
 
   /**
@@ -52,6 +51,14 @@ export class BaseCommand {
   static channels: string[] = []
 
   /**
+   * Is the command visible only to the user?
+   * Defaults to always visible.
+   */
+  get isEphemeral(): boolean {
+    return false
+  }
+
+  /**
    * Execute the command
    */
   async execute(): Promise<void> {}
@@ -76,17 +83,11 @@ export class BaseCommand {
     return this.interaction.member as GuildMember
   }
 
-  async reply(options: string | MessagePayload | InteractionReplyOptions) {
+  async reply(options: string | Omit<InteractionReplyOptions, "ephemeral">) {
     try {
-      return await this.interaction.reply(options)
-    } catch {
-      // Message is most likely deleted
-    }
-  }
-
-  async editReply(options: string | MessagePayload | InteractionReplyOptions) {
-    try {
-      return await this.interaction.editReply(options)
+      return await this.interaction[
+        this.interaction.deferred ? "editReply" : "reply"
+      ](options)
     } catch {
       // Message is most likely deleted
     }
@@ -100,14 +101,6 @@ export class BaseCommand {
   success(message?: string) {
     return this.reply({
       content: message ?? "Success!",
-      ephemeral: true,
-    })
-  }
-
-  deny() {
-    return this.reply({
-      content: "No permission to use this command",
-      ephemeral: true,
     })
   }
 

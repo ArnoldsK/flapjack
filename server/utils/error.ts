@@ -1,6 +1,6 @@
-export function assert(condition: boolean, msg?: string): asserts condition {
+export function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
-    throw new Error(msg ?? "Unable to handle data")
+    throw new Error(message)
   }
 }
 

@@ -102,7 +102,7 @@ nextApp.prepare().then(async () => {
       const command = commands.find((el) => el.name === interaction.commandName)
 
       try {
-        await command?.execute(interaction)
+        await command?.handleExecute(interaction)
       } catch (error) {
         interaction[interaction.deferred ? "editReply" : "reply"]({
           content: (error as Error).message,

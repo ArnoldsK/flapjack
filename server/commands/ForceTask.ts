@@ -48,12 +48,12 @@ export default class ForceTaskCommand extends BaseCommand {
     permissions: [PermissionFlags.Administrator],
   })
 
+  get isEphemeral(): boolean {
+    return true
+  }
+
   async execute() {
     const taskName = this.interaction.options.getString(OptionName.Task, true)
-
-    await this.interaction.deferReply({
-      ephemeral: true,
-    })
 
     try {
       const cronTask = cronTasks.find((task) => task.description === taskName)
@@ -61,9 +61,9 @@ export default class ForceTaskCommand extends BaseCommand {
 
       await cronTask.task(this.context)
 
-      this.editReply("Task complete")
+      this.reply("Task complete")
     } catch (error) {
-      this.editReply("Failed to run the task")
+      this.reply("Failed to run the task")
       console.error(`Failed to force run "${taskName}" task`, error)
     }
   }

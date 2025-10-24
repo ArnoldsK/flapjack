@@ -26,5 +26,11 @@
   "jest.runMode": "on-demand",
   "workbench.editorAssociations": {
     "*.svg": "default"
-  }
+  },
+  "typescript.preferences.autoImportSpecifierExcludeRegexes": [
+    "^assert$",
+    "^node:assert$",
+    "^console$",
+    "^node:console$"
+  ]
 }
