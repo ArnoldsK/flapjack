@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs"
 import path from "node:path"
 
 import { createCanvas, Image, loadImage } from "@napi-rs/canvas"
@@ -246,6 +247,7 @@ const getItemImage = async (slot: GearSlot, itemId: number | undefined) => {
     image = `https://secure.runescape.com/m=itemdb_oldschool/obj_big.gif?id=${itemId}`
   } else if (defaultImagePath) {
     image = path.join(__dirname, "assets", defaultImagePath)
+    console.log("Gear default image path:", image, existsSync(image))
   }
 
   if (!image) {
