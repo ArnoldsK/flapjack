@@ -23,7 +23,7 @@ import { OPTION_DESCRIPTION_AMOUNT, Unicode } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { CacheKey } from "~/server/cache"
 import { CreditsModel } from "~/server/db/model/Credits"
-import { OsrsItemsEmbedData, OsrsItemsModel } from "~/server/db/model/OsrsItems"
+import { OsrsItemsEmbedData, GearModel } from "~/server/db/model/Gear"
 import { isNonNullish } from "~/server/utils/boolean"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
@@ -137,8 +137,8 @@ export default class BlackjackCommand extends BaseCommand {
       ? await this.#handleGameOver(game, wonAmount)
       : undefined
 
-    const osrsItemsModel = new OsrsItemsModel(this.context)
-    this.#embedData = await osrsItemsModel.getEmbedData(this.member)
+    const gearModel = new GearModel(this.context)
+    this.#embedData = await gearModel.getEmbedData(this.member)
 
     const ephemeral = !isCasinoChannel(this.channel)
     const response = await this.reply({

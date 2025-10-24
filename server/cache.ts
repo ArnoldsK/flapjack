@@ -11,6 +11,7 @@ export enum CacheKey {
   Videos = "videos",
   Stats = "stats",
   DeleteUserMessagesRunning = "deleteUserMessagesRunning",
+  UserGearImage = "userGearImage",
 }
 
 interface AppCache {
@@ -21,6 +22,7 @@ interface AppCache {
   [CacheKey.Videos]: ApiVideos | null
   [CacheKey.Stats]: ApiStats | null
   [CacheKey.DeleteUserMessagesRunning]: boolean
+  [CacheKey.UserGearImage]: CacheObjectManager<Buffer>
 }
 
 export default class CacheManager {
@@ -32,6 +34,7 @@ export default class CacheManager {
     [CacheKey.Videos]: null,
     [CacheKey.Stats]: null,
     [CacheKey.DeleteUserMessagesRunning]: false,
+    [CacheKey.UserGearImage]: new CacheObjectManager(),
   }
 
   constructor() {}

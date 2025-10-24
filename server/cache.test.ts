@@ -14,4 +14,15 @@ describe("CacheObjectManager", () => {
     manager.uns("key")
     expect(manager.get("key")).toBe(undefined)
   })
+
+  test("flow", () => {
+    const global = new CacheObjectManager<string>()
+    expect(global.raw()).toEqual({})
+
+    global.set("hello", "world")
+    expect(global.raw()).toEqual({ hello: "world" })
+
+    global.uns("hello")
+    expect(global.raw()).toEqual({})
+  })
 })

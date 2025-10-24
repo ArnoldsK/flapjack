@@ -2,6 +2,7 @@ import { RequiredEntityData } from "@mikro-orm/core"
 import { APIEmbedThumbnail, AttachmentBuilder, GuildMember } from "discord.js"
 
 import { BaseModel } from "~/server/base/Model"
+import { CacheKey } from "~/server/cache"
 import { getGearImage } from "~/server/canvas/gearImage"
 import { getOsrsPrices } from "~/server/cron/tasks/getOsrsPrices"
 import { OsrsItemsEntity } from "~/server/db/entity/OsrsItems"
@@ -16,7 +17,7 @@ export interface OsrsItemsEmbedData {
 
 export class OsrsItemSlotError extends Error {}
 
-export class OsrsItemsModel extends BaseModel {
+export class GearModel extends BaseModel {
   protected override Entity = OsrsItemsEntity
 
   async getUserItems(userId: string): Promise<OsrsItemsEntity[]> {
@@ -36,13 +37,21 @@ export class OsrsItemsModel extends BaseModel {
 
     await this.em.create(this.Entity, input)
     await this.em.flush()
+
+    // Clear user cache
+    const cachedImageByUserId = this.context.cache.get(CacheKey.UserGearImage)
+    cachedImageByUserId.uns(input.userId)
   }
 
-  async removeItem({ userId, itemId }: { userId: string; itemId: number }) {
+  async removeItem(input: { userId: string; itemId: number }) {
     await this.em.nativeDelete(this.Entity, {
-      userId,
-      itemId,
+      userId: input.userId,
+      itemId: input.itemId,
     })
+
+    // Clear user cache
+    const cachedImageByUserId = this.context.cache.get(CacheKey.UserGearImage)
+    cachedImageByUserId.uns(input.userId)
   }
 
   async getPriceByItemIdMap(): Promise<Map<number, number>> {
@@ -56,10 +65,18 @@ export class OsrsItemsModel extends BaseModel {
     return new Map(data.items)
   }
 
-  async getEmbedData(
+  async #getCachedGearImage(
     member: GuildMember,
-  ): Promise<OsrsItemsEmbedData & { items: OsrsItemsEntity[] }> {
-    const items = await this.getUserItems(member.id)
+    items: OsrsItemsEntity[],
+  ): Promise<Buffer> {
+    const cachedImageByUserId = this.context.cache.get(CacheKey.UserGearImage)
+
+    // Use cached
+    const cachedImage = cachedImageByUserId.get(member.id)
+    if (cachedImage) {
+      return cachedImage
+    }
+
     const image = await getGearImage({
       avatarUrl: member.displayAvatarURL({
         extension: "png",
@@ -67,6 +84,18 @@ export class OsrsItemsModel extends BaseModel {
       }),
       items,
     })
+
+    // Update user cache
+    cachedImageByUserId.set(member.id, image)
+
+    return image
+  }
+
+  async getEmbedData(
+    member: GuildMember,
+  ): Promise<OsrsItemsEmbedData & { items: OsrsItemsEntity[] }> {
+    const items = await this.getUserItems(member.id)
+    const image = await this.#getCachedGearImage(member, items)
 
     return {
       items,

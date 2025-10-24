@@ -3,7 +3,7 @@ import { SlashCommandBuilder } from "discord.js"
 import { Color, OPTION_DESCRIPTION_AMOUNT } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { CreditsModel } from "~/server/db/model/Credits"
-import { OsrsItemsModel } from "~/server/db/model/OsrsItems"
+import { GearModel } from "~/server/db/model/Gear"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
 import { randomValue } from "~/server/utils/random"
@@ -72,8 +72,8 @@ export default class RouletteCommand extends BaseCommand {
       isCasino: true,
     })
 
-    const osrsItemsModel = new OsrsItemsModel(this.context)
-    const { thumbnail, files } = await osrsItemsModel.getEmbedData(this.member)
+    const gearModel = new GearModel(this.context)
+    const { thumbnail, files } = await gearModel.getEmbedData(this.member)
 
     this.reply({
       ephemeral: !isCasinoChannel(this.channel),

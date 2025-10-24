@@ -10,7 +10,7 @@ import { DISCORD_IDS } from "~/constants"
 import { osrsItemIdByName } from "~/constants/osrs"
 import { BaseCommand } from "~/server/base/Command"
 import { CreditsModel } from "~/server/db/model/Credits"
-import { OsrsItemSlotError, OsrsItemsModel } from "~/server/db/model/OsrsItems"
+import { OsrsItemSlotError, GearModel } from "~/server/db/model/Gear"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits } from "~/server/utils/credits"
 import { checkUnreachable } from "~/server/utils/error"
@@ -134,7 +134,7 @@ export default class GearCommand extends BaseCommand {
       throw new Error("User not found")
     }
 
-    const model = new OsrsItemsModel(this.context)
+    const model = new GearModel(this.context)
     const { items, thumbnail, files } = await model.getEmbedData(member)
     const priceByItemId = await model.getPriceByItemIdMap()
 
@@ -189,8 +189,8 @@ export default class GearCommand extends BaseCommand {
       throw new Error("Unknown OSRS item or it's not tradeable in the GE")
     }
 
-    const itemsModel = new OsrsItemsModel(this.context)
-    const priceByItemId = await itemsModel.getPriceByItemIdMap()
+    const gearModel = new GearModel(this.context)
+    const priceByItemId = await gearModel.getPriceByItemIdMap()
 
     const price = priceByItemId.get(itemId)
     if (!price) {
@@ -199,13 +199,13 @@ export default class GearCommand extends BaseCommand {
       )
     }
 
-    const items = await itemsModel.getUserItems(this.member.id)
+    const items = await gearModel.getUserItems(this.member.id)
 
     const creditsModel = new CreditsModel(this.context)
     const wallet = await creditsModel.getWallet(this.member.id)
 
     const canAfford = price <= wallet.credits
-    const slotError = itemsModel.getSlotError({
+    const slotError = gearModel.getSlotError({
       slot,
       items,
     })
@@ -245,7 +245,7 @@ export default class GearCommand extends BaseCommand {
       await interaction.deferUpdate()
 
       // Handle separately to catch error
-      await itemsModel.addItem({
+      await gearModel.addItem({
         userId: this.member.id,
         itemId,
         itemName: name,
@@ -308,15 +308,15 @@ export default class GearCommand extends BaseCommand {
       true,
     ) as GearSlot
 
-    const itemsModel = new OsrsItemsModel(this.context)
-    const items = await itemsModel.getUserItems(this.member.id)
+    const gearModel = new GearModel(this.context)
+    const items = await gearModel.getUserItems(this.member.id)
 
     const item = items.find((item) => item.itemSlot === slot)
     if (!item) {
       throw new Error("Item not found or you don't own any")
     }
 
-    const priceByItemId = await itemsModel.getPriceByItemIdMap()
+    const priceByItemId = await gearModel.getPriceByItemIdMap()
     // Sell for the bought price as a fallback
     const realPrice = priceByItemId.get(item.itemId)
     const price = realPrice ?? item.itemBoughtPrice
@@ -358,7 +358,7 @@ export default class GearCommand extends BaseCommand {
             success: true,
           }),
         }),
-        itemsModel.removeItem({
+        gearModel.removeItem({
           userId: this.member.id,
           itemId: item.itemId,
         }),
