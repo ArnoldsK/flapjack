@@ -175,7 +175,7 @@ export default class BlackjackCommand extends BaseCommand {
     try {
       const interaction = await response.awaitMessageComponent({
         componentType: ComponentType.Button,
-        time: 5 * 60_000, // 5 minutes
+        idle: 5 * 60_000, // 5 minutes
         filter: (i) => i.user.id === this.user.id,
       })
 
