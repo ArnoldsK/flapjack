@@ -9,10 +9,8 @@ import OpenAI from "openai"
 
 import { DISCORD_IDS } from "~/constants"
 import CacheManager from "~/server/cache"
-import { getOsrsGearImage } from "~/server/canvas/osrsGearImage"
 import { appConfig } from "~/server/config"
 import { createConnection } from "~/server/db"
-import { OsrsItemsModel } from "~/server/db/model/OsrsItems"
 import {
   getSetupCommands,
   handleApiCommands,
@@ -95,19 +93,6 @@ nextApp.prepare().then(async () => {
     // Pre-fetch members
     const guild = client.guilds.cache.get(DISCORD_IDS.guild)!
     await guild.members.fetch()
-
-    const member = guild.members.cache.get(DISCORD_IDS.users.owner)!
-    const model = new OsrsItemsModel(context)
-    const userItems = await model.getUserItems(member.id)
-
-    await getOsrsGearImage({
-      avatarUrl: member.displayAvatarURL({
-        extension: "png",
-        forceStatic: true,
-        size: 64,
-      }),
-      items: userItems,
-    })
   })
 
   client.on(Events.InteractionCreate, async (interaction) => {

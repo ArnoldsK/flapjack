@@ -2,12 +2,12 @@ import { RequiredEntityData } from "@mikro-orm/core"
 import { APIEmbedThumbnail, AttachmentBuilder, GuildMember } from "discord.js"
 
 import { BaseModel } from "~/server/base/Model"
-import { getOsrsGearImage } from "~/server/canvas/osrsGearImage"
+import { getGearImage } from "~/server/canvas/gearImage"
 import { getOsrsPrices } from "~/server/cron/tasks/getOsrsPrices"
 import { OsrsItemsEntity } from "~/server/db/entity/OsrsItems"
 import { StaticDataModel } from "~/server/db/model/StaticData"
 import { StaticDataType } from "~/types/entity"
-import { OsrsItemSlot } from "~/types/osrs"
+import { GearSlot } from "~/types/osrs"
 
 export interface OsrsItemsEmbedData {
   thumbnail: APIEmbedThumbnail
@@ -60,7 +60,7 @@ export class OsrsItemsModel extends BaseModel {
     member: GuildMember,
   ): Promise<OsrsItemsEmbedData & { items: OsrsItemsEntity[] }> {
     const items = await this.getUserItems(member.id)
-    const image = await getOsrsGearImage({
+    const image = await getGearImage({
       avatarUrl: member.displayAvatarURL({
         extension: "png",
         size: 64,
@@ -81,7 +81,7 @@ export class OsrsItemsModel extends BaseModel {
     slot,
     items,
   }: {
-    slot: OsrsItemSlot
+    slot: GearSlot
     items: OsrsItemsEntity[]
   }): string | undefined {
     const itemBySlot = new Map(items.map((item) => [item.itemSlot, true]))
@@ -91,16 +91,15 @@ export class OsrsItemsModel extends BaseModel {
     }
 
     if (
-      slot === OsrsItemSlot.TwoHanded &&
-      (itemBySlot.has(OsrsItemSlot.OneHanded) ||
-        itemBySlot.has(OsrsItemSlot.Shield))
+      slot === GearSlot.TwoHanded &&
+      (itemBySlot.has(GearSlot.OneHanded) || itemBySlot.has(GearSlot.Shield))
     ) {
       return "Already using a weapon or a shield"
     }
 
     if (
-      (slot === OsrsItemSlot.Shield || slot === OsrsItemSlot.OneHanded) &&
-      itemBySlot.has(OsrsItemSlot.TwoHanded)
+      (slot === GearSlot.Shield || slot === GearSlot.OneHanded) &&
+      itemBySlot.has(GearSlot.TwoHanded)
     ) {
       return "You're using a two-handed weapon"
     }

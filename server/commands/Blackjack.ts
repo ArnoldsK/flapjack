@@ -255,10 +255,12 @@ export default class BlackjackCommand extends BaseCommand {
         // Continue the rabbit hole...
         await this.#handleAwaitResponse(nextResponse, game)
       }
-    } catch {
+    } catch (error) {
       const wallet = await this.#creditsModel.getWallet(this.member.id)
       const state = game.getState()
       const lostAmount = state.finalBet || state.initialBet
+
+      console.error("> Blackjack >", error)
 
       await this.editReply({
         embeds: [

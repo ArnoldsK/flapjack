@@ -1,4 +1,4 @@
-export enum OsrsItemSlot {
+export enum GearSlot {
   Body = "body",
   Cape = "cape",
   Feet = "feet",

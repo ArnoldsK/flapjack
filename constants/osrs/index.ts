@@ -1,9 +1,9 @@
 /* eslint-disable unicorn/numeric-separators-style */
 
-import { OsrsItemSlot } from "~/types/osrs"
+import { GearSlot } from "~/types/osrs"
 
-export const osrsItemIdByName: Record<OsrsItemSlot, Map<string, number>> = {
-  body: new Map([
+export const osrsItemIdByName: Record<GearSlot, Map<string, number>> = {
+  [GearSlot.Body]: new Map([
     ["Bronze platebody", 1117],
     ["Iron chainbody", 1101],
     ["Iron platebody", 1115],
@@ -251,7 +251,7 @@ export const osrsItemIdByName: Record<OsrsItemSlot, Map<string, number>> = {
     ["Oathplate chest", 30753],
     ["Grid master tabard", 31181],
   ]),
-  cape: new Map([
+  [GearSlot.Cape]: new Map([
     ["Saradomin cloak", 10446],
     ["Obsidian cape", 6568],
     ["Ham cloak", 4304],
@@ -344,7 +344,7 @@ export const osrsItemIdByName: Record<OsrsItemSlot, Map<string, number>> = {
     ["Mixed hide cape", 29289],
     ["Swords and emblem", 31193],
   ]),
-  feet: new Map([
+  [GearSlot.Feet]: new Map([
     ["Bronze boots", 4119],
     ["Iron boots", 4121],
     ["Steel boots", 4123],
@@ -446,7 +446,7 @@ export const osrsItemIdByName: Record<OsrsItemSlot, Map<string, number>> = {
     ["Raging echoes boots (t3)", 30426],
     ["Avernic treads", 31088],
   ]),
-  legs: new Map([
+  [GearSlot.Legs]: new Map([
     ["Bronze plateskirt", 1087],
     ["Dragon platelegs", 4087],
     ["Dragon plateskirt", 4585],
@@ -692,7 +692,7 @@ export const osrsItemIdByName: Record<OsrsItemSlot, Map<string, number>> = {
     ["Raging echoes robeskirt (t3)", 30424],
     ["Oathplate legs", 30756],
   ]),
-  neck: new Map([
+  [GearSlot.Neck]: new Map([
     ["Amulet of accuracy", 1478],
     ["Amulet of defence", 1729],
     ["Amulet of fury", 6585],
@@ -766,7 +766,7 @@ export const osrsItemIdByName: Record<OsrsItemSlot, Map<string, number>> = {
     ["Cursed amulet of magic", 29486],
     ["Amulet of rancour", 29801],
   ]),
-  shield: new Map([
+  [GearSlot.Shield]: new Map([
     ["Bronze sq shield", 1173],
     ["Bronze kiteshield", 1189],
     ["Iron kiteshield", 1191],
@@ -870,7 +870,7 @@ export const osrsItemIdByName: Record<OsrsItemSlot, Map<string, number>> = {
     ["Elidinis' ward", 25985],
     ["Antler guard", 31081],
   ]),
-  oneHanded: new Map([
+  [GearSlot.OneHanded]: new Map([
     ["Crossbow", 837],
     ["Bronze crossbow", 9174],
     ["Bronze thrownaxe", 800],
@@ -1148,7 +1148,7 @@ export const osrsItemIdByName: Record<OsrsItemSlot, Map<string, number>> = {
     ["Soulflame horn", 30759],
     ["Redwood hiking staff", 31049],
   ]),
-  twoHanded: new Map([
+  [GearSlot.TwoHanded]: new Map([
     ["Iron 2h sword", 1309],
     ["Iron spear", 1239],
     ["Steel spear", 1241],

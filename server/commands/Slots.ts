@@ -80,6 +80,7 @@ export default class SlotsCommand extends BaseCommand {
       ephemeral: !isCasinoChannel(this.channel),
       embeds: [
         {
+          color: this.member.displayColor,
           title: winningEmojis.join(" "),
           description: joinAsLines(
             reward

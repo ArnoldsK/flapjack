@@ -1,9 +1,9 @@
 import type { Image, SKRSContext2D } from "@napi-rs/canvas"
 
 export interface CanvasDrawImageOptions {
-  rotate?: number
-  mirror?: boolean
   ellipse?: boolean
+  mirror?: boolean
+  rotate?: number
 }
 
 export const canvasDrawImage = (

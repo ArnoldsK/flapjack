@@ -16,7 +16,7 @@ import { formatCredits } from "~/server/utils/credits"
 import { checkUnreachable } from "~/server/utils/error"
 import { getPercentageChangeString } from "~/server/utils/number"
 import { joinAsLines } from "~/server/utils/string"
-import { OsrsItemSlot } from "~/types/osrs"
+import { GearSlot } from "~/types/osrs"
 
 enum SubcommandName {
   View = "view",
@@ -60,7 +60,7 @@ export default class GearCommand extends BaseCommand {
             .setName(OptionName.Slot)
             .setDescription("Select gear slot")
             .setChoices(
-              ...Object.entries(OsrsItemSlot).map(([name, value]) => ({
+              ...Object.entries(GearSlot).map(([name, value]) => ({
                 name,
                 value,
               })),
@@ -85,7 +85,7 @@ export default class GearCommand extends BaseCommand {
             .setName(OptionName.Slot)
             .setDescription("Select gear slot")
             .setChoices(
-              ...Object.entries(OsrsItemSlot).map(([name, value]) => ({
+              ...Object.entries(GearSlot).map(([name, value]) => ({
                 name,
                 value,
               })),
@@ -173,7 +173,7 @@ export default class GearCommand extends BaseCommand {
     const slot = this.interaction.options.getString(
       OptionName.Slot,
       true,
-    ) as OsrsItemSlot
+    ) as GearSlot
     const nameInput = this.interaction.options.getString(OptionName.Name, true)
 
     const itemsBySlot = osrsItemIdByName[slot]
@@ -306,7 +306,7 @@ export default class GearCommand extends BaseCommand {
     const slot = this.interaction.options.getString(
       OptionName.Slot,
       true,
-    ) as OsrsItemSlot
+    ) as GearSlot
 
     const itemsModel = new OsrsItemsModel(this.context)
     const items = await itemsModel.getUserItems(this.member.id)
