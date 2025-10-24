@@ -100,9 +100,11 @@ export default class BlackjackCommand extends BaseCommand {
   async execute() {
     const gameUrl = this.#getRunningGameUrl()
     if (gameUrl) {
-      this.fail(`You already have a running game at ${gameUrl}`)
-      return
+      throw new Error(`You already have a running game at ${gameUrl}`)
     }
+
+    const ephemeral = !isCasinoChannel(this.channel)
+    await this.interaction.deferReply({ ephemeral })
 
     // #############################################################################
     // Prepare credits
@@ -140,9 +142,7 @@ export default class BlackjackCommand extends BaseCommand {
     const gearModel = new GearModel(this.context)
     this.#embedData = await gearModel.getEmbedData(this.member)
 
-    const ephemeral = !isCasinoChannel(this.channel)
-    const response = await this.reply({
-      ephemeral,
+    const response = await this.editReply({
       embeds: [
         {
           ...embed,
