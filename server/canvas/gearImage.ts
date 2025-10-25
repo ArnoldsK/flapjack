@@ -99,23 +99,29 @@ export const getGearImage = async ({
   const bodyImage = await getItemImage(GearSlot.Body, bodyItem?.itemId)
 
   if (bodyImage) {
+    const skewRotation = getSkewRotation(bodyImage)
+
     const bodySize = scaleToHeight(
       bodyImage.width,
       bodyImage.height,
       BODY_HEIGHT,
     )
 
+    let rotate = 0
+    if (skewRotation === "Clockwise") rotate = -35
+    if (skewRotation === "CounterClockwise") rotate = 35
+
     drawQueue.set("body", {
       image: bodyImage,
       itemName: bodyItem?.itemName,
       x: WIDTH / 2 - bodySize.width / 2,
-      y: HEAD_HEIGHT,
+      y: HEAD_HEIGHT - (skewRotation === "Clockwise" ? 25 : 0),
       width: bodySize.width,
       height: bodySize.height,
       options: {
         ellipse: false,
         mirror: false,
-        rotate: 0,
+        rotate,
       },
     })
   }
@@ -368,5 +374,12 @@ const mutateDrawItemByName = (name: string, el: DrawItem) => {
   } else if (has(" dagger")) {
     el.height *= 0.9
     el.options.rotate -= 20
+  } else if (has("Citizen shoes", "Vyrewatch shoes")) {
+    el.options.rotate = -45
+  } else if (has("Vyrewatch legs")) {
+    el.options.rotate -= 10
+  } else if (has("Vyrewatch top")) {
+    el.height *= 1.4
+    el.options.rotate += 10
   }
 }

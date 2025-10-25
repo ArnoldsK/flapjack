@@ -5,6 +5,7 @@ import {
   type SKRSContext2D,
 } from "@napi-rs/canvas"
 
+import { appConfig } from "~/server/config"
 import { scaleToMax } from "~/server/utils/number"
 
 export interface CanvasDrawImageOptions {
@@ -159,21 +160,31 @@ export const getSkewRotation = (
   const xTopSolid: number[] = []
   const xBotSolid: number[] = []
 
-  const topRowY = Math.floor(height * 0.1)
-  const botRowY = Math.floor(height * 0.9 - 1)
+  const topRowY = Math.floor(height * 0.05)
+  const botRowY = Math.floor(height * 0.95 - 1)
   const topRowStartIndex = Math.floor(topRowY * width * 4)
   const botRowStartIndex = Math.floor(botRowY * width * 4)
 
   // 1. Get top row solid pixels
   for (let i = topRowStartIndex; i < topRowStartIndex + width * 4; i += 4) {
     if (data[i + 3] === 0) continue
-    xTopSolid.push((i - topRowStartIndex) / 4)
+    const x = (i - topRowStartIndex) / 4
+    if (appConfig.dev) {
+      ctx.fillStyle = "red"
+      ctx.fillRect(x, topRowY, 1, 1)
+    }
+    xTopSolid.push(x)
   }
 
   // 2. Get bottom row solid pixels
   for (let i = botRowStartIndex; i < botRowStartIndex + width * 4; i += 4) {
     if (data[i + 3] === 0) continue
-    xBotSolid.push((i - botRowStartIndex) / 4)
+    const x = (i - botRowStartIndex) / 4
+    if (appConfig.dev) {
+      ctx.fillStyle = "red"
+      ctx.fillRect(x, botRowY, 1, 1)
+    }
+    xBotSolid.push(x)
   }
 
   // Safety check: if either is -1, the crop failed or the row is empty
@@ -181,16 +192,25 @@ export const getSkewRotation = (
     return "None"
   }
 
-  const xTop =
-    (Math.min(...xTopSolid) + Math.max(...xTopSolid)) / xTopSolid.length
-  const xBot =
-    (Math.min(...xBotSolid) + Math.max(...xBotSolid)) / xBotSolid.length
-
   // 3. Compare Points
-  const diff = xTop - xBot
+  const xTopMin = Math.min(...xTopSolid)
+  const xTopMax = Math.max(...xTopSolid)
 
-  // Use a small tolerance (e.g., 2 pixels) for 'None' to account for rounding/aliasing
-  const tolerance = Math.ceil(width * 0.02)
+  const xBotMin = Math.min(...xBotSolid)
+  const xBotMax = Math.max(...xBotSolid)
+
+  const isSymmetrical =
+    (xTopMin > xBotMin && xTopMax < xBotMax) ||
+    (xTopMin < xBotMin && xTopMin > xBotMax)
+
+  if (isSymmetrical) {
+    return "None"
+  }
+
+  const diff = xTopMin > xBotMax ? xTopMax - xBotMin : xBotMax - xBotMin
+
+  // Use a small tolerance to account for rounding/aliasing
+  const tolerance = Math.ceil(width * 0.04)
 
   if (Math.abs(diff) <= tolerance) {
     // xTop and xBottom are very close
