@@ -12,7 +12,6 @@ import {
   getSkewRotation,
 } from "~/server/utils/canvas"
 import { scaleToHeight } from "~/server/utils/number"
-import { randomHexColor } from "~/server/utils/random"
 import { GearSlot } from "~/types/osrs"
 
 type Item = Pick<OsrsItemsEntity, "itemId" | "itemSlot" | "itemName">
@@ -30,7 +29,7 @@ interface DrawItem {
 // Canvas sizes
 const BASE_SIZE = [140, 190]
 const [WIDTH, HEIGHT] = appConfig.dev
-  ? [BASE_SIZE[0] * 4, BASE_SIZE[1] * 4]
+  ? [BASE_SIZE[0] * 3, BASE_SIZE[1] * 3]
   : BASE_SIZE
 const ONE_TENTH = HEIGHT / 10
 const HEAD_HEIGHT = ONE_TENTH * 2
@@ -103,7 +102,7 @@ export const getGearImage = async ({
     const bodySize = scaleToHeight(
       bodyImage.width,
       bodyImage.height,
-      BODY_HEIGHT * 1.1,
+      BODY_HEIGHT,
     )
 
     drawQueue.set("body", {
@@ -135,7 +134,7 @@ export const getGearImage = async ({
       image: neckImage,
       itemName: neckItem?.itemName,
       x: WIDTH / 2 - neckSize.width / 2,
-      y: HEAD_HEIGHT * 0.8,
+      y: HEAD_HEIGHT - neckSize.height * 0.4,
       width: neckSize.width,
       height: neckSize.height,
       options: {
@@ -155,7 +154,7 @@ export const getGearImage = async ({
     const legsSize = scaleToHeight(
       legsImage.width,
       legsImage.height,
-      LEGS_HEIGHT * 1.1,
+      LEGS_HEIGHT,
     )
 
     legsSize.width = Math.max(legsSize.width, WIDTH / 3)
@@ -304,15 +303,6 @@ export const getGearImage = async ({
       mutateDrawItemByName(el.itemName, el)
     }
 
-    if (appConfig.dev) {
-      ctx.fillStyle = randomHexColor("6")
-      ctx.fillRect(el.x, el.y, el.width, el.height)
-
-      ctx.lineWidth = 2
-      ctx.strokeStyle = randomHexColor()
-      ctx.strokeRect(el.x, el.y, el.width, el.height)
-    }
-
     canvasDrawImage(ctx, el.image, el.x, el.y, el.width, el.height, el.options)
   }
 
@@ -347,13 +337,11 @@ const mutateDrawItemByName = (name: string, el: DrawItem) => {
   const recenterHeight = () => (el.y = HEIGHT / 2 - el.height / 2)
 
   if (has(" robe")) {
-    el.height += BODY_HEIGHT / 10
+    el.height *= 1.1
   } else if (has(" skirt")) {
-    el.width *= 1.3
-    recenterWidth()
     el.y *= 0.95
     el.height *= 1.1
-  } else if (has("scimitar")) {
+  } else if (has(" scimitar")) {
     el.options.mirror = false
     el.options.rotate = -70
   } else if (has(" longbow")) {
@@ -365,8 +353,8 @@ const mutateDrawItemByName = (name: string, el: DrawItem) => {
     el.x += WIDTH * 0.1
   } else if (has(" backpack")) {
     el.width *= 0.8
-    el.height *= 0.8
     recenterWidth()
+    el.height *= 0.8
     el.y = HEAD_HEIGHT + BODY_HEIGHT / 2 - el.width / 2
     el.options.rotate = -45
   } else if (has(" bludgeon")) {

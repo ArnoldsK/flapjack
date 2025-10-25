@@ -5,7 +5,6 @@ import {
   type SKRSContext2D,
 } from "@napi-rs/canvas"
 
-import { appConfig } from "~/server/config"
 import { scaleToMax } from "~/server/utils/number"
 
 export interface CanvasDrawImageOptions {
@@ -168,24 +167,12 @@ export const getSkewRotation = (
   // 1. Get top row solid pixels
   for (let i = topRowStartIndex; i < topRowStartIndex + width * 4; i += 4) {
     if (data[i + 3] === 0) continue
-
-    if (appConfig.dev) {
-      ctx.fillStyle = "red"
-      ctx.fillRect((i - topRowStartIndex) / 4, topRowY, 2, 2)
-    }
-
     xTopSolid.push((i - topRowStartIndex) / 4)
   }
 
   // 2. Get bottom row solid pixels
   for (let i = botRowStartIndex; i < botRowStartIndex + width * 4; i += 4) {
     if (data[i + 3] === 0) continue
-
-    if (appConfig.dev) {
-      ctx.fillStyle = "red"
-      ctx.fillRect((i - botRowStartIndex) / 4, botRowY, 2, 2)
-    }
-
     xBotSolid.push((i - botRowStartIndex) / 4)
   }
 
@@ -203,7 +190,7 @@ export const getSkewRotation = (
   const diff = xTop - xBot
 
   // Use a small tolerance (e.g., 2 pixels) for 'None' to account for rounding/aliasing
-  const tolerance = Math.ceil(width * 0.05)
+  const tolerance = Math.ceil(width * 0.02)
 
   if (Math.abs(diff) <= tolerance) {
     // xTop and xBottom are very close
