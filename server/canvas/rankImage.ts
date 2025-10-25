@@ -6,7 +6,7 @@ import { Unicode } from "~/constants"
 import { ExperienceRankData } from "~/server/db/model/Experience"
 import { canvasFont, canvasDrawImage } from "~/server/utils/canvas"
 import { getBackgroundTextColor } from "~/server/utils/color"
-import { interpolate } from "~/server/utils/number"
+import { range } from "~/server/utils/number"
 
 export const getRankImage = async (
   rankData: ExperienceRankData,
@@ -91,7 +91,7 @@ export const getRankImage = async (
 
   // Bar foreground
   const { exp, min, max } = rankData.levelData
-  const barWidth = interpolate(exp, min, max, 0, barWidthMax)
+  const barWidth = range(exp, min, max, 0, barWidthMax)
 
   ctx.fillStyle = textColor
   ctx.fillRect(barX, barY, barWidth, barHeight)

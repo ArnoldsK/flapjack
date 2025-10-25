@@ -26,8 +26,6 @@ const run = async () => {
     .map((el) => el.trim())
     .filter((el) => !!el && !el.startsWith("#"))
 
-  console.log(names)
-
   const buffer = await getGearImage({
     avatarUrl: "https://i.imgur.com/HWDfNVH.png",
     items: names.map(itemByName).filter(isNonNullish),

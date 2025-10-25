@@ -4,7 +4,7 @@ import { useWindowSize } from "react-use"
 
 import * as S from "./styles"
 
-import { interpolate } from "~/server/utils/number"
+import { range } from "~/server/utils/number"
 import { randomValue } from "~/server/utils/random"
 
 interface AvatarGridBannerProps {
@@ -63,27 +63,9 @@ export const AvatarGridBanner = ({ avatarUrls }: AvatarGridBannerProps) => {
 
     const degAbs = 20
 
-    const degY = interpolate(
-      ev.nativeEvent.offsetX,
-      0,
-      rect.width,
-      -degAbs,
-      degAbs,
-    )
-    const degX = interpolate(
-      ev.nativeEvent.offsetY,
-      0,
-      rect.height,
-      degAbs,
-      -degAbs,
-    )
-    const brightness = interpolate(
-      ev.nativeEvent.offsetY,
-      0,
-      rect.height,
-      1.2,
-      0.8,
-    )
+    const degY = range(ev.nativeEvent.offsetX, 0, rect.width, -degAbs, degAbs)
+    const degX = range(ev.nativeEvent.offsetY, 0, rect.height, degAbs, -degAbs)
+    const brightness = range(ev.nativeEvent.offsetY, 0, rect.height, 1.2, 0.8)
 
     imgEl.style.transform = `rotateX(${degX}deg) rotateY(${degY}deg)`
     imgEl.style.filter = `brightness(${brightness})`

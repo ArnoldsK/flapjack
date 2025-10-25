@@ -1,6 +1,6 @@
 import { RANK_MAX_LEVEL } from "~/constants"
 import { ExperienceLevelData } from "~/server/db/model/Experience"
-import { interpolate } from "~/server/utils/number"
+import { range } from "~/server/utils/number"
 
 export const getExperienceForLevel = (lvl: number): number => {
   // RuneScape uses factor of 4
@@ -28,7 +28,7 @@ export const getExperienceLevelData = (exp: number): ExperienceLevelData => {
     data.lvl = lvl
     data.min = minExp
     data.max = maxExp
-    data.percent = Math.floor(interpolate(exp, minExp, maxExp, 0, 100))
+    data.percent = Math.floor(range(exp, minExp, maxExp, 0, 100))
   }
 
   for (let lvl = 1; lvl <= RANK_MAX_LEVEL; lvl++) {

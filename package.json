@@ -6,7 +6,7 @@
     "dev": "nodemon",
     "dev:cmd": "cross-env LOCAL_COMMANDS=true nodemon",
     "dev:web": "cross-env WEB_ONLY=true nodemon",
-    "dev:script": "nodemon --watch scripts --watch server --ext ts --exec ts-node --project tsconfig.server.json",
+    "dev:script": "nodemon --watch scripts --watch server --ext ts,yaml --exec ts-node --project tsconfig.server.json",
     "build": "rm -rf dist/ && next build && tsc --project tsconfig.server.json && tsc-alias -p tsconfig.server.json",
     "start": "cross-env NODE_ENV=development node dist/server/index.js",
     "lint": "npx eslint .",

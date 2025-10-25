@@ -53,7 +53,7 @@ export class GearModel extends BaseModel {
 
     const image = await getGearImage({
       avatarUrl: member.displayAvatarURL({
-        extension: "png",
+        extension: "jpg",
         size: 64,
       }),
       items,

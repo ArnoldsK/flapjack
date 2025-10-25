@@ -1,16 +1,24 @@
 import { existsSync } from "node:fs"
 import path from "node:path"
 
-import { createCanvas, Image, loadImage } from "@napi-rs/canvas"
+import { Canvas, createCanvas, Image, loadImage } from "@napi-rs/canvas"
 
+import { appConfig } from "~/server/config"
 import { OsrsItemsEntity } from "~/server/db/entity/OsrsItems"
-import { canvasDrawImage, CanvasDrawImageOptions } from "~/server/utils/canvas"
+import {
+  canvasDrawImage,
+  CanvasDrawImageOptions,
+  cropImageToContent,
+  getSkewRotation,
+} from "~/server/utils/canvas"
+import { scaleToHeight } from "~/server/utils/number"
+import { randomHexColor } from "~/server/utils/random"
 import { GearSlot } from "~/types/osrs"
 
 type Item = Pick<OsrsItemsEntity, "itemId" | "itemSlot" | "itemName">
 
 interface DrawItem {
-  image: Image | undefined
+  image: Image | Canvas
   itemName: string | undefined
   x: number
   y: number
@@ -20,7 +28,15 @@ interface DrawItem {
 }
 
 // Canvas sizes
-const [WIDTH, HEIGHT] = [140, 190]
+const BASE_SIZE = [140, 190]
+const [WIDTH, HEIGHT] = appConfig.dev
+  ? [BASE_SIZE[0] * 4, BASE_SIZE[1] * 4]
+  : BASE_SIZE
+const ONE_TENTH = HEIGHT / 10
+const HEAD_HEIGHT = ONE_TENTH * 2
+const BODY_HEIGHT = ONE_TENTH * 2.8
+const LEGS_HEIGHT = ONE_TENTH * 3.5
+const FEET_HEIGHT = ONE_TENTH * 1.7
 
 // Used for layer order
 const DRAW_KEYS = [
@@ -29,7 +45,7 @@ const DRAW_KEYS = [
   "legs",
   "body",
   "neck",
-  "avatar",
+  "head",
   "weapon",
   "shield",
 ] as const
@@ -58,19 +74,20 @@ export const getGearImage = async ({
   // Use a queue for layering
   const drawQueue = new Map<(typeof DRAW_KEYS)[number], DrawItem>()
 
-  // Avatar
-  const avatarImage = await loadImage(avatarUrl)
-  const avatarWidth = 50
-  const avatarX = WIDTH / 2 - avatarWidth / 2
-  const avatarY = 0
+  // Head
+  const headImage = await loadImage(avatarUrl)
+  const headSize = {
+    width: HEAD_HEIGHT * 1.1,
+    height: HEAD_HEIGHT * 1.1,
+  }
 
-  drawQueue.set("avatar", {
-    image: avatarImage,
+  drawQueue.set("head", {
+    image: headImage,
     itemName: undefined,
-    x: avatarX,
-    y: avatarY,
-    width: avatarWidth,
-    height: avatarWidth,
+    x: WIDTH / 2 - headSize.width / 2,
+    y: 0,
+    width: headSize.width,
+    height: headSize.height,
     options: {
       ellipse: true,
       mirror: false,
@@ -80,149 +97,203 @@ export const getGearImage = async ({
 
   // Body
   const bodyItem = userItemBySlot.get(GearSlot.Body)
-  const bodyWidth = 76
-  const bodyHeight = 76
-  const bodyX = WIDTH / 2 - bodyWidth / 2
-  const bodyY = avatarY + avatarWidth - 20
-  drawQueue.set("body", {
-    image: await getItemImage(GearSlot.Body, bodyItem?.itemId),
-    itemName: bodyItem?.itemName,
-    x: bodyX,
-    y: bodyY,
-    width: bodyWidth,
-    height: bodyHeight,
-    options: {
-      ellipse: false,
-      mirror: false,
-      rotate: 0,
-    },
-  })
+  const bodyImage = await getItemImage(GearSlot.Body, bodyItem?.itemId)
+
+  if (bodyImage) {
+    const bodySize = scaleToHeight(
+      bodyImage.width,
+      bodyImage.height,
+      BODY_HEIGHT * 1.1,
+    )
+
+    drawQueue.set("body", {
+      image: bodyImage,
+      itemName: bodyItem?.itemName,
+      x: WIDTH / 2 - bodySize.width / 2,
+      y: HEAD_HEIGHT,
+      width: bodySize.width,
+      height: bodySize.height,
+      options: {
+        ellipse: false,
+        mirror: false,
+        rotate: 0,
+      },
+    })
+  }
 
   // Neck
   const neckItem = userItemBySlot.get(GearSlot.Neck)
-  const neckWidth = 40
-  const neckHeight = 40
-  const neckX = WIDTH / 2 - neckWidth / 2
-  const neckY = avatarY + avatarWidth - 20
-  drawQueue.set("neck", {
-    image: await getItemImage(GearSlot.Neck, neckItem?.itemId),
-    itemName: neckItem?.itemName,
-    x: neckX,
-    y: neckY,
-    width: neckWidth,
-    height: neckHeight,
-    options: {
-      ellipse: false,
-      mirror: false,
-      rotate: 0,
-    },
-  })
+  const neckImage = await getItemImage(GearSlot.Neck, neckItem?.itemId)
+
+  if (neckImage) {
+    const neckSize = {
+      width: 80,
+      height: 100,
+    }
+
+    drawQueue.set("neck", {
+      image: neckImage,
+      itemName: neckItem?.itemName,
+      x: WIDTH / 2 - neckSize.width / 2,
+      y: HEAD_HEIGHT * 0.8,
+      width: neckSize.width,
+      height: neckSize.height,
+      options: {
+        ellipse: false,
+        mirror: false,
+        rotate: -20,
+      },
+    })
+  }
 
   // Legs
   const legsItem = userItemBySlot.get(GearSlot.Legs)
-  const legsWidth = 130
-  const legsHeight = 120
-  const legsX = WIDTH / 2 - legsWidth / 2
-  const legsY = bodyY + bodyHeight - 40
-  drawQueue.set("legs", {
-    image: await getItemImage(GearSlot.Legs, legsItem?.itemId),
-    itemName: legsItem?.itemName,
-    x: legsX,
-    y: legsY,
-    width: legsWidth,
-    height: legsHeight,
-    options: {
-      ellipse: false,
-      mirror: false,
-      rotate: 0,
-    },
-  })
+  const legsImage = await getItemImage(GearSlot.Legs, legsItem?.itemId)
+
+  if (legsImage) {
+    const skewRotation = getSkewRotation(legsImage)
+    const legsSize = scaleToHeight(
+      legsImage.width,
+      legsImage.height,
+      LEGS_HEIGHT * 1.1,
+    )
+
+    legsSize.width = Math.max(legsSize.width, WIDTH / 3)
+
+    let rotate = 0
+    if (skewRotation === "Clockwise") rotate = -40
+    if (skewRotation === "CounterClockwise") rotate = 40
+
+    drawQueue.set("legs", {
+      image: legsImage,
+      itemName: legsItem?.itemName,
+      x: WIDTH / 2 - legsSize.width / 2,
+      y: HEAD_HEIGHT + BODY_HEIGHT,
+      width: legsSize.width,
+      height: legsSize.height,
+      options: {
+        ellipse: false,
+        mirror: false,
+        rotate,
+      },
+    })
+  }
 
   // Feet
   const feetItem = userItemBySlot.get(GearSlot.Feet)
-  const feetWidth = 48
-  const feetHeight = 48
-  const feetX = WIDTH / 2 - feetWidth / 2
-  const feetY = legsY + legsHeight - 35
-  drawQueue.set("feet", {
-    image: await getItemImage(GearSlot.Feet, feetItem?.itemId),
-    itemName: feetItem?.itemName,
-    x: feetX,
-    y: feetY,
-    width: feetWidth,
-    height: feetHeight,
-    options: {
-      ellipse: false,
-      mirror: false,
-      rotate: 0,
-    },
-  })
+  const feetImage = await getItemImage(GearSlot.Feet, feetItem?.itemId)
+
+  if (feetImage) {
+    const feetSize = scaleToHeight(
+      feetImage.width,
+      feetImage.height,
+      FEET_HEIGHT,
+    )
+
+    drawQueue.set("feet", {
+      image: feetImage,
+      itemName: feetItem?.itemName,
+      x: WIDTH / 2 - feetSize.width / 2,
+      y: HEAD_HEIGHT + BODY_HEIGHT + LEGS_HEIGHT,
+      width: feetSize.width,
+      height: feetSize.height,
+      options: {
+        ellipse: false,
+        mirror: false,
+        rotate: 0,
+      },
+    })
+  }
 
   // Cape
   const capeItem = userItemBySlot.get(GearSlot.Cape)
-  const capeWidth = 160
-  const capeHeight = 160
-  const capeX = WIDTH / 2 - capeWidth / 2
-  const capeY = avatarY + avatarWidth - 30
-  drawQueue.set("cape", {
-    image: await getItemImage(GearSlot.Cape, capeItem?.itemId),
-    itemName: capeItem?.itemName,
-    x: capeX,
-    y: capeY,
-    width: capeWidth,
-    height: capeHeight,
-    options: {
-      ellipse: false,
-      mirror: false,
-      rotate: -30,
-    },
-  })
+  const capeImage = await getItemImage(GearSlot.Cape, capeItem?.itemId)
+
+  if (capeImage) {
+    const skewRotation = getSkewRotation(capeImage)
+
+    const capeSize = scaleToHeight(
+      capeImage.width,
+      capeImage.height,
+      BODY_HEIGHT + LEGS_HEIGHT,
+    )
+
+    let rotate = 0
+    if (skewRotation === "Clockwise") rotate = -30
+
+    drawQueue.set("cape", {
+      image: capeImage,
+      itemName: capeItem?.itemName,
+      x: WIDTH / 2 - capeSize.width / 2,
+      y: HEAD_HEIGHT * 0.9,
+      width: capeSize.width,
+      height: capeSize.height,
+      options: {
+        ellipse: false,
+        mirror: false,
+        rotate,
+      },
+    })
+  }
 
   // Weapon
   const weaponItem =
     userItemBySlot.get(GearSlot.OneHanded) ??
     userItemBySlot.get(GearSlot.TwoHanded)
-  const weaponWidth = 100
-  const weaponHeight = 100
-  const weaponX = WIDTH / 5 - weaponWidth / 2
-  const weaponY = HEIGHT / 3 - weaponHeight / 2
+  const weaponImage = await getItemImage(
+    weaponItem?.itemSlot ?? GearSlot.OneHanded,
+    weaponItem?.itemId,
+  )
 
-  drawQueue.set("weapon", {
-    image: await getItemImage(
-      weaponItem?.itemSlot ?? GearSlot.OneHanded,
-      weaponItem?.itemId,
-    ),
-    itemName: weaponItem?.itemName,
-    x: weaponX,
-    y: weaponY,
-    width: weaponWidth,
-    height: weaponHeight,
-    options: {
-      ellipse: false,
-      mirror: true,
-      rotate: 20,
-    },
-  })
+  if (weaponImage) {
+    const skewRotation = getSkewRotation(weaponImage)
+
+    const weaponSize = scaleToHeight(
+      weaponImage.width,
+      weaponImage.height,
+      ONE_TENTH * 3,
+    )
+
+    drawQueue.set("weapon", {
+      image: weaponImage,
+      itemName: weaponItem?.itemName,
+      x: WIDTH / 5 - weaponSize.width / 2,
+      y: HEIGHT / 2 - weaponSize.height / 2,
+      width: weaponSize.width,
+      height: weaponSize.height,
+      options: {
+        ellipse: false,
+        mirror: skewRotation === "Clockwise",
+        rotate: 20,
+      },
+    })
+  }
 
   // Shield
   const shieldItem = userItemBySlot.get(GearSlot.Shield)
-  const shieldWidth = 100
-  const shieldHeight = 100
-  const shieldX = WIDTH - WIDTH / 5 - shieldWidth / 2
-  const shieldY = HEIGHT / 2.3 - shieldHeight / 2
-  drawQueue.set("shield", {
-    image: await getItemImage(GearSlot.Shield, shieldItem?.itemId),
-    itemName: shieldItem?.itemName,
-    x: shieldX,
-    y: shieldY,
-    width: shieldWidth,
-    height: shieldHeight,
-    options: {
-      ellipse: false,
-      mirror: false,
-      rotate: 0,
-    },
-  })
+  const shieldImage = await getItemImage(GearSlot.Shield, shieldItem?.itemId)
+
+  if (shieldImage) {
+    const shieldSize = scaleToHeight(
+      shieldImage.width,
+      shieldImage.height,
+      ONE_TENTH * 3,
+    )
+
+    drawQueue.set("shield", {
+      image: shieldImage,
+      itemName: shieldItem?.itemName,
+      x: WIDTH - WIDTH / 5 - shieldSize.width / 2,
+      y: HEIGHT / 2 - shieldSize.height / 2,
+      width: shieldSize.width,
+      height: shieldSize.height,
+      options: {
+        ellipse: false,
+        mirror: true,
+        rotate: 45,
+      },
+    })
+  }
 
   // Draw the queue
   for (const key of DRAW_KEYS) {
@@ -231,6 +302,15 @@ export const getGearImage = async ({
 
     if (el.itemName) {
       mutateDrawItemByName(el.itemName, el)
+    }
+
+    if (appConfig.dev) {
+      ctx.fillStyle = randomHexColor("6")
+      ctx.fillRect(el.x, el.y, el.width, el.height)
+
+      ctx.lineWidth = 2
+      ctx.strokeStyle = randomHexColor()
+      ctx.strokeRect(el.x, el.y, el.width, el.height)
     }
 
     canvasDrawImage(ctx, el.image, el.x, el.y, el.width, el.height, el.options)
@@ -256,64 +336,49 @@ const getItemImage = async (slot: GearSlot, itemId: number | undefined) => {
     return
   }
 
-  return await loadImage(image)
+  return cropImageToContent(await loadImage(image))
 }
 
 const mutateDrawItemByName = (name: string, el: DrawItem) => {
   const has = (...needles: string[]) =>
     needles.some((needle) => name.toLowerCase().includes(needle.toLowerCase()))
 
-  if (has(" scimitar")) {
-    el.options.rotate = -60
+  const recenterWidth = () => (el.x = WIDTH / 2 - el.width / 2)
+  const recenterHeight = () => (el.y = HEIGHT / 2 - el.height / 2)
+
+  if (has(" robe")) {
+    el.height += BODY_HEIGHT / 10
+  } else if (has(" skirt")) {
+    el.width *= 1.3
+    recenterWidth()
+    el.y *= 0.95
+    el.height *= 1.1
+  } else if (has("scimitar")) {
     el.options.mirror = false
-  } else if (has(" crossbow")) {
-    el.y += 70
-    el.options.rotate = -20
-    el.options.mirror = false
-  } else if (has(" whip")) {
-    el.y += 40
-    el.options.mirror = false
-  } else if (has(" shortbow")) {
-    el.y += 30
-  } else if (has(" longbow") || has("seercull")) {
-    el.y += 30
     el.options.rotate = -70
-  } else if (has(" bow")) {
-    el.x += 10
-    el.y += 30
-    el.options.mirror = false
-  } else if (has(" claws")) {
-    el.x += 20
-    el.y += 40
-    if (has("Dragon")) {
-      el.y += 30
-      el.options.rotate = 0
-    }
-  } else if (has(" greataxe", " maul", " halberd", "tzhaar-ket-om")) {
-    el.options.mirror = false
+  } else if (has(" longbow")) {
+    el.height *= 2
+    recenterHeight()
+    el.options.rotate = -170
+  } else if (has(" shortbow")) {
+    el.width *= 0.6
+    el.x += WIDTH * 0.1
+  } else if (has(" backpack")) {
+    el.width *= 0.8
+    el.height *= 0.8
+    recenterWidth()
+    el.y = HEAD_HEIGHT + BODY_HEIGHT / 2 - el.width / 2
+    el.options.rotate = -45
   } else if (has(" bludgeon")) {
     el.width *= 2
+    recenterWidth()
     el.height *= 2
-    el.x -= 10
-    el.y -= 40
+    recenterHeight()
+    el.y -= HEIGHT * 0.1
+    el.options.mirror = true
     el.options.rotate = -10
-  } else if (has(" flower")) {
-    el.width *= 0.8
-    el.height *= 0.8
-    el.x += 10
-    el.y += 30
-    el.options.mirror = false
-  } else if (has("magic shield")) {
-    el.options.rotate = 160
-  } else if (has("backpack")) {
-    el.width *= 0.8
-    el.height *= 0.8
-    el.x = WIDTH / 2 - el.width / 2
-    el.y *= 1.2
-    el.y -= 10
-  } else if (has(" skirt")) {
-    el.height *= 1.2
-    el.y *= 0.8
-    el.y += 10
+  } else if (has(" dagger")) {
+    el.height *= 0.9
+    el.options.rotate -= 20
   }
 }
