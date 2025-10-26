@@ -101,9 +101,9 @@ export default class SlotsCommand extends BaseCommand {
   #getReward(): SlotsReward | null {
     // Try winning the first 50% chance reward
     const firstReward = this.#rewards[0]!
-    if (randomInt(0, 100) < firstReward.chance) {
+    if (randomInt(0, 99) <= firstReward.chance) {
       // Try winning any of the next ones
-      const extraRoll = randomInt(0, 100 * EXTRA_CHANCE_MULTI)
+      const extraRoll = randomInt(0, 99 * EXTRA_CHANCE_MULTI)
       const extraReward = this.#rewards
         .slice(1)
         .reverse()
