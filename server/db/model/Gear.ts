@@ -1,12 +1,10 @@
-import { RequiredEntityData } from "@mikro-orm/core"
 import { APIEmbedThumbnail, AttachmentBuilder, GuildMember } from "discord.js"
 
-import { osrsItemByLcName } from "~/constants/osrs"
 import { BaseModel } from "~/server/base/Model"
 import { CacheKey } from "~/server/cache"
 import { getGearImage } from "~/server/canvas/gearImage"
 import { getOsrsPrices } from "~/server/cron/tasks/getOsrsPrices"
-import { OsrsItemsEntity } from "~/server/db/entity/OsrsItems"
+import { GearEntity } from "~/server/db/entity/Gear"
 import { StaticDataModel } from "~/server/db/model/StaticData"
 import { StaticDataType } from "~/types/entity"
 import { ItemSlot, ItemWeaponVariant, OsrsItemData } from "~/types/osrs"
@@ -19,15 +17,15 @@ export interface OsrsItemsEmbedData {
 export class OsrsItemSlotError extends Error {}
 
 export class GearModel extends BaseModel {
-  protected override Entity = OsrsItemsEntity
+  protected override Entity = GearEntity
 
-  async getItems(userId: string): Promise<OsrsItemsEntity[]> {
+  async getItems(userId: string): Promise<GearEntity[]> {
     return await this.em.find(this.Entity, { userId })
   }
 
   async getItemsWithEmbed(
     member: GuildMember,
-  ): Promise<OsrsItemsEmbedData & { items: OsrsItemsEntity[] }> {
+  ): Promise<OsrsItemsEmbedData & { items: GearEntity[] }> {
     const items = await this.getItems(member.id)
     const image = await this.#getCachedGearImage(member, items)
 
@@ -42,7 +40,7 @@ export class GearModel extends BaseModel {
 
   async #getCachedGearImage(
     member: GuildMember,
-    items: OsrsItemsEntity[],
+    items: GearEntity[],
   ): Promise<Buffer> {
     const cachedImageByUserId = this.context.cache.get(CacheKey.UserGearImage)
 
@@ -62,11 +60,11 @@ export class GearModel extends BaseModel {
 
   async addItem({
     userId,
-    itemBoughtPrice,
+    boughtPrice,
     itemData,
   }: {
     userId: string
-    itemBoughtPrice: number
+    boughtPrice: number
     itemData: OsrsItemData
   }) {
     const items = await this.getItems(userId)
@@ -82,10 +80,11 @@ export class GearModel extends BaseModel {
     await this.em.create(this.Entity, {
       userId,
       itemId: itemData.id,
-      itemName: itemData.name,
-      itemSlot: itemData.slot,
-      itemBoughtPrice: BigInt(itemBoughtPrice),
-    } satisfies RequiredEntityData<OsrsItemsEntity>)
+      name: itemData.name,
+      slot: itemData.slot,
+      weaponVariant: itemData.weaponVariant,
+      boughtPrice: BigInt(boughtPrice),
+    })
     await this.em.flush()
 
     // Clear user cache
@@ -119,10 +118,10 @@ export class GearModel extends BaseModel {
     itemData,
     items,
   }: {
-    itemData: OsrsItemData
-    items: OsrsItemsEntity[]
+    itemData: Pick<OsrsItemData, "slot" | "weaponVariant">
+    items: GearEntity[]
   }): string | undefined {
-    const itemBySlot = new Map(items.map((item) => [item.itemSlot, item]))
+    const itemBySlot = new Map(items.map((item) => [item.slot, item]))
 
     if (itemBySlot.has(itemData.slot)) {
       return "Sell your current item to replace"
@@ -137,9 +136,8 @@ export class GearModel extends BaseModel {
 
     if (itemData.slot === ItemSlot.Shield && itemBySlot.has(ItemSlot.Weapon)) {
       const weapon = itemBySlot.get(ItemSlot.Weapon)!
-      const weaponData = osrsItemByLcName.get(weapon.itemName.toLowerCase())
 
-      if (weaponData?.weaponVariant === ItemWeaponVariant.TwoHanded) {
+      if (weapon.weaponVariant === ItemWeaponVariant.TwoHanded) {
         return "Can't buy a shield while using a two-handed weapon"
       }
     }

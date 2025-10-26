@@ -16,20 +16,7 @@ export enum ItemWeaponVariant {
   TwoHanded = "twoHanded",
 }
 
-export interface OsrsItemStats {
-  meleeAttack: number
-  magicAttack: number
-  rangedAttack: number
-  meleeDefence: number
-  magicDefence: number
-  rangedDefence: number
-  meleeStrength: number
-  rangedStrength: number
-  magicStrength: number
-  speed: number | null
-}
-
-export interface OsrsItemData extends Omit<OsrsItemStats, "speed"> {
+export interface OsrsItemData {
   id: number
   name: string
   slot: ItemSlot

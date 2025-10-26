@@ -11,11 +11,9 @@ import { osrsItemByLcName } from "~/constants/osrs"
 import { BaseCommand } from "~/server/base/Command"
 import { CreditsModel } from "~/server/db/model/Credits"
 import { OsrsItemSlotError, GearModel } from "~/server/db/model/Gear"
-import { isNonNullish } from "~/server/utils/boolean"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits } from "~/server/utils/credits"
 import { assert, checkUnreachable } from "~/server/utils/error"
-import { GearDuel, getCombinedItemStats } from "~/server/utils/gear"
 import { getPercentageChangeString } from "~/server/utils/number"
 import { joinAsLines } from "~/server/utils/string"
 import { ItemSlot } from "~/types/osrs"
@@ -24,7 +22,6 @@ enum SubcommandName {
   View = "view",
   Buy = "buy",
   Sell = "sell",
-  Duel = "duel",
 }
 
 enum OptionName {
@@ -39,7 +36,7 @@ enum CustomId {
 }
 
 export default class GearCommand extends BaseCommand {
-  static version = 3
+  static version = 2
 
   static command = new SlashCommandBuilder()
     .setName("gear")
@@ -84,17 +81,6 @@ export default class GearCommand extends BaseCommand {
             .setRequired(true),
         ),
     )
-    .addSubcommand((subcommand) =>
-      subcommand
-        .setName(SubcommandName.Duel)
-        .setDescription("Duel with another user")
-        .addUserOption((option) =>
-          option
-            .setName(OptionName.User)
-            .setDescription("User to duel")
-            .setRequired(true),
-        ),
-    )
 
   async execute() {
     const subcommand = this.getSubcommand<SubcommandName>()
@@ -112,11 +98,6 @@ export default class GearCommand extends BaseCommand {
 
       case SubcommandName.Sell: {
         await this.#handleSell()
-        break
-      }
-
-      case SubcommandName.Duel: {
-        await this.#handleDuel()
         break
       }
 
@@ -153,14 +134,14 @@ export default class GearCommand extends BaseCommand {
               ? items.map((item) => {
                   const price = priceByItemId.get(item.itemId)
                   const change = getPercentageChangeString({
-                    initial: Number(item.itemBoughtPrice),
-                    current: Number(price ?? item.itemBoughtPrice),
+                    initial: Number(item.boughtPrice),
+                    current: Number(price ?? item.boughtPrice),
                   })
                   const changeStr = change !== "0%" ? ` (${change})` : ""
 
                   return {
-                    name: item.itemName,
-                    value: `Bought for ${formatCredits(item.itemBoughtPrice)}${changeStr}`,
+                    name: item.name,
+                    value: `Bought for ${formatCredits(item.boughtPrice)}${changeStr}`,
                     inline: true,
                   }
                 })
@@ -231,7 +212,7 @@ export default class GearCommand extends BaseCommand {
       // Handle separately to catch error
       await gearModel.addItem({
         userId: this.member.id,
-        itemBoughtPrice: price,
+        boughtPrice: price,
         itemData,
       })
 
@@ -292,19 +273,19 @@ export default class GearCommand extends BaseCommand {
     const gearModel = new GearModel(this.context)
     const items = await gearModel.getItems(this.member.id)
 
-    const item = items.find((item) => item.itemSlot === slot)
+    const item = items.find((item) => item.slot === slot)
     assert(!!item, "Item not found or you don't own any")
 
     const priceByItemId = await gearModel.getPriceByItemIdMap()
     // Sell for the bought price as a fallback
     const realPrice = priceByItemId.get(item.itemId)
-    const price = realPrice ?? item.itemBoughtPrice
+    const price = realPrice ?? item.boughtPrice
 
     const response = await this.reply({
       embeds: [
         {
           color: this.member.displayColor,
-          title: item.itemName,
+          title: item.name,
           description: `**${formatCredits(price)}**`,
           footer: !realPrice
             ? { text: `Real price not found, using purchase price` }
@@ -372,48 +353,5 @@ export default class GearCommand extends BaseCommand {
     actionRow.addComponents(button)
 
     return [actionRow]
-  }
-
-  async #handleDuel() {
-    const enemyUser = this.interaction.options.getUser(OptionName.User, true)
-    const enemyMember = this.guild.members.cache.get(enemyUser.id)
-    assert(!!enemyMember, "Member not found")
-
-    const model = new GearModel(this.context)
-
-    const [playerItems, enemyItems] = await Promise.all([
-      model.getItems(this.user.id),
-      model.getItems(enemyMember.id),
-    ])
-
-    const playerItemData = playerItems
-      .map((el) => osrsItemByLcName.get(el.itemName.toLowerCase()))
-      .filter(isNonNullish)
-    const enemyItemData = enemyItems
-      .map((el) => osrsItemByLcName.get(el.itemName.toLowerCase()))
-      .filter(isNonNullish)
-
-    const duel = new GearDuel({
-      player: {
-        name: this.member.displayName,
-        stats: getCombinedItemStats(playerItemData),
-      },
-      enemy: {
-        name: enemyMember.displayName,
-        stats: getCombinedItemStats(enemyItemData),
-      },
-    })
-
-    const { result, actionLog } = duel.simulateDuel()
-
-    this.reply({
-      content: result,
-      files: [
-        {
-          name: "action-log.txt",
-          attachment: Buffer.from(actionLog.join("\n")),
-        },
-      ],
-    })
   }
 }

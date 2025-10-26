@@ -2,10 +2,10 @@ import path from "node:path"
 
 import { createCanvas, Image, loadImage } from "@napi-rs/canvas"
 
-import { OsrsItemsEntity } from "~/server/db/entity/OsrsItems"
+import { GearEntity } from "~/server/db/entity/Gear"
 import { ItemSlot } from "~/types/osrs"
 
-type Item = Pick<OsrsItemsEntity, "itemId" | "itemSlot" | "itemName">
+type Item = Pick<GearEntity, "itemId" | "slot">
 
 interface Position {
   x: number
@@ -55,7 +55,7 @@ export const getGearImage = async ({
         items.map(
           async (item) =>
             [
-              item.itemSlot,
+              item.slot,
               await loadImage(
                 `https://secure.runescape.com/m=itemdb_oldschool/obj_sprite.gif?id=${item.itemId}`,
               ),

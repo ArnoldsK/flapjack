@@ -1,29 +1,32 @@
 import { Entity, Opt, PrimaryKey, Property } from "@mikro-orm/core"
 
-import { ItemSlot } from "~/types/osrs"
+import { ItemSlot, ItemWeaponVariant } from "~/types/osrs"
 
 @Entity()
-export class OsrsItemsEntity {
+export class GearEntity {
   @PrimaryKey({ autoincrement: true })
   id: number & Opt
 
-  @PrimaryKey()
+  @Property()
   userId: string
 
   @Property()
   itemId: number
 
   @Property()
-  itemSlot: ItemSlot
+  slot: ItemSlot
+
+  @Property({ nullable: true })
+  weaponVariant: ItemWeaponVariant | null
 
   @Property()
-  itemName: string
+  name: string
 
   @Property({
     type: "bigint",
     unsigned: true,
   })
-  itemBoughtPrice: bigint
+  boughtPrice: bigint
 
   @Property()
   createdAt: Date & Opt = new Date()
