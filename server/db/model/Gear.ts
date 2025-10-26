@@ -1,6 +1,7 @@
 import { RequiredEntityData } from "@mikro-orm/core"
 import { APIEmbedThumbnail, AttachmentBuilder, GuildMember } from "discord.js"
 
+import { osrsItemByLcName } from "~/constants/osrs"
 import { BaseModel } from "~/server/base/Model"
 import { CacheKey } from "~/server/cache"
 import { getGearImage } from "~/server/canvas/gearImage"
@@ -8,7 +9,7 @@ import { getOsrsPrices } from "~/server/cron/tasks/getOsrsPrices"
 import { OsrsItemsEntity } from "~/server/db/entity/OsrsItems"
 import { StaticDataModel } from "~/server/db/model/StaticData"
 import { StaticDataType } from "~/types/entity"
-import { ItemSlot } from "~/types/osrs"
+import { ItemSlot, ItemWeaponVariant, OsrsItemData } from "~/types/osrs"
 
 export interface OsrsItemsEmbedData {
   thumbnail: APIEmbedThumbnail
@@ -59,10 +60,18 @@ export class GearModel extends BaseModel {
     return image
   }
 
-  async addItem(input: RequiredEntityData<OsrsItemsEntity>) {
-    const items = await this.getItems(input.userId)
+  async addItem({
+    userId,
+    itemBoughtPrice,
+    itemData,
+  }: {
+    userId: string
+    itemBoughtPrice: number
+    itemData: OsrsItemData
+  }) {
+    const items = await this.getItems(userId)
     const slotError = this.getSlotError({
-      slot: input.itemSlot,
+      itemData,
       items,
     })
 
@@ -70,12 +79,18 @@ export class GearModel extends BaseModel {
       throw new OsrsItemSlotError(slotError)
     }
 
-    await this.em.create(this.Entity, input)
+    await this.em.create(this.Entity, {
+      userId,
+      itemId: itemData.id,
+      itemName: itemData.name,
+      itemSlot: itemData.slot,
+      itemBoughtPrice: BigInt(itemBoughtPrice),
+    } satisfies RequiredEntityData<OsrsItemsEntity>)
     await this.em.flush()
 
     // Clear user cache
     const cachedImageByUserId = this.context.cache.get(CacheKey.UserGearImage)
-    cachedImageByUserId.uns(input.userId)
+    cachedImageByUserId.uns(userId)
   }
 
   async removeItem(input: { userId: string; itemId: number }) {
@@ -101,30 +116,32 @@ export class GearModel extends BaseModel {
   }
 
   getSlotError({
-    slot,
+    itemData,
     items,
   }: {
-    slot: ItemSlot
+    itemData: OsrsItemData
     items: OsrsItemsEntity[]
   }): string | undefined {
-    const itemBySlot = new Map(items.map((item) => [item.itemSlot, true]))
+    const itemBySlot = new Map(items.map((item) => [item.itemSlot, item]))
 
-    if (itemBySlot.has(slot)) {
+    if (itemBySlot.has(itemData.slot)) {
       return "Sell your current item to replace"
     }
 
     if (
-      slot === ItemSlot.Weapon &&
-      (itemBySlot.has(ItemSlot.Weapon) || itemBySlot.has(ItemSlot.Shield))
+      itemData.weaponVariant === ItemWeaponVariant.TwoHanded &&
+      itemBySlot.has(ItemSlot.Shield)
     ) {
-      return "Already using a weapon or a shield"
+      return "Can't buy a two-handed weapon while using a shield"
     }
 
-    if (
-      (slot === ItemSlot.Shield || slot === ItemSlot.Weapon) &&
-      itemBySlot.has(ItemSlot.Weapon)
-    ) {
-      return "You're using a two-handed weapon"
+    if (itemData.slot === ItemSlot.Shield && itemBySlot.has(ItemSlot.Weapon)) {
+      const weapon = itemBySlot.get(ItemSlot.Weapon)!
+      const weaponData = osrsItemByLcName.get(weapon.itemName.toLowerCase())
+
+      if (weaponData?.weaponVariant === ItemWeaponVariant.TwoHanded) {
+        return "Can't buy a shield while using a two-handed weapon"
+      }
     }
 
     return undefined

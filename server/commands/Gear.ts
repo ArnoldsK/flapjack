@@ -7,13 +7,15 @@ import {
 } from "discord.js"
 
 import { DISCORD_IDS } from "~/constants"
-import { osrsItemByName } from "~/constants/osrs"
+import { osrsItemByLcName } from "~/constants/osrs"
 import { BaseCommand } from "~/server/base/Command"
 import { CreditsModel } from "~/server/db/model/Credits"
 import { OsrsItemSlotError, GearModel } from "~/server/db/model/Gear"
+import { isNonNullish } from "~/server/utils/boolean"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits } from "~/server/utils/credits"
 import { assert, checkUnreachable } from "~/server/utils/error"
+import { GearDuel, getCombinedItemStats } from "~/server/utils/gear"
 import { getPercentageChangeString } from "~/server/utils/number"
 import { joinAsLines } from "~/server/utils/string"
 import { ItemSlot } from "~/types/osrs"
@@ -22,6 +24,7 @@ enum SubcommandName {
   View = "view",
   Buy = "buy",
   Sell = "sell",
+  Duel = "duel",
 }
 
 enum OptionName {
@@ -57,18 +60,6 @@ export default class GearCommand extends BaseCommand {
         .setDescription("Buy new gear")
         .addStringOption((option) =>
           option
-            .setName(OptionName.Slot)
-            .setDescription("Select gear slot")
-            .setChoices(
-              ...Object.entries(ItemSlot).map(([name, value]) => ({
-                name,
-                value,
-              })),
-            )
-            .setRequired(true),
-        )
-        .addStringOption((option) =>
-          option
             .setName(OptionName.Name)
             .setDescription(
               "Find OSRS item by name. The item must be tradeable in the Grand Exchange.",
@@ -93,6 +84,17 @@ export default class GearCommand extends BaseCommand {
             .setRequired(true),
         ),
     )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName(SubcommandName.Duel)
+        .setDescription("Duel with another user")
+        .addUserOption((option) =>
+          option
+            .setName(OptionName.User)
+            .setDescription("User to duel")
+            .setRequired(true),
+        ),
+    )
 
   async execute() {
     const subcommand = this.getSubcommand<SubcommandName>()
@@ -110,6 +112,11 @@ export default class GearCommand extends BaseCommand {
 
       case SubcommandName.Sell: {
         await this.#handleSell()
+        break
+      }
+
+      case SubcommandName.Duel: {
+        await this.#handleDuel()
         break
       }
 
@@ -166,13 +173,9 @@ export default class GearCommand extends BaseCommand {
   }
 
   async #handleBuy() {
-    const slot = this.interaction.options.getString(
-      OptionName.Slot,
-      true,
-    ) as ItemSlot
     const nameInput = this.interaction.options.getString(OptionName.Name, true)
 
-    const itemData = osrsItemByName.get(nameInput)
+    const itemData = osrsItemByLcName.get(nameInput.toLowerCase())
     assert(!!itemData, "Unknown OSRS item or it's not tradeable in the GE")
 
     const gearModel = new GearModel(this.context)
@@ -188,7 +191,7 @@ export default class GearCommand extends BaseCommand {
 
     const canAfford = price <= wallet.credits
     const slotError = gearModel.getSlotError({
-      slot,
+      itemData,
       items,
     })
 
@@ -228,10 +231,8 @@ export default class GearCommand extends BaseCommand {
       // Handle separately to catch error
       await gearModel.addItem({
         userId: this.member.id,
-        itemId: itemData.id,
-        itemName: itemData.name,
-        itemBoughtPrice: BigInt(price),
-        itemSlot: slot,
+        itemBoughtPrice: price,
+        itemData,
       })
 
       await Promise.all([
@@ -371,5 +372,48 @@ export default class GearCommand extends BaseCommand {
     actionRow.addComponents(button)
 
     return [actionRow]
+  }
+
+  async #handleDuel() {
+    const enemyUser = this.interaction.options.getUser(OptionName.User, true)
+    const enemyMember = this.guild.members.cache.get(enemyUser.id)
+    assert(!!enemyMember, "Member not found")
+
+    const model = new GearModel(this.context)
+
+    const [playerItems, enemyItems] = await Promise.all([
+      model.getItems(this.user.id),
+      model.getItems(enemyMember.id),
+    ])
+
+    const playerItemData = playerItems
+      .map((el) => osrsItemByLcName.get(el.itemName.toLowerCase()))
+      .filter(isNonNullish)
+    const enemyItemData = enemyItems
+      .map((el) => osrsItemByLcName.get(el.itemName.toLowerCase()))
+      .filter(isNonNullish)
+
+    const duel = new GearDuel({
+      player: {
+        name: this.member.displayName,
+        stats: getCombinedItemStats(playerItemData),
+      },
+      enemy: {
+        name: enemyMember.displayName,
+        stats: getCombinedItemStats(enemyItemData),
+      },
+    })
+
+    const { result, actionLog } = duel.simulateDuel()
+
+    this.reply({
+      content: result,
+      files: [
+        {
+          name: "action-log.txt",
+          attachment: Buffer.from(actionLog.join("\n")),
+        },
+      ],
+    })
   }
 }

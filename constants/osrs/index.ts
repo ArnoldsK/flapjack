@@ -25,6 +25,6 @@ const items: OsrsItemData[] = z
   )
   .parse(itemsJson)
 
-export const osrsItemByName = new Map<string, OsrsItemData>(
-  items.map((item) => [item.name, item]),
+export const osrsItemByLcName = new Map<string, OsrsItemData>(
+  items.map((item) => [item.name.toLowerCase(), item]),
 )
