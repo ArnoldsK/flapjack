@@ -1,92 +1,96 @@
-import { randomValue } from "~/server/utils/random"
+import { randomInt, randomValue } from "~/server/utils/random"
+
+interface SlotsReward {
+  label: string
+  /** x in 100 */
+  chance: number
+  emoji: string
+  count: number
+}
 
 class SlotsCommand {
   async execute(amount: number) {
-    const winningEmojis = [...Array.from({ length: 3 }).keys()].map(() => {
-      const item = randomValue(this.#distribution)!
-      return item.emoji
-    })
-    const reward = this.#getReward(winningEmojis)
+    const reward = this.#getReward()
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const emojis = this.#getEmojis(reward)
 
-    const winMulti = reward ? reward.multiplier : 0
+    const winMulti = reward ? Number.parseInt(reward.label) : 0
     const winAmount = amount * winMulti
 
     return winAmount
   }
 
-  #getReward(emojis: string[]) {
-    // Reverse is used to validate e.g. 3 cherries before 2 cherries roll
-    const rewards = [...this.#rewards].reverse()
+  #getEmojis(reward: SlotsReward | null) {
+    const emojis: string[] = []
 
-    // Find the reward
-    for (const reward of rewards) {
-      const { name, count } = reward
-      const item = this.#items.find((item) => item.name === name)!
-
-      // Find matching items to rewards
-      const matches = emojis.filter((emoji) => emoji === item.emoji).length
-
-      if (matches >= count) {
-        return reward
+    if (reward) {
+      for (let i = 0; i < reward.count; i++) {
+        emojis.push(reward.emoji)
+      }
+      for (let i = 0; i < 3 - reward.count; i++) {
+        emojis.push(randomValue(["filler1", "filler2", "filler3"])!)
+      }
+    } else {
+      for (let i = 0; i < 3; i++) {
+        emojis.push(randomValue(["filler1", "filler2", "filler3"])!)
       }
     }
 
-    return null
+    return emojis
   }
 
-  get #distribution() {
-    const column = []
+  #getReward(): SlotsReward | null {
+    let finalReward: SlotsReward | null = null
 
-    for (const item of this.#items) {
-      for (let i = 0; i < item.distribution; i++) {
-        column.push(item)
+    for (const [i, reward] of this.#rewards.entries()) {
+      // Won the current?
+      if (randomInt(0, 100) < reward.chance) {
+        finalReward = reward
+
+        // Try winning the next one
+        const nextReward = this.#rewards[i + 1]
+        if (nextReward && randomInt(0, 100) < nextReward.chance) {
+          continue
+        }
+
+        break
       }
     }
 
-    return column
+    return finalReward
   }
 
-  get #rewards() {
-    return [
-      { label: "2x", multiplier: 2, name: "cherries", count: 1 },
-      { label: "5x", multiplier: 5, name: "cherries", count: 2 },
-      { label: "20x", multiplier: 20, name: "cherries", count: 3 },
-      { label: "40x", multiplier: 40, name: "seven", count: 3 },
-      { label: "80x", multiplier: 80, name: "dream", count: 3 },
-    ]
-  }
-
-  get #items() {
+  get #rewards(): SlotsReward[] {
     return [
       {
-        name: "filler1",
-        distribution: 6,
-        emoji: "💩",
-      },
-      {
-        name: "filler2",
-        distribution: 5,
-        emoji: "🕸️",
-      },
-      {
-        name: "filler3",
-        distribution: 4,
-        emoji: "💀",
-      },
-      {
-        name: "cherries",
-        distribution: 3,
+        label: "2x",
+        chance: 50,
         emoji: "🍒",
+        count: 1,
       },
       {
-        name: "seven",
-        distribution: 1,
+        label: "5x",
+        chance: 10,
+        emoji: "🍒",
+        count: 2,
+      },
+      {
+        label: "20x",
+        chance: 5,
+        emoji: "🍒",
+        count: 3,
+      },
+      {
+        label: "40x",
+        chance: 2.5,
         emoji: "<:slotsseven:1205175066170626098>",
+        count: 3,
       },
       {
-        name: "dream",
-        distribution: 1,
+        label: "80x",
+        chance: 1.25,
         emoji: "<:Dreaming:712788218319339581>",
+        count: 3,
       },
     ]
   }
@@ -96,7 +100,13 @@ const run = async () => {
   const command = new SlotsCommand()
 
   const count = 1_000_000
-  let winCount = 0
+  const winCountMap = {
+    2: 0,
+    5: 0,
+    20: 0,
+    40: 0,
+    80: 0,
+  }
   let lossCount = 0
   let total = 0
   let lowest = 0
@@ -110,7 +120,7 @@ const run = async () => {
     }
 
     if (winAmount > 0) {
-      winCount++
+      winCountMap[winAmount as keyof typeof winCountMap]++
     } else {
       lossCount++
     }
@@ -119,7 +129,11 @@ const run = async () => {
   console.log(`${count}x runs`)
   console.log(`credits: ${total} (starting from 0, betting 1)`)
   console.log(`lowest: ${lowest} (consecutive losses)`)
-  console.log(`${winCount} wins (${Math.round((winCount / count) * 100)}%)`)
+  for (const [mult, winCount] of Object.entries(winCountMap)) {
+    console.log(
+      `${winCount} ${mult}x wins (${Math.round((winCount / count) * 100)}%)`,
+    )
+  }
   console.log(`${lossCount} losses (${Math.round((lossCount / count) * 100)}%)`)
 }
 
