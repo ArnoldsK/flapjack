@@ -1,5 +1,8 @@
 import { randomInt, randomValue } from "~/server/utils/random"
 
+// Due to 1.25 we need to make the numbers be at least 3 digits
+const EXTRA_CHANCE_MULTI = 100
+
 interface SlotsReward {
   label: string
   /** x in 100 */
@@ -44,11 +47,11 @@ class SlotsCommand {
     const firstReward = this.#rewards[0]!
     if (randomInt(0, 100) < firstReward.chance) {
       // Try winning any of the next ones
-      const extraRoll = randomInt(0, 100)
+      const extraRoll = randomInt(0, 100 * EXTRA_CHANCE_MULTI)
       const extraReward = this.#rewards
         .slice(1)
         .reverse()
-        .find((el) => extraRoll < el.chance)
+        .find((el) => extraRoll <= el.chance * EXTRA_CHANCE_MULTI)
 
       return extraReward ?? firstReward
     }
@@ -60,31 +63,31 @@ class SlotsCommand {
     return [
       {
         label: "2x",
-        chance: 50,
+        chance: 50, // (100 / 2)
         emoji: "🍒",
         count: 1,
       },
       {
         label: "5x",
-        chance: 10,
+        chance: 10, // (100 / 5)
         emoji: "🍒",
         count: 2,
       },
       {
         label: "20x",
-        chance: 5,
+        chance: 5, // (100 / 20)
         emoji: "🍒",
         count: 3,
       },
       {
         label: "40x",
-        chance: 2.5,
+        chance: 2.5, // (100 / 40)
         emoji: "<:slotsseven:1205175066170626098>",
         count: 3,
       },
       {
         label: "80x",
-        chance: 1.25,
+        chance: 1.25, // (100 / 80)
         emoji: "<:Dreaming:712788218319339581>",
         count: 3,
       },
