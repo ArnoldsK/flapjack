@@ -7,10 +7,10 @@ import { ItemSlot, ItemWeaponVariant, OsrsItemData } from "~/types/osrs"
 const items: OsrsItemData[] = z
   .array(
     z.object({
-      itemSlot: z.nativeEnum(ItemSlot),
+      slot: z.nativeEnum(ItemSlot),
       weaponVariant: z.nativeEnum(ItemWeaponVariant).nullable(),
-      itemId: z.number(),
-      itemName: z.string(),
+      id: z.number(),
+      name: z.string(),
       meleeAttack: z.number(),
       magicAttack: z.number(),
       rangedAttack: z.number(),
@@ -26,5 +26,5 @@ const items: OsrsItemData[] = z
   .parse(itemsJson)
 
 export const osrsItemByName = new Map<string, OsrsItemData>(
-  items.map((item) => [item.itemName, item]),
+  items.map((item) => [item.name, item]),
 )

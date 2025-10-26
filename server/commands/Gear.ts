@@ -178,7 +178,7 @@ export default class GearCommand extends BaseCommand {
     const gearModel = new GearModel(this.context)
     const priceByItemId = await gearModel.getPriceByItemIdMap()
 
-    const price = priceByItemId.get(itemData.itemId)
+    const price = priceByItemId.get(itemData.id)
     assert(!!price, "Item was found but it seems to not be tradeable in the GE")
 
     const items = await gearModel.getItems(this.member.id)
@@ -198,7 +198,7 @@ export default class GearCommand extends BaseCommand {
       embeds: [
         {
           color: this.member.displayColor,
-          title: itemData.itemName,
+          title: itemData.name,
           description: joinAsLines(
             `**${formatCredits(price)}**`,
             !canAfford
@@ -207,7 +207,7 @@ export default class GearCommand extends BaseCommand {
           ),
           footer: canAfford && slotError ? { text: slotError } : undefined,
           thumbnail: {
-            url: `https://secure.runescape.com/m=itemdb_oldschool/obj_big.gif?id=${itemData.itemId}`,
+            url: `https://secure.runescape.com/m=itemdb_oldschool/obj_big.gif?id=${itemData.id}`,
           },
         },
       ],
@@ -228,8 +228,8 @@ export default class GearCommand extends BaseCommand {
       // Handle separately to catch error
       await gearModel.addItem({
         userId: this.member.id,
-        itemId: itemData.itemId,
-        itemName: itemData.itemName,
+        itemId: itemData.id,
+        itemName: itemData.name,
         itemBoughtPrice: BigInt(price),
         itemSlot: slot,
       })
