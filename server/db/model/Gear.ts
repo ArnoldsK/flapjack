@@ -51,13 +51,7 @@ export class GearModel extends BaseModel {
       return cachedImage
     }
 
-    const image = await getGearImage({
-      avatarUrl: member.displayAvatarURL({
-        extension: "jpg",
-        size: 64,
-      }),
-      items,
-    })
+    const image = await getGearImage({ items })
 
     // Update user cache
     cachedImageByUserId.set(member.id, image)

@@ -1,13 +1,17 @@
 export enum GearSlot {
-  Body = "body",
+  Head = "head",
   Cape = "cape",
-  Feet = "feet",
-  Legs = "legs",
   Neck = "neck",
-  Shield = "shield",
   OneHanded = "oneHanded",
   TwoHanded = "twoHanded",
+  Body = "body",
+  Shield = "shield",
+  Legs = "legs",
+  Hands = "hands",
+  Feet = "feet",
+  Ring = "ring",
 }
+
 export interface OsrsPriceData {
   items: Array<[number, number]>
 }
