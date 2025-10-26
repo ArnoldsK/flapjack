@@ -95,24 +95,20 @@ export default class SlotsCommand extends BaseCommand {
   }
 
   #getReward(): SlotsReward | null {
-    let finalReward: SlotsReward | null = null
+    // Try winning the first 50% chance reward
+    const firstReward = this.#rewards[0]!
+    if (randomInt(0, 100) < firstReward.chance) {
+      // Try winning any of the next ones
+      const extraRoll = randomInt(0, 100)
+      const extraReward = this.#rewards
+        .slice(1)
+        .reverse()
+        .find((el) => extraRoll < el.chance)
 
-    for (const [i, reward] of this.#rewards.entries()) {
-      // Won the current?
-      if (randomInt(0, 100) < reward.chance) {
-        finalReward = reward
-
-        // Try winning the next one
-        const nextReward = this.#rewards[i + 1]
-        if (nextReward && randomInt(0, 100) < nextReward.chance) {
-          continue
-        }
-
-        break
-      }
+      return extraReward ?? firstReward
     }
 
-    return finalReward
+    return null
   }
 
   get #rewards(): SlotsReward[] {
