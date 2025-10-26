@@ -465,7 +465,6 @@ export default class BlackjackCommand extends BaseCommand {
 
   #getNewGame() {
     return new Game(undefined, {
-      // Why is this so retarded - why do I need to define all to change few?
       decks: 2,
       standOnSoft17: true,
       double: "any",

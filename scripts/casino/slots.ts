@@ -60,17 +60,17 @@ class SlotsCommand {
     return [
       {
         name: "filler1",
-        distribution: 5,
+        distribution: 6,
         emoji: "💩",
       },
       {
         name: "filler2",
-        distribution: 4,
+        distribution: 5,
         emoji: "🕸️",
       },
       {
         name: "filler3",
-        distribution: 3,
+        distribution: 4,
         emoji: "💀",
       },
       {
