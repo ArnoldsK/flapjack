@@ -10,6 +10,7 @@ import { joinAsLines } from "~/server/utils/string"
 
 // Due to 1.25 we need to make the numbers be at least 3 digits
 const EXTRA_CHANCE_MULTI = 100
+const FILLER_EMOJIS = ["💀", "🕸️", "💩"]
 
 interface SlotsReward {
   label: string
@@ -86,11 +87,11 @@ export default class SlotsCommand extends BaseCommand {
         emojis.push(reward.emoji)
       }
       for (let i = 0; i < 3 - reward.count; i++) {
-        emojis.push(randomValue(["filler1", "filler2", "filler3"])!)
+        emojis.push(randomValue(FILLER_EMOJIS)!)
       }
     } else {
       for (let i = 0; i < 3; i++) {
-        emojis.push(randomValue(["filler1", "filler2", "filler3"])!)
+        emojis.push(randomValue(FILLER_EMOJIS)!)
       }
     }
 
