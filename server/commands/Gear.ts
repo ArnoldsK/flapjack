@@ -36,7 +36,7 @@ enum CustomId {
 }
 
 export default class GearCommand extends BaseCommand {
-  static version = 2
+  static version = 3
 
   static command = new SlashCommandBuilder()
     .setName("gear")
