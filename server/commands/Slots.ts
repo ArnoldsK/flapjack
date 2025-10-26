@@ -3,7 +3,6 @@ import { SlashCommandBuilder } from "discord.js"
 import { OPTION_DESCRIPTION_AMOUNT } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { CreditsModel } from "~/server/db/model/Credits"
-import { GearModel } from "~/server/db/model/Gear"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
 import { randomValue } from "~/server/utils/random"
@@ -77,9 +76,6 @@ export default class SlotsCommand extends BaseCommand {
       isCasino: true,
     })
 
-    const gearModel = new GearModel(this.context)
-    const { thumbnail, files } = await gearModel.getItemsWithEmbed(this.member)
-
     this.reply({
       embeds: [
         {
@@ -91,10 +87,8 @@ export default class SlotsCommand extends BaseCommand {
               : `**You got nothing and lost ${formatCredits(amount)}**`,
             `You have ${formatCredits(newWallet.credits)} now`,
           ),
-          thumbnail,
         },
       ],
-      files,
     })
   }
 

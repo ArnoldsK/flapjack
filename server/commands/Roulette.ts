@@ -3,7 +3,6 @@ import { SlashCommandBuilder } from "discord.js"
 import { Color, OPTION_DESCRIPTION_AMOUNT } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { CreditsModel } from "~/server/db/model/Credits"
-import { GearModel } from "~/server/db/model/Gear"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
 import { randomValue } from "~/server/utils/random"
@@ -76,9 +75,6 @@ export default class RouletteCommand extends BaseCommand {
       isCasino: true,
     })
 
-    const gearModel = new GearModel(this.context)
-    const { thumbnail, files } = await gearModel.getItemsWithEmbed(this.member)
-
     this.reply({
       embeds: [
         {
@@ -89,10 +85,8 @@ export default class RouletteCommand extends BaseCommand {
             `You have ${formatCredits(newWallet.credits)} now`,
           ),
           color: Color[rolledColor],
-          thumbnail,
         },
       ],
-      files,
     })
   }
 

@@ -21,7 +21,6 @@ import { OPTION_DESCRIPTION_AMOUNT, Unicode } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { CacheKey } from "~/server/cache"
 import { CreditsModel } from "~/server/db/model/Credits"
-import { OsrsItemsEmbedData, GearModel } from "~/server/db/model/Gear"
 import { isNonNullish } from "~/server/utils/boolean"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
@@ -80,8 +79,6 @@ export default class BlackjackCommand extends BaseCommand {
     return this.#_creditsModel
   }
 
-  #embedData: OsrsItemsEmbedData | undefined
-
   #getRunningGameUrl(): string | undefined {
     const manager = this.context.cache.get(CacheKey.Blackjack)
 
@@ -137,9 +134,6 @@ export default class BlackjackCommand extends BaseCommand {
       ? await this.#handleGameOver(game, wonAmount)
       : undefined
 
-    const gearModel = new GearModel(this.context)
-    this.#embedData = await gearModel.getItemsWithEmbed(this.member)
-
     const response = await this.reply({
       embeds: [
         {
@@ -151,10 +145,8 @@ export default class BlackjackCommand extends BaseCommand {
                   text: "Dismissing message counts as a loss",
                 }
               : undefined,
-          thumbnail: this.#embedData?.thumbnail,
         },
       ],
-      files: this.#embedData?.files,
       components,
     })
 
@@ -370,7 +362,6 @@ export default class BlackjackCommand extends BaseCommand {
             ),
           },
         ].filter(isNonNullish),
-        thumbnail: this.#embedData?.thumbnail,
       },
       components: [actionRow].filter(isNonNullish),
       gameOver,
