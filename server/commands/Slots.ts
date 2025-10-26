@@ -138,17 +138,17 @@ export default class SlotsCommand extends BaseCommand {
     return [
       {
         name: "filler1",
-        distribution: 6,
+        distribution: 5,
         emoji: "💩",
       },
       {
         name: "filler2",
-        distribution: 6,
+        distribution: 4,
         emoji: "🕸️",
       },
       {
         name: "filler3",
-        distribution: 6,
+        distribution: 3,
         emoji: "💀",
       },
       {
