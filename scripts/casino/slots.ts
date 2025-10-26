@@ -43,20 +43,46 @@ class SlotsCommand {
   }
 
   #getReward(): SlotsReward | null {
-    // Try winning the first 50% chance reward
-    const firstReward = this.#rewards[0]!
-    if (randomInt(0, 99) <= firstReward.chance) {
-      // Try winning any of the next ones
-      const extraRoll = randomInt(0, 99 * EXTRA_CHANCE_MULTI)
-      const extraReward = this.#rewards
-        .slice(1)
-        .reverse()
-        .find((el) => extraRoll <= el.chance * EXTRA_CHANCE_MULTI)
+    const firstReward = this.#rewards[0]! // This is the 2x, 50% reward
 
-      return extraReward ?? firstReward
+    // STEP 1: Check the 50% gate. If false, return null (50% chance).
+    // Using randomInt(0, 99) gives 100 possible values (0 to 99).
+    // Checking <= 49 gives a 50/100 = 50% chance.
+    if (randomInt(0, 99) >= firstReward.chance) {
+      return null // 50% chance of losing
     }
 
-    return null
+    // STEP 2: We are now in the 50% "Win" pool.
+    // The total chance of all *better* rewards (5x, 20x, 40x, 80x) is:
+    // 10 + 5 + 2.5 + 1.25 = 18.75
+
+    // We need to roll for a chance within the remaining 18.75%
+    // To properly calculate the chances, roll for a value from 0 to 9999
+    const maxRoll = 100 * EXTRA_CHANCE_MULTI - 1 // 9999
+    const extraRoll = randomInt(0, maxRoll)
+
+    // Calculate the total adjusted chance for only the *extra* rewards (5x to 80x)
+    const extraRewardsTotalChance = this.#rewards
+      .slice(1)
+      .reduce((sum, el) => sum + el.chance * EXTRA_CHANCE_MULTI, 0) // Should be 1875
+
+    let cumulativeChance = 0
+
+    // Check if the roll falls into the cumulative range of the better rewards
+    // The extra roll only needs to be less than or equal to the total chance of those rewards (1875)
+    if (extraRoll <= extraRewardsTotalChance) {
+      // This is a standard weighted selection, but only among the 5x, 20x, 40x, 80x
+      const extraReward = this.#rewards.slice(1).find((el) => {
+        cumulativeChance += el.chance * EXTRA_CHANCE_MULTI
+        return extraRoll <= cumulativeChance
+      })
+
+      return extraReward! // This will be one of 5x, 20x, 40x, or 80x
+    }
+
+    // STEP 3: The roll did not hit any of the better rewards, so the user wins the minimum 2x.
+    // The chance of reaching here is 50% * (1 - 0.1875) = 40.625% of the total game.
+    return firstReward
   }
 
   get #rewards(): SlotsReward[] {
