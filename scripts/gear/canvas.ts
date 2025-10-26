@@ -8,8 +8,8 @@ const run = async () => {
   const buffer = await getGearImage({
     items: items.map((item) => ({
       itemId: item.id,
-      itemName: item.name,
-      itemSlot: item.slot,
+      name: item.name,
+      slot: item.slot,
     })),
   })
 
