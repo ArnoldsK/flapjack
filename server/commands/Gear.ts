@@ -120,8 +120,10 @@ export default class GearCommand extends BaseCommand {
     assert(!!member, "Member not found")
 
     const model = new GearModel(this.context)
-    const { items, thumbnail, files } = await model.getItemsWithEmbed(member)
-    const priceByItemId = await model.getPriceByItemIdMap()
+    const [{ items, thumbnail, files }, priceByItemId] = await Promise.all([
+      model.getItemsWithEmbed(member),
+      model.getPriceByItemIdMap(),
+    ])
 
     this.reply({
       embeds: [
