@@ -1,6 +1,6 @@
 import { Entity, Opt, PrimaryKey, Property } from "@mikro-orm/core"
 
-import { GearSlot } from "~/types/osrs"
+import { ItemSlot } from "~/types/osrs"
 
 @Entity()
 export class OsrsItemsEntity {
@@ -14,7 +14,7 @@ export class OsrsItemsEntity {
   itemId: number
 
   @Property()
-  itemSlot: GearSlot
+  itemSlot: ItemSlot
 
   @Property()
   itemName: string

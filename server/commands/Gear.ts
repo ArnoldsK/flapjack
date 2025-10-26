@@ -7,7 +7,7 @@ import {
 } from "discord.js"
 
 import { DISCORD_IDS } from "~/constants"
-import { osrsItemIdByName } from "~/constants/osrs"
+import { osrsItemByName } from "~/constants/osrs"
 import { BaseCommand } from "~/server/base/Command"
 import { CreditsModel } from "~/server/db/model/Credits"
 import { OsrsItemSlotError, GearModel } from "~/server/db/model/Gear"
@@ -16,7 +16,7 @@ import { formatCredits } from "~/server/utils/credits"
 import { assert, checkUnreachable } from "~/server/utils/error"
 import { getPercentageChangeString } from "~/server/utils/number"
 import { joinAsLines } from "~/server/utils/string"
-import { GearSlot } from "~/types/osrs"
+import { ItemSlot } from "~/types/osrs"
 
 enum SubcommandName {
   View = "view",
@@ -60,7 +60,7 @@ export default class GearCommand extends BaseCommand {
             .setName(OptionName.Slot)
             .setDescription("Select gear slot")
             .setChoices(
-              ...Object.entries(GearSlot).map(([name, value]) => ({
+              ...Object.entries(ItemSlot).map(([name, value]) => ({
                 name,
                 value,
               })),
@@ -85,7 +85,7 @@ export default class GearCommand extends BaseCommand {
             .setName(OptionName.Slot)
             .setDescription("Select gear slot")
             .setChoices(
-              ...Object.entries(GearSlot).map(([name, value]) => ({
+              ...Object.entries(ItemSlot).map(([name, value]) => ({
                 name,
                 value,
               })),
@@ -169,25 +169,16 @@ export default class GearCommand extends BaseCommand {
     const slot = this.interaction.options.getString(
       OptionName.Slot,
       true,
-    ) as GearSlot
+    ) as ItemSlot
     const nameInput = this.interaction.options.getString(OptionName.Name, true)
 
-    const itemsBySlot = osrsItemIdByName[slot]
-    assert(itemsBySlot.size > 0, "Unknown slot")
-
-    const name = [...itemsBySlot.keys()].find(
-      (el) => el.toLowerCase() === nameInput.toLowerCase(),
-    )
-    const itemId = name ? itemsBySlot.get(name) : null
-    assert(
-      !!name && !!itemId,
-      "Unknown OSRS item or it's not tradeable in the GE",
-    )
+    const itemData = osrsItemByName.get(nameInput)
+    assert(!!itemData, "Unknown OSRS item or it's not tradeable in the GE")
 
     const gearModel = new GearModel(this.context)
     const priceByItemId = await gearModel.getPriceByItemIdMap()
 
-    const price = priceByItemId.get(itemId)
+    const price = priceByItemId.get(itemData.itemId)
     assert(!!price, "Item was found but it seems to not be tradeable in the GE")
 
     const items = await gearModel.getItems(this.member.id)
@@ -207,7 +198,7 @@ export default class GearCommand extends BaseCommand {
       embeds: [
         {
           color: this.member.displayColor,
-          title: name,
+          title: itemData.itemName,
           description: joinAsLines(
             `**${formatCredits(price)}**`,
             !canAfford
@@ -216,7 +207,7 @@ export default class GearCommand extends BaseCommand {
           ),
           footer: canAfford && slotError ? { text: slotError } : undefined,
           thumbnail: {
-            url: `https://secure.runescape.com/m=itemdb_oldschool/obj_big.gif?id=${itemId}`,
+            url: `https://secure.runescape.com/m=itemdb_oldschool/obj_big.gif?id=${itemData.itemId}`,
           },
         },
       ],
@@ -237,8 +228,8 @@ export default class GearCommand extends BaseCommand {
       // Handle separately to catch error
       await gearModel.addItem({
         userId: this.member.id,
-        itemId,
-        itemName: name,
+        itemId: itemData.itemId,
+        itemName: itemData.itemName,
         itemBoughtPrice: BigInt(price),
         itemSlot: slot,
       })
@@ -295,7 +286,7 @@ export default class GearCommand extends BaseCommand {
     const slot = this.interaction.options.getString(
       OptionName.Slot,
       true,
-    ) as GearSlot
+    ) as ItemSlot
 
     const gearModel = new GearModel(this.context)
     const items = await gearModel.getItems(this.member.id)

@@ -8,7 +8,7 @@ import { getOsrsPrices } from "~/server/cron/tasks/getOsrsPrices"
 import { OsrsItemsEntity } from "~/server/db/entity/OsrsItems"
 import { StaticDataModel } from "~/server/db/model/StaticData"
 import { StaticDataType } from "~/types/entity"
-import { GearSlot } from "~/types/osrs"
+import { ItemSlot } from "~/types/osrs"
 
 export interface OsrsItemsEmbedData {
   thumbnail: APIEmbedThumbnail
@@ -104,7 +104,7 @@ export class GearModel extends BaseModel {
     slot,
     items,
   }: {
-    slot: GearSlot
+    slot: ItemSlot
     items: OsrsItemsEntity[]
   }): string | undefined {
     const itemBySlot = new Map(items.map((item) => [item.itemSlot, true]))
@@ -114,15 +114,15 @@ export class GearModel extends BaseModel {
     }
 
     if (
-      slot === GearSlot.TwoHanded &&
-      (itemBySlot.has(GearSlot.OneHanded) || itemBySlot.has(GearSlot.Shield))
+      slot === ItemSlot.Weapon &&
+      (itemBySlot.has(ItemSlot.Weapon) || itemBySlot.has(ItemSlot.Shield))
     ) {
       return "Already using a weapon or a shield"
     }
 
     if (
-      (slot === GearSlot.Shield || slot === GearSlot.OneHanded) &&
-      itemBySlot.has(GearSlot.TwoHanded)
+      (slot === ItemSlot.Shield || slot === ItemSlot.Weapon) &&
+      itemBySlot.has(ItemSlot.Weapon)
     ) {
       return "You're using a two-handed weapon"
     }

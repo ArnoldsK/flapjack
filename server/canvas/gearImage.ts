@@ -3,7 +3,7 @@ import path from "node:path"
 import { createCanvas, Image, loadImage } from "@napi-rs/canvas"
 
 import { OsrsItemsEntity } from "~/server/db/entity/OsrsItems"
-import { GearSlot } from "~/types/osrs"
+import { ItemSlot } from "~/types/osrs"
 
 type Item = Pick<OsrsItemsEntity, "itemId" | "itemSlot" | "itemName">
 
@@ -13,18 +13,18 @@ interface Position {
 }
 
 const SLOT_SIZE = 32
-const SLOT_POSITION = new Map<GearSlot, Position>([
-  [GearSlot.Head, { x: 58, y: 2 }],
-  [GearSlot.Cape, { x: 17, y: 41 }],
-  [GearSlot.Neck, { x: 58, y: 41 }],
-  [GearSlot.OneHanded, { x: 2, y: 80 }],
-  [GearSlot.TwoHanded, { x: 2, y: 80 }],
-  [GearSlot.Body, { x: 58, y: 80 }],
-  [GearSlot.Shield, { x: 114, y: 80 }],
-  [GearSlot.Legs, { x: 58, y: 120 }],
-  [GearSlot.Hands, { x: 2, y: 160 }],
-  [GearSlot.Feet, { x: 58, y: 160 }],
-  [GearSlot.Ring, { x: 114, y: 160 }],
+const SLOT_POSITION = new Map<ItemSlot, Position>([
+  [ItemSlot.Head, { x: 58, y: 2 }],
+  [ItemSlot.Cape, { x: 17, y: 41 }],
+  [ItemSlot.Neck, { x: 58, y: 41 }],
+  [ItemSlot.Weapon, { x: 2, y: 80 }],
+  [ItemSlot.Weapon, { x: 2, y: 80 }],
+  [ItemSlot.Body, { x: 58, y: 80 }],
+  [ItemSlot.Shield, { x: 114, y: 80 }],
+  [ItemSlot.Legs, { x: 58, y: 120 }],
+  [ItemSlot.Hands, { x: 2, y: 160 }],
+  [ItemSlot.Feet, { x: 58, y: 160 }],
+  [ItemSlot.Ring, { x: 114, y: 160 }],
 ])
 
 export const getGearImage = async ({
@@ -50,7 +50,7 @@ export const getGearImage = async ({
       path.join("public", "static", "gear", "empty-slot.png"),
     )
 
-    const imageBySlot = new Map<GearSlot, Image>(
+    const imageBySlot = new Map<ItemSlot, Image>(
       await Promise.all(
         items.map(
           async (item) =>
@@ -64,7 +64,7 @@ export const getGearImage = async ({
       ),
     )
 
-    for (const slot of Object.values(GearSlot)) {
+    for (const slot of Object.values(ItemSlot)) {
       const itemImage = imageBySlot.get(slot)
       if (!itemImage) continue
 
