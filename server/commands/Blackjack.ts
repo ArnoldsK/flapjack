@@ -302,9 +302,13 @@ export default class BlackjackCommand extends BaseCommand {
       outcome = "Blackjack"
     }
 
-    const result = wonAmount
-      ? `won ${formatCredits(wonAmount)}`
-      : `lost ${formatCredits(state.finalBet || state.initialBet)}`
+    const bet = state.finalBet || state.initialBet
+    const receivedAmount = wonAmount - bet
+
+    const result =
+      receivedAmount > 0
+        ? `won ${formatCredits(receivedAmount)}`
+        : `${receivedAmount === 0 ? "get back" : "lost"} ${formatCredits(bet)}`
 
     return joinAsLines(
       `**${outcome}, you ${result}**`,
