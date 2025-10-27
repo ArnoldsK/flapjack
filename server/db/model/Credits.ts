@@ -10,6 +10,7 @@ import { assert } from "~/server/utils/error"
 export interface Wallet {
   member: GuildMember
   credits: bigint
+  lastMessageAt: Date | null
   updatedAt: Date
 }
 
@@ -22,11 +23,13 @@ const parseEntityCredits = (
 const getUpsertData = (
   userId: string,
   credits: bigint,
+  lastMessageAt?: Date | null,
 ): RequiredEntityData<CreditsEntity> => ({
   userId,
   // Unsigned field allows only positive values
   credits: credits < 0n ? -credits : credits,
   multiplier: credits < 0n ? -1 : 1,
+  lastMessageAt,
 })
 
 export class CreditsModel extends BaseModel {
@@ -41,6 +44,7 @@ export class CreditsModel extends BaseModel {
     return {
       member,
       credits: parseEntityCredits(entity),
+      lastMessageAt: entity?.lastMessageAt ?? null,
       updatedAt: entity?.updatedAt ?? new Date(),
     }
   }
@@ -58,6 +62,7 @@ export class CreditsModel extends BaseModel {
     userId,
     byAmount,
     isCasino,
+    messageAt,
   }: {
     userId: string
     byAmount: bigint | number
@@ -66,6 +71,10 @@ export class CreditsModel extends BaseModel {
      * Will modify bot credits with the opposite amount.
      */
     isCasino: boolean
+    /**
+     * When updating time-based message credits
+     */
+    messageAt?: Date
   }): Promise<Wallet> {
     const { member, credits } = await this.getWallet(userId)
 
@@ -76,7 +85,7 @@ export class CreditsModel extends BaseModel {
 
     const entity = await this.em.upsert(
       this.Entity,
-      getUpsertData(userId, newCredits),
+      getUpsertData(userId, newCredits, messageAt),
     )
 
     // Modify bot credits with the opposite amount
@@ -92,6 +101,7 @@ export class CreditsModel extends BaseModel {
     const newWallet: Wallet = {
       member,
       credits: newCredits,
+      lastMessageAt: messageAt ?? entity.lastMessageAt,
       updatedAt: entity.updatedAt,
     }
 
@@ -109,6 +119,7 @@ export class CreditsModel extends BaseModel {
       .map((entity) => ({
         member: members.get(entity.userId)!,
         credits: entity.credits * BigInt(entity.multiplier),
+        lastMessageAt: entity.lastMessageAt,
         updatedAt: entity.updatedAt,
       }))
   }

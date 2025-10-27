@@ -18,6 +18,9 @@ export class CreditsEntity {
   })
   multiplier: -1 | 1
 
+  @Property({ nullable: true })
+  lastMessageAt: Date | null
+
   @Property()
   updatedAt: Date & Opt = new Date()
 }

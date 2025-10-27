@@ -66,13 +66,16 @@ export default createEvent(
     const creditsModel = new CreditsModel(context)
     const wallet = await creditsModel.getWallet(message.member.id)
 
-    const secondsSinceUpdate = (Date.now() - wallet.updatedAt.getTime()) / 1000
+    const secondsSinceUpdate = wallet.lastMessageAt
+      ? (Date.now() - wallet.lastMessageAt.getTime()) / 1000
+      : 0
     const timeBasedAmount = Math.floor(secondsSinceUpdate * 0.2)
 
     await creditsModel.modifyCredits({
       userId: message.member.id,
       byAmount: Math.max(MIN_CREDITS_PER_MESSAGE, timeBasedAmount),
       isCasino: false,
+      messageAt: message.createdAt,
     })
   },
 )
