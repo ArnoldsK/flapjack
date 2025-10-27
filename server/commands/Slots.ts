@@ -145,31 +145,31 @@ export default class SlotsCommand extends BaseCommand {
     return [
       {
         label: "2x",
-        chance: 50, // (100 / 2)
+        chance: 49, // (100 / 2 - 1)
         emoji: "🍒",
         count: 1,
       },
       {
         label: "5x",
-        chance: 10, // (100 / 5)
+        chance: 9, // (100 / 5 - 1)
         emoji: "🍒",
         count: 2,
       },
       {
         label: "20x",
-        chance: 5, // (100 / 20)
+        chance: 4, // (100 / 20 - 1)
         emoji: "🍒",
         count: 3,
       },
       {
         label: "40x",
-        chance: 2.5, // (100 / 40)
+        chance: 1.5, // (100 / 40 - 1)
         emoji: "<:slotsseven:1205175066170626098>",
         count: 3,
       },
       {
         label: "80x",
-        chance: 1.25, // (100 / 80)
+        chance: 0.25, // (100 / 80 - 1)
         emoji: "<:Dreaming:712788218319339581>",
         count: 3,
       },
