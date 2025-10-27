@@ -289,29 +289,32 @@ export default class BlackjackCommand extends BaseCommand {
     const hasBj: boolean =
       rightHand.playerHasBlackjack || !!leftHand?.playerHasBlackjack
 
-    let outcome = "Game over"
-    if (bust) {
-      outcome = "Bust"
-    } else if (state.dealerHasBusted) {
-      outcome = "Dealer bust"
-    } else if (state.dealerHasBlackjack) {
-      outcome = "Dealer blackjack"
-    } else if (hasDoubleBj) {
-      outcome = "Double blackjack"
-    } else if (hasBj) {
-      outcome = "Blackjack"
-    }
-
     const bet = state.finalBet || state.initialBet
     const receivedAmount = wonAmount - bet
 
-    const result =
-      receivedAmount > 0
-        ? `won ${formatCredits(receivedAmount)}`
-        : `${receivedAmount === 0 ? "get back" : "lost"} ${formatCredits(bet)}`
+    let outcome: string
+    if (bust) {
+      outcome = "Bust, you lost"
+    } else if (state.dealerHasBusted) {
+      outcome = "Dealer bust, you won"
+    } else if (state.dealerHasBlackjack) {
+      outcome = "Dealer blackjack, you lost"
+    } else if (hasDoubleBj) {
+      outcome = "Double blackjack, you won"
+    } else if (hasBj) {
+      outcome = "Blackjack, you won"
+    } else {
+      if (receivedAmount > 0) {
+        outcome = "You won"
+      } else if (receivedAmount === 0) {
+        outcome = "Draw, you get back"
+      } else {
+        outcome = "You lost"
+      }
+    }
 
     return joinAsLines(
-      `**${outcome}, you ${result}**`,
+      `**${outcome} ${formatCredits(receivedAmount > 0 ? receivedAmount : bet)}**`,
       `You have ${formatCredits(wallet.credits)} now`,
     )
   }
