@@ -193,6 +193,7 @@ export default class CreditsCommand extends BaseCommand {
       embeds: [
         {
           fields: wallets
+            .filter((wallet) => !wallet.member.user.bot)
             .map((wallet) => ({
               member: wallet.member,
               amount: wallet.credits,

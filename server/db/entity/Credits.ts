@@ -18,7 +18,7 @@ export class CreditsEntity {
   })
   multiplier: -1 | 1
 
-  @Property({ nullable: true })
+  @Property({ type: "timestamp", nullable: true })
   lastMessageAt: Date | null
 
   @Property()

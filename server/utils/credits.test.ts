@@ -1,15 +1,18 @@
 import {
+  formatCredits,
   formatCreditsAmount,
   getCreditsEmoji,
   parseCreditsAmount,
 } from "~/server/utils/credits"
 
 test("getCreditsEmoji", () => {
+  expect(getCreditsEmoji(-100)).toContain("")
   expect(getCreditsEmoji(0)).toContain("")
   expect(getCreditsEmoji(1)).toContain(":Coins1:")
   expect(getCreditsEmoji(2)).toContain(":Coins1:")
   expect(getCreditsEmoji(5000)).toContain(":Coins250:")
   expect(getCreditsEmoji(1_000_000_000)).toContain(":Coins10000:")
+  expect(getCreditsEmoji(100_133_287_524)).toContain(":Coins10000:")
 })
 
 test("parseCreditsAmount", () => {
@@ -29,6 +32,8 @@ test("parseCreditsAmount", () => {
 
   expect(parseCreditsAmount("50000", BigInt(1000))).toBe(1000)
 
+  expect(parseCreditsAmount("100133287524", Infinity)).toBe(100_133_287_524)
+
   expect(parseCreditsAmount("500 100", 1000)).toBe(500)
 
   expect(() => parseCreditsAmount("a3m", 100)).toThrow()
@@ -43,6 +48,10 @@ test("parseCreditsAmount", () => {
 })
 
 test("formatCreditsAmount", () => {
+  expect(formatCreditsAmount(-100_133_287_524n)).toStrictEqual({
+    amount: -100,
+    suffix: "B",
+  })
   expect(formatCreditsAmount(-123_123)).toStrictEqual({
     amount: -123.1,
     suffix: "K",
@@ -115,4 +124,12 @@ test("formatCreditsAmount", () => {
     amount: 12,
     suffix: "T",
   })
+})
+
+test("formatCredits", () => {
+  expect(formatCredits(100_133_287_524)).toBe(
+    "100B <:Coins10000:1204533924559065099>",
+  )
+  expect(formatCredits(-100_133_287_524)).toBe("-100B")
+  expect(formatCredits(-100_133_287_524n)).toBe("-100B")
 })

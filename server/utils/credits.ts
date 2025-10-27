@@ -18,7 +18,7 @@ export const getCreditsEmoji = (value: bigint | number): string => {
   return (
     Object.entries(minValueMap).find(
       ([, minValue]) => value >= minValue,
-    )?.[0] ?? "<:Coins1:1204533883702612018>"
+    )?.[0] ?? ""
   )
 }
 
@@ -34,6 +34,8 @@ export const formatCreditsAmount = (
 
   if (typeof value === "number") {
     value = Math.abs(Math.floor(value))
+  } else if (isNegative) {
+    value = value * -1n // abs the bigint
   }
 
   const items: Array<{
@@ -122,12 +124,9 @@ export const formatCredits = (value: bigint | number): string => {
     return "no credits"
   }
 
-  return [
-    amount,
-    suffix,
-    value >= 30 ? Unicode.thinSpace : null,
-    getCreditsEmoji(value) || null,
-  ].join("")
+  const emoji = getCreditsEmoji(value)
+
+  return [amount, suffix, emoji ? Unicode.thinSpace : "", emoji].join("")
 }
 
 export const parseCreditsAmount = (

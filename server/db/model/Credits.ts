@@ -100,7 +100,7 @@ export class CreditsModel extends BaseModel {
 
     const newWallet: Wallet = {
       member,
-      credits: newCredits,
+      credits: parseEntityCredits(entity),
       lastMessageAt: messageAt ?? entity.lastMessageAt,
       updatedAt: entity.updatedAt,
     }
@@ -118,7 +118,7 @@ export class CreditsModel extends BaseModel {
       .filter((entity) => members.has(entity.userId))
       .map((entity) => ({
         member: members.get(entity.userId)!,
-        credits: entity.credits * BigInt(entity.multiplier),
+        credits: parseEntityCredits(entity),
         lastMessageAt: entity.lastMessageAt,
         updatedAt: entity.updatedAt,
       }))
