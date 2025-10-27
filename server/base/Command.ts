@@ -88,8 +88,9 @@ export class BaseCommand {
       return await this.interaction[
         this.interaction.deferred ? "editReply" : "reply"
       ](options)
-    } catch {
+    } catch (error) {
       // Message is most likely deleted
+      console.error("Failed to reply!", error)
     }
   }
 

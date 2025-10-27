@@ -76,12 +76,17 @@ export class CreditsModel extends BaseModel {
      */
     messageAt?: Date
   }): Promise<Wallet> {
-    const { member, credits } = await this.getWallet(userId)
+    const wallet = await this.getWallet(userId)
 
-    const bigAmount: bigint =
+    const bigByAmount: bigint =
       typeof byAmount === "bigint" ? byAmount : BigInt(Math.floor(byAmount))
 
-    const newCredits = credits + bigAmount
+    // No update
+    if (bigByAmount === 0n) {
+      return wallet
+    }
+
+    const newCredits = wallet.credits + bigByAmount
 
     const entity = await this.em.upsert(
       this.Entity,
@@ -91,7 +96,7 @@ export class CreditsModel extends BaseModel {
     // Modify bot credits with the opposite amount
     if (isCasino) {
       try {
-        await this.modifyBotCredits(-bigAmount)
+        await this.modifyBotCredits(-bigByAmount)
       } catch {
         // Should not fail the user credits add
         console.error("Failed to add bot credits")
@@ -99,7 +104,7 @@ export class CreditsModel extends BaseModel {
     }
 
     const newWallet: Wallet = {
-      member,
+      member: wallet.member,
       credits: parseEntityCredits(entity),
       lastMessageAt: messageAt ?? entity.lastMessageAt,
       updatedAt: entity.updatedAt,

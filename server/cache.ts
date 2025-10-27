@@ -6,6 +6,7 @@ import { RedGifsGif } from "~/types/redgifs"
 export enum CacheKey {
   NsfwPosts = "nsfwPosts",
   Blackjack = "blackjack",
+  JacksBetter = "jacksBetter",
   McStatus = "mcStatus",
   Setting = "setting",
   Videos = "videos",
@@ -17,6 +18,7 @@ export enum CacheKey {
 interface AppCache {
   [CacheKey.NsfwPosts]: RedGifsGif[]
   [CacheKey.Blackjack]: CacheObjectManager<string>
+  [CacheKey.JacksBetter]: CacheObjectManager<string>
   [CacheKey.McStatus]: McStatus | null
   [CacheKey.Setting]: Settings | null
   [CacheKey.Videos]: ApiVideos | null
@@ -29,6 +31,7 @@ export default class CacheManager {
   #cache: AppCache = {
     [CacheKey.NsfwPosts]: [],
     [CacheKey.Blackjack]: new CacheObjectManager(),
+    [CacheKey.JacksBetter]: new CacheObjectManager(),
     [CacheKey.McStatus]: null,
     [CacheKey.Setting]: null,
     [CacheKey.Videos]: null,

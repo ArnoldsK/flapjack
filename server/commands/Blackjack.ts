@@ -71,7 +71,6 @@ export default class BlackjackCommand extends BaseCommand {
   }
 
   #_creditsModel: CreditsModel
-
   get #creditsModel() {
     if (!this.#_creditsModel) {
       this.#_creditsModel = new CreditsModel(this.context)
@@ -152,7 +151,12 @@ export default class BlackjackCommand extends BaseCommand {
 
     this.#updateCache(game, response ?? null)
 
-    if (response && !gameOver) {
+    if (!response) {
+      await this.#handleRefund(game)
+      return
+    }
+
+    if (!gameOver) {
       // Begin the rabbit hole...
       await this.#handleAwaitResponse(response, game)
     }
@@ -174,9 +178,7 @@ export default class BlackjackCommand extends BaseCommand {
       // #############################################################################
       // Handle actions
       // #############################################################################
-      const { action, handSide } = this.#decodeCustomAction(
-        interaction.customId,
-      )
+      const { action, handSide } = this.#decodeCustomId(interaction.customId)
 
       switch (action) {
         case "stand": {
@@ -246,28 +248,30 @@ export default class BlackjackCommand extends BaseCommand {
         await this.#handleAwaitResponse(nextResponse, game)
       }
     } catch (error) {
-      const wallet = await this.#creditsModel.getWallet(this.member.id)
-      const state = game.getState()
-      const lostAmount = state.finalBet || state.initialBet
-
-      console.error("> Blackjack >", error)
-
-      await this.reply({
-        embeds: [
-          {
-            color: this.member.displayColor,
-            description: joinAsLines(
-              `**No action within 1 minute, you lost ${formatCredits(
-                lostAmount,
-              )}**`,
-              `You have ${formatCredits(wallet.credits)} now`,
-            ),
-          },
-        ],
-        components: [],
-      })
-
       this.#updateCache(game, null)
+
+      if ((error as Error).name === "[InteractionCollectorError]") {
+        const wallet = await this.#creditsModel.getWallet(this.member.id)
+        const state = game.getState()
+        const lostAmount = state.finalBet || state.initialBet
+
+        await this.reply({
+          embeds: [
+            {
+              color: this.member.displayColor,
+              description: joinAsLines(
+                `**No action within 5 minutes, you lost ${formatCredits(
+                  lostAmount,
+                )}**`,
+                `You have ${formatCredits(wallet.credits)} now`,
+              ),
+            },
+          ],
+          components: [],
+        })
+      } else {
+        await this.#handleRefund(game, error as Error)
+      }
     }
   }
 
@@ -434,7 +438,7 @@ export default class BlackjackCommand extends BaseCommand {
     return [action, handSide].join("::")
   }
 
-  #decodeCustomAction(customId: string) {
+  #decodeCustomId(customId: string) {
     const [action, handSide] = customId.split("::")
 
     return {
@@ -444,14 +448,8 @@ export default class BlackjackCommand extends BaseCommand {
   }
 
   #formatCards(cards: Card[], dealerHasHole = false): string {
-    const suiteEmoji: Record<Card["suite"], string> = {
-      clubs: "♧",
-      diamonds: "♢",
-      hearts: "♡",
-      spades: "♤",
-    }
+    const result = cards.map((card) => `${card.text}${Unicode[card.suite]}`)
 
-    const result = cards.map((card) => `${card.text}${suiteEmoji[card.suite]}`)
     if (dealerHasHole) {
       result.push("?")
     }
@@ -481,5 +479,35 @@ export default class BlackjackCommand extends BaseCommand {
       insurance: false,
       showdownAfterAceSplit: true,
     })
+  }
+
+  async #handleRefund(game: Game, error?: Error) {
+    const state = game.getState()
+    const lostAmount = state.finalBet || state.initialBet
+
+    const wallet = await this.#creditsModel.modifyCredits({
+      userId: this.user.id,
+      byAmount: lostAmount,
+      isCasino: true,
+    })
+
+    const description = joinAsLines(
+      `**No action within 5 minutes, you lost ${formatCredits(lostAmount)}**`,
+      `You have ${formatCredits(wallet.credits)} now`,
+    )
+
+    if (error) {
+      await this.reply({
+        embeds: [
+          {
+            color: this.member.displayColor,
+            description,
+          },
+        ],
+        components: [],
+      })
+    } else {
+      throw new Error(description)
+    }
   }
 }

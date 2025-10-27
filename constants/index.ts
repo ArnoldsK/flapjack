@@ -1,11 +1,13 @@
 export enum Unicode {
-  /** @deprecated */
-  credits = "❈",
   middot = "·",
   zeroWidthSpace = "​",
   thinSpace = " ",
   enSpace = " ",
   longDash = "—",
+  clubs = "♧",
+  diamonds = "♢",
+  hearts = "♡",
+  spades = "♤",
 }
 
 // prettier-ignore
