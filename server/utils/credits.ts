@@ -146,6 +146,8 @@ export const parseCreditsAmount = (
     amount = Number.parseFloat(value) * 1000
   } else if (value.endsWith("m")) {
     amount = Number.parseFloat(value) * 1_000_000
+  } else if (value.endsWith("b")) {
+    amount = Number.parseFloat(value) * 1_000_000_000
   } else {
     amount = Number.parseInt(value)
   }
