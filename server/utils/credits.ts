@@ -127,7 +127,7 @@ export const formatCredits = (
     return "no credits"
   }
 
-  const emoji = getCreditsEmoji(value)
+  const emoji = getCreditsEmoji(BigInt(value) * BigInt(options?.withTimes ?? 1))
   const times = options?.withTimes ? `${Unicode.times}${options.withTimes}` : ""
 
   return [amount, suffix, times, emoji ? Unicode.thinSpace : "", emoji].join("")
