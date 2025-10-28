@@ -140,7 +140,7 @@ export default class JacksBetterCommand extends BaseCommand {
         isCasino: true,
       })
 
-      await this.reply(this.#getDrawReply(result, wallet, true))
+      await this.reply(this.#getDrawReply(result, wallet))
 
       this.#updateCache(false, null)
     } catch (error) {
@@ -159,7 +159,6 @@ export default class JacksBetterCommand extends BaseCommand {
   #getDrawReply(
     result: JbDrawResult,
     wallet: Wallet,
-    hasInteractionError?: boolean,
   ): InteractionEditReplyOptions {
     let outcome: string
     if (result.handName) {
@@ -193,9 +192,6 @@ export default class JacksBetterCommand extends BaseCommand {
               joinAsLines(
                 `**${outcome} ${amount}**`,
                 `You have ${formatCredits(wallet.credits)} now`,
-                hasInteractionError
-                  ? "-# There was an interaction error"
-                  : null,
               ),
             ),
           ),
