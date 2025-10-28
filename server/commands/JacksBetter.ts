@@ -114,7 +114,6 @@ export default class JacksBetterCommand extends BaseCommand {
       return
     }
 
-    // Begin the rabbit hole...
     await this.#handleResponse(response, game)
   }
 
@@ -133,13 +132,6 @@ export default class JacksBetterCommand extends BaseCommand {
 
       // Draw new cards and end the game
       const state = game.draw()
-
-      // Adjust credits
-      const wallet = await this.#creditsModel.modifyCredits({
-        userId: this.member.id,
-        byAmount: state.winAmount,
-        isCasino: true,
-      })
 
       let outcome: string
       if (state.handName) {
@@ -176,6 +168,13 @@ export default class JacksBetterCommand extends BaseCommand {
               ),
             ),
         ],
+      })
+
+      // Adjust credits
+      const wallet = await this.#creditsModel.modifyCredits({
+        userId: this.member.id,
+        byAmount: state.winAmount,
+        isCasino: true,
       })
 
       this.#updateCache(false, null)
