@@ -1,13 +1,18 @@
 import {
   ActionRowBuilder,
   APIEmbed,
+  APISelectMenuOption,
   ButtonBuilder,
   ButtonStyle,
-  ComponentType,
   InteractionReplyOptions,
   InteractionResponse,
+  LabelBuilder,
   Message,
+  ModalBuilder,
   SlashCommandBuilder,
+  StringSelectMenuBuilder,
+  ButtonInteraction,
+  ModalSubmitInteraction,
 } from "discord.js"
 
 import { OPTION_DESCRIPTION_AMOUNT, Unicode } from "~/constants"
@@ -25,8 +30,8 @@ enum OptionName {
 }
 
 enum Action {
-  Card = "card",
-  Draw = "draw",
+  Cards = "jb-cards",
+  Draw = "jb-draw",
 }
 
 export default class JacksBetterCommand extends BaseCommand {
@@ -103,7 +108,7 @@ export default class JacksBetterCommand extends BaseCommand {
       isCasino: true,
     })
 
-    const response = await this.reply(this.#getReply(game))
+    const response = await this.reply(this.#getDealReply(game))
 
     this.#updateCache(true, response ?? null)
 
@@ -112,95 +117,142 @@ export default class JacksBetterCommand extends BaseCommand {
       return
     }
 
-    // Begin the rabbit hole...
-    await this.#handleAwaitResponse(response, game)
+    // This is so... dumb
+    this.client.on("interactionCreate", async (interaction) => {
+      if (interaction.user.id !== this.user.id) return
+
+      try {
+        if (
+          interaction.isButton() &&
+          Object.values(Action).includes(interaction.customId as Action)
+        ) {
+          switch (interaction.customId as Action) {
+            case Action.Cards: {
+              await interaction.showModal(this.#getCardsModal(game), {
+                withResponse: true,
+              })
+              break
+            }
+            case Action.Draw: {
+              this.#handleDrawAction(game, interaction)
+              break
+            }
+          }
+        }
+
+        if (
+          interaction.isModalSubmit() &&
+          interaction.isFromMessage() &&
+          interaction.customId === `jb-modal-${game.id}`
+        ) {
+          await this.#handleModalSubmit(game, interaction)
+        }
+      } catch (error) {
+        this.#updateCache(false, null)
+
+        console.log("EVENT ERROR", error)
+
+        if ((error as Error).name === "[InteractionCollectorError]") {
+          const wallet = await this.#creditsModel.getWallet(this.member.id)
+
+          await this.reply(this.#getTimedOutReply(game, wallet))
+        } else {
+          await this.#handleRefund(game, error as Error)
+        }
+      }
+    })
   }
 
-  async #handleAwaitResponse(
-    response: InteractionResponse | Message,
+  async #handleModalSubmit(
     game: JacksBetter,
+    interaction: ModalSubmitInteraction,
   ) {
-    try {
-      const interaction = await response.awaitMessageComponent({
-        componentType: ComponentType.Button,
-        idle: 5 * 60_000, // 5 minutes
-        filter: (i) => i.user.id === this.user.id,
-      })
-
+    if (!interaction.deferred) {
       await interaction.deferUpdate()
-
-      const customId = this.#decodeCustomId(interaction.customId)
-
-      // #############################################################################
-      // Toggle card state
-      // #############################################################################
-      if (customId.action === Action.Card) {
-        // Update card held state
-        const card = game.cards.find((card) => card.id === customId.cardId)
-        assert(!!card, "Card not found!")
-
-        game.setCardHold(card.id, !card.isHeld)
-
-        // Update response
-        const nextResponse = await interaction.editReply(this.#getReply(game))
-
-        this.#updateCache(true, nextResponse)
-
-        // Continue the rabbit hole...
-        await this.#handleAwaitResponse(nextResponse, game)
-        return
-      }
-
-      // #############################################################################
-      // Draw new cards and end the game
-      // #############################################################################
-      const state = game.draw()
-
-      // Adjust credits
-      const wallet = await this.#creditsModel.modifyCredits({
-        userId: this.member.id,
-        byAmount: state.winAmount,
-        isCasino: true,
-      })
-
-      let outcome
-      if (state.handName) {
-        outcome = `${state.handName}, you won`
-      } else {
-        outcome = state.isWin ? "You won" : "You lost"
-      }
-
-      await interaction.editReply({
-        embeds: [
-          {
-            color: this.member.displayColor,
-            description: joinAsLines(
-              `**${outcome} ${formatCredits(state.winAmount || game.bet)}**`,
-              `You have ${formatCredits(wallet.credits)} now`,
-            ),
-            fields: [
-              {
-                name: "Your hand",
-                value: this.#formatCards(game.cards),
-              },
-            ],
-          },
-        ],
-        components: [],
-      })
-
-      this.#updateCache(false, null)
-    } catch (error) {
-      this.#updateCache(false, null)
-
-      if ((error as Error).name === "[InteractionCollectorError]") {
-        const wallet = await this.#creditsModel.getWallet(this.member.id)
-
-        await this.reply(this.#getTimedOutReply(game, wallet))
-      } else {
-        await this.#handleRefund(game, error as Error)
-      }
     }
+
+    const holdCardIds =
+      interaction.fields.getStringSelectValues("hold-card-ids")
+
+    for (const card of game.cards) {
+      game.setCardHold(card.id, holdCardIds.includes(card.id))
+    }
+
+    const nextResponse = await interaction.editReply(this.#getDealReply(game))
+
+    this.#updateCache(true, nextResponse)
+  }
+
+  async #handleDrawAction(game: JacksBetter, interaction: ButtonInteraction) {
+    if (!interaction.deferred) {
+      await interaction.deferUpdate()
+    }
+
+    const state = game.draw()
+
+    const wallet = await this.#creditsModel.modifyCredits({
+      userId: this.member.id,
+      byAmount: state.winAmount,
+      isCasino: true,
+    })
+
+    let outcome
+    if (state.handName) {
+      outcome = `${state.handName}, you won`
+    } else {
+      outcome = state.isWin ? "You won" : "You lost"
+    }
+
+    await interaction.editReply({
+      embeds: [
+        {
+          color: this.member.displayColor,
+          description: joinAsLines(
+            `**${outcome} ${formatCredits(state.winAmount || game.bet)}**`,
+            `You have ${formatCredits(wallet.credits)} now`,
+          ),
+          fields: [
+            {
+              name: "Your hand",
+              value: this.#formatCards(game.cards),
+            },
+          ],
+        },
+      ],
+      components: [],
+    })
+
+    this.#updateCache(false, null)
+  }
+
+  #getCardsModal(game: JacksBetter) {
+    const modal = new ModalBuilder()
+      .setCustomId(`jb-modal-${game.id}`)
+      .setTitle("Jacks or Better")
+
+    const cardsLabel = new LabelBuilder()
+      .setLabel("Choose cards to hold")
+      .setStringSelectMenuComponent(
+        new StringSelectMenuBuilder()
+          .setCustomId("hold-card-ids")
+          .setOptions(
+            ...game.cards.map(
+              (card) =>
+                ({
+                  label: this.#formatCard(card),
+                  value: card.id,
+                  default: card.isHeld,
+                }) satisfies APISelectMenuOption,
+            ),
+          )
+          .setRequired(false)
+          .setMinValues(0)
+          .setMaxValues(5),
+      )
+
+    modal.addLabelComponents(cardsLabel)
+
+    return modal
   }
 
   #getTimedOutReply(
@@ -247,68 +299,47 @@ export default class JacksBetterCommand extends BaseCommand {
     }
   }
 
-  #getReply(game: JacksBetter): InteractionReplyOptions {
+  #getDealReply(game: JacksBetter): Omit<InteractionReplyOptions, "flags"> {
+    const actionRow = new ActionRowBuilder<ButtonBuilder>()
+    actionRow.addComponents(
+      new ButtonBuilder()
+        .setCustomId(Action.Cards)
+        .setLabel("Cards")
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId(Action.Draw)
+        .setLabel("Draw")
+        .setStyle(ButtonStyle.Success),
+    )
+
     return {
       embeds: [
         {
           color: this.member.displayColor,
-          description: "Select cards to hold",
+          fields: [
+            {
+              name: "Your hand",
+              value: this.#formatCards(game.cards),
+            },
+          ],
           footer: this.isEphemeral
             ? { text: "Dismissing message counts as a loss" }
             : undefined,
         },
       ],
-      components: this.#getCardsComponents(game.cards),
+      components: [actionRow],
     }
   }
 
-  #getCardsComponents(cards: JbCard[]) {
-    const cardsActionRow = new ActionRowBuilder<ButtonBuilder>()
-    cardsActionRow.addComponents(
-      ...cards.map((card) =>
-        new ButtonBuilder()
-          .setCustomId(this.#encodeCustomId(Action.Card, card.id))
-          .setLabel(this.#formatCards([card]))
-          .setStyle(card.isHeld ? ButtonStyle.Success : ButtonStyle.Secondary),
-      ),
-    )
+  #formatCard(card: JbCard, isHeld?: boolean): string {
+    const result = `${card.value}${Unicode[card.suit]}`
 
-    const drawActionRow = new ActionRowBuilder<ButtonBuilder>()
-    drawActionRow.addComponents(
-      new ButtonBuilder()
-        .setCustomId(this.#encodeCustomId(Action.Draw))
-        .setLabel("Draw")
-        .setStyle(ButtonStyle.Primary),
-    )
-
-    return [cardsActionRow, drawActionRow]
-  }
-
-  #encodeCustomId(action: Action.Card, cardId: string): string
-  #encodeCustomId(action: Action.Draw, cardId?: undefined): string
-  #encodeCustomId(action: Action, cardId?: string): string {
-    return [action, cardId].filter(Boolean).join("::")
-  }
-
-  #decodeCustomId(customId: string):
-    | {
-        action: Action.Card
-        cardId: string
-      }
-    | {
-        action: Action.Draw
-      } {
-    const [action, cardId] = customId.split("::")
-
-    return {
-      action: action as Action,
-      cardId: cardId as string,
-    }
+    return isHeld ? `__**${result}**__` : result
   }
 
   #formatCards(cards: JbCard[]): string {
     return cards
-      .map((card) => `${card.value}${Unicode[card.suit]}`)
+      .map((card) => this.#formatCard(card, card.isHeld))
       .join(` ${Unicode.middot} `)
   }
 

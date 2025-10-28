@@ -104,10 +104,13 @@ nextApp.prepare().then(async () => {
       try {
         await command?.handleExecute(interaction)
       } catch (error) {
-        interaction[interaction.deferred ? "editReply" : "reply"]({
+        const options = {
           content: (error as Error).message,
-          ephemeral: true,
-        })
+        }
+
+        await (interaction.deferred
+          ? interaction.editReply(options)
+          : interaction.reply({ flags: ["Ephemeral"], ...options }))
       }
     }
   })

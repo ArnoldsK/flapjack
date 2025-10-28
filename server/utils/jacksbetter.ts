@@ -78,13 +78,21 @@ const CARD_SUIT_NAME = new Map<string, JbCard["suit"]>([
 ])
 
 export class JacksBetter {
+  #id: number
+
   #bet: number
 
   #deck: JbCard[] = []
 
   #cards: JbCard[] = []
 
-  constructor() {}
+  constructor() {
+    this.#id = Date.now()
+  }
+
+  get id() {
+    return this.#id
+  }
 
   get bet() {
     return this.#bet

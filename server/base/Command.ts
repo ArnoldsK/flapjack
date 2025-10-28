@@ -6,6 +6,7 @@ import {
   GuildTextBasedChannel,
   InteractionReplyOptions,
   SlashCommandBuilder,
+  SlashCommandOptionsOnlyBuilder,
   SlashCommandSubcommandsOnlyBuilder,
   User,
 } from "discord.js"
@@ -34,8 +35,8 @@ export class BaseCommand {
    * Command builder
    */
   static command:
-    | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
-    | SlashCommandSubcommandsOnlyBuilder = new SlashCommandBuilder()
+    | SlashCommandSubcommandsOnlyBuilder
+    | SlashCommandOptionsOnlyBuilder = new SlashCommandBuilder()
 
   /**
    * Permissions required to execute
@@ -83,7 +84,7 @@ export class BaseCommand {
     return this.interaction.member as GuildMember
   }
 
-  async reply(options: string | Omit<InteractionReplyOptions, "ephemeral">) {
+  async reply(options: string | Omit<InteractionReplyOptions, "flags">) {
     try {
       return await this.interaction[
         this.interaction.deferred ? "editReply" : "reply"

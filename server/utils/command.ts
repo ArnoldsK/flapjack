@@ -23,7 +23,9 @@ import { BaseContext } from "~/types"
 
 export type SetupCommand = RESTPostAPIChatInputApplicationCommandsJSONBody & {
   dynamicVersion: boolean
-  handleExecute: (interaction: ChatInputCommandInteraction) => Promise<void>
+  handleExecute: (
+    interaction: Omit<ChatInputCommandInteraction, "deferReply">,
+  ) => Promise<void>
 }
 
 const getCommandVersion = (command: {
@@ -104,7 +106,9 @@ export const getSetupCommands = async (
         )
 
         // Always defer
-        await interaction.deferReply({ ephemeral: command.isEphemeral })
+        await interaction.deferReply({
+          flags: command.isEphemeral ? ["Ephemeral"] : undefined,
+        })
 
         // Execute
         await command.execute()
@@ -155,10 +159,16 @@ export const handleApiCommands = async (commands: SetupCommand[]) => {
   const updateCommands: Omit<
     SetupCommand,
     "handleExecute" | "dynamicVersion"
-  >[] = apiCommands.map((el) => ({
-    ...el,
-    type: el.type === ApplicationCommandType.ChatInput ? el.type : undefined,
-  }))
+  >[] = apiCommands.map(
+    ({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      contexts,
+      ...el
+    }) => ({
+      ...el,
+      type: el.type === ApplicationCommandType.ChatInput ? el.type : undefined,
+    }),
+  )
 
   // Add new commands
   for (const command of commands) {

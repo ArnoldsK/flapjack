@@ -3,6 +3,7 @@ import { APIEmbed } from "discord.js"
 import { DISCORD_IDS } from "~/constants"
 import { Color } from "~/constants"
 import { CreditsModel } from "~/server/db/model/Credits"
+import { isTextChannel } from "~/server/utils/channel"
 import { formatCredits } from "~/server/utils/credits"
 import { Task } from "~/types/tasks"
 
@@ -27,7 +28,7 @@ export const resetCredits: Task = async (context) => {
   await Promise.all(
     channelIds.map(async (id) => {
       const channel = context.client.channels.cache.get(id)
-      if (channel?.isTextBased()) {
+      if (isTextChannel(channel)) {
         await channel.send({ embeds })
       }
     }),
