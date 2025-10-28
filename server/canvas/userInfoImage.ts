@@ -55,7 +55,7 @@ export const getUserInfoImage = async (
   )
 
   // Position
-  ctx.font = canvasFont("bold 26px")
+  ctx.font = canvasFont(26, { bold: true })
   ctx.fillStyle = textColor
   ctx.textBaseline = "top"
   ctx.textAlign = "center"
@@ -70,37 +70,37 @@ export const getUserInfoImage = async (
   const createdX = avatarX + avatarWidth + margin
   const createdY = margin
 
-  ctx.font = canvasFont("bold 11px")
+  ctx.font = canvasFont(11, { bold: true })
   ctx.fillStyle = textColor
   ctx.textBaseline = "top"
   ctx.textAlign = "left"
   ctx.fillText(`On Discord since`, createdX, createdY)
 
-  ctx.font = canvasFont("13px")
+  ctx.font = canvasFont(13)
   ctx.fillText(info.createdDate, createdX, createdY + 14)
 
   // Joined since
   const joinedX = createdX
   const joinedY = createdY + 27 + margin
 
-  ctx.font = canvasFont("bold 11px")
+  ctx.font = canvasFont(11, { bold: true })
   ctx.fillStyle = textColor
   ctx.textBaseline = "top"
   ctx.textAlign = "left"
   ctx.fillText(`On ${member.guild.name} since`, joinedX, joinedY)
-  ctx.font = canvasFont("13px")
+  ctx.font = canvasFont(13)
   ctx.fillText(info.joinedDate, joinedX, joinedY + 14)
 
   // Joined ago
   const agoX = createdX
   const agoY = joinedY + 27 + margin
 
-  ctx.font = canvasFont("bold 11px")
+  ctx.font = canvasFont(11, { bold: true })
   ctx.fillStyle = textColor
   ctx.textBaseline = "top"
   ctx.textAlign = "left"
   ctx.fillText(`Joined`, agoX, agoY)
-  ctx.font = canvasFont("13px")
+  ctx.font = canvasFont(13)
   ctx.fillText(info.joinedAgo, agoX, agoY + 14)
 
   return canvas.toBuffer("image/png")

@@ -1,0 +1,77 @@
+import { createCanvas } from "@napi-rs/canvas"
+
+import { canvasFont } from "~/server/utils/canvas"
+import { JbCard } from "~/server/utils/jacksbetter"
+
+const HEADER_HEIGHT = 10
+const CARD_WIDTH = 60
+const CARD_HEIGHT = 80
+const CARD_RADII = CARD_HEIGHT * 0.1
+const CARD_PADDING = CARD_WIDTH * 0.1
+const CARDS_GAP = CARD_WIDTH * 0.2
+const CARD_SUIT = new Map<JbCard["suit"], string>([
+  ["spades", "♠"],
+  ["clubs", "♣"],
+  ["hearts", "♥"],
+  ["diamonds", "♦"],
+])
+
+export const getJbCardsImage = ({ cards }: { cards: JbCard[] }): Buffer => {
+  const width = CARD_WIDTH * cards.length + CARDS_GAP * (cards.length - 1)
+  const height = HEADER_HEIGHT + CARD_HEIGHT
+
+  const canvas = createCanvas(width, height)
+  const ctx = canvas.getContext("2d")
+
+  let x = 0
+  const y = HEADER_HEIGHT
+  for (const card of cards) {
+    // Value
+    ctx.fillStyle = "#fff"
+
+    ctx.arc(0, 0, 20, 0, Math.PI * 2)
+    ctx.beginPath()
+    ctx.roundRect(x, y, CARD_WIDTH, CARD_HEIGHT, CARD_RADII)
+    ctx.fill()
+
+    // Suit
+    ctx.textBaseline = "top"
+    ctx.fillStyle = ["hearts", "diamonds"].includes(card.suit) ? "#F00" : "#000"
+
+    const valueSize = CARD_HEIGHT * 0.5
+    ctx.font = canvasFont(valueSize, { bold: true })
+    ctx.letterSpacing = `${-valueSize * 0.2}px`
+    ctx.fillText(card.value, x + CARD_PADDING, y + CARD_PADDING)
+
+    const suitSize = CARD_HEIGHT * 0.5
+    ctx.font = canvasFont(suitSize, { family: "" })
+    const suit = CARD_SUIT.get(card.suit)!
+    const suitMetrics = ctx.measureText(suit)
+
+    ctx.fillText(
+      suit,
+      x + CARD_WIDTH - CARD_PADDING - suitMetrics.actualBoundingBoxRight,
+      y + CARD_HEIGHT - CARD_PADDING - suitMetrics.actualBoundingBoxDescent,
+    )
+
+    // Hold label
+    if (card.isHeld) {
+      const labelSize = HEADER_HEIGHT
+      ctx.fillStyle = "#fff"
+      ctx.letterSpacing = `${labelSize * 0.2}px`
+      ctx.font = canvasFont(labelSize, { bold: true })
+      const label = "HOLD"
+      const labelMetrics = ctx.measureText(label)
+      ctx.fillText(
+        label,
+        x + CARD_WIDTH / 2 - labelMetrics.actualBoundingBoxRight / 2,
+        0,
+      )
+    }
+
+    // Prepare next
+    x += CARD_WIDTH + CARDS_GAP
+  }
+
+  return canvas.toBuffer("image/png")
+}

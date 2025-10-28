@@ -59,7 +59,7 @@ export const getRankImage = async (
   )
 
   // Rank and level
-  ctx.font = canvasFont("16px")
+  ctx.font = canvasFont(16)
   ctx.fillStyle = textColor
   ctx.textBaseline = "bottom"
   ctx.fillText(
@@ -73,7 +73,7 @@ export const getRankImage = async (
   const percentTextY = height / 2 + margin / 2
   const percentText = `${rankData.levelData.percent}%`
 
-  ctx.font = canvasFont("bold 16px")
+  ctx.font = canvasFont(16, { bold: true })
   ctx.fillStyle = textColor
   ctx.textBaseline = "top"
   ctx.fillText(percentText, percentTextX, percentTextY)

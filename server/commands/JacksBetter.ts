@@ -1,4 +1,5 @@
 import {
+  AttachmentBuilder,
   ComponentType,
   ContainerBuilder,
   InteractionEditReplyOptions,
@@ -12,6 +13,7 @@ import {
 import { OPTION_DESCRIPTION_AMOUNT, Unicode } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { CacheKey } from "~/server/cache"
+import { getJbCardsImage } from "~/server/canvas/jbCardsImage"
 import { CreditsModel, Wallet } from "~/server/db/model/Credits"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
@@ -151,11 +153,18 @@ export default class JacksBetterCommand extends BaseCommand {
       })
 
       await interaction.update({
+        files: [
+          new AttachmentBuilder(getJbCardsImage({ cards: game.cards }), {
+            name: "cards.png",
+          }),
+        ],
         components: [
           new ContainerBuilder()
             .setAccentColor(this.member.displayColor)
-            .addTextDisplayComponents((textDisplay) =>
-              textDisplay.setContent(this.#formatCards(game.cards)),
+            .addMediaGalleryComponents((mediaGallery) =>
+              mediaGallery.addItems((mediaItem) =>
+                mediaItem.setURL("attachment://cards.png"),
+              ),
             )
             .addSeparatorComponents((separator) => separator)
             .addTextDisplayComponents((textDisplay) =>
@@ -227,18 +236,29 @@ export default class JacksBetterCommand extends BaseCommand {
     }
   }
 
-  #getDealReply(game: JacksBetter): Omit<InteractionEditReplyOptions, "flags"> {
+  #getDealReply(game: JacksBetter): InteractionEditReplyOptions {
     return {
+      files: [
+        new AttachmentBuilder(getJbCardsImage({ cards: game.cards }), {
+          name: "cards.png",
+        }),
+      ],
       components: [
         new ContainerBuilder()
           .setAccentColor(this.member.displayColor)
-          .addTextDisplayComponents((textDisplay) =>
-            textDisplay.setContent(
-              joinAsLines(
-                this.#formatCards(game.cards),
-                game.cardsHandName ? `-# ${game.cardsHandName}` : null,
-              ),
+          .addMediaGalleryComponents((mediaGallery) =>
+            mediaGallery.addItems((mediaItem) =>
+              mediaItem.setURL("attachment://cards.png"),
             ),
+          )
+          .addTextDisplayComponents(
+            game.cardsHandName
+              ? [
+                  new TextDisplayBuilder().setContent(
+                    `-# ${game.cardsHandName}`,
+                  ),
+                ]
+              : [],
           )
           .addSeparatorComponents((separator) => separator)
           .addActionRowComponents((actionRow) =>
@@ -278,12 +298,6 @@ export default class JacksBetterCommand extends BaseCommand {
     const result = `${card.value}${Unicode[card.suit]}`
 
     return showHeld && card.isHeld ? `__${result}__` : result
-  }
-
-  #formatCards(cards: JbCard[]): string {
-    return cards
-      .map((card) => this.#formatCard(card, true))
-      .join(` ${Unicode.middot} `)
   }
 
   async #handleRefund(game: JacksBetter, error?: Error) {

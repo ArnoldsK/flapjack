@@ -1,4 +1,11 @@
-import { type Canvas, type Image, type SKRSContext2D } from "@napi-rs/canvas"
+import path from "node:path"
+
+import {
+  GlobalFonts,
+  type Canvas,
+  type Image,
+  type SKRSContext2D,
+} from "@napi-rs/canvas"
 
 export interface CanvasDrawImageOptions {
   ellipse?: boolean
@@ -41,11 +48,32 @@ export const deg2rad = (deg: number): number => (deg * Math.PI) / 180
 export const rad2deg = (rad: number): number => (rad * 180) / Math.PI
 
 /**
+ * Register global fonts
+ */
+export const registerGlobalFonts = () => {
+  if (GlobalFonts.has("Roboto")) return
+
+  for (const fontPath of [
+    path.join("public", "font", "roboto.bold.ttf"),
+    path.join("public", "font", "roboto.bold-italic.ttf"),
+    path.join("public", "font", "roboto.italic.ttf"),
+    path.join("public", "font", "roboto.regular.ttf"),
+  ]) {
+    GlobalFonts.registerFromPath(fontPath, "Roboto")
+  }
+}
+
+/**
  * Adds default font family
  */
-export const canvasFont = (input: string) => {
-  // Need to specify linux sans serif font due to @napi-rs/canvas issue
-  const family = "'DejaVu Sans', sans-serif"
+export const canvasFont = (
+  size: number,
+  options?: { bold?: boolean; family?: string },
+) => {
+  registerGlobalFonts()
 
-  return `${input} ${family}`
+  const bold = options?.bold ? "bold" : ""
+  const family = options?.family ?? "'Roboto', sans-serif"
+
+  return `${bold} ${size} ${family}`.trim()
 }
