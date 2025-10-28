@@ -39,15 +39,15 @@ enum HandName {
 }
 
 const PAY_TABLE = new Map<HandName, number>([
-  [HandName.RoyalFlush, 4000],
-  [HandName.StraightFlush, 250],
-  [HandName.FourOfAKind, 125],
-  [HandName.FullHouse, 45],
-  [HandName.Flush, 30],
-  [HandName.Straight, 20],
-  [HandName.ThreeOfAKind, 15],
-  [HandName.TwoPairs, 10],
-  [HandName.JacksOrBetter, 5],
+  [HandName.RoyalFlush, 250],
+  [HandName.StraightFlush, 50],
+  [HandName.FourOfAKind, 25],
+  [HandName.FullHouse, 9],
+  [HandName.Flush, 6],
+  [HandName.Straight, 4],
+  [HandName.ThreeOfAKind, 3],
+  [HandName.TwoPairs, 2],
+  [HandName.JacksOrBetter, 1],
 ])
 
 const CARD_VALUES = new Set([
