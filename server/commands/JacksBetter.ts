@@ -1,13 +1,13 @@
 import {
-  ActionRowBuilder,
-  APIEmbed,
   ButtonBuilder,
   ButtonStyle,
-  ComponentType,
-  InteractionReplyOptions,
+  ContainerBuilder,
+  InteractionEditReplyOptions,
   InteractionResponse,
   Message,
   SlashCommandBuilder,
+  StringSelectMenuBuilder,
+  TextDisplayBuilder,
 } from "discord.js"
 
 import { OPTION_DESCRIPTION_AMOUNT, Unicode } from "~/constants"
@@ -22,11 +22,6 @@ import { joinAsLines } from "~/server/utils/string"
 
 enum OptionName {
   Amount = "amount",
-}
-
-enum Action {
-  Card = "card",
-  Draw = "draw",
 }
 
 export default class JacksBetterCommand extends BaseCommand {
@@ -44,6 +39,10 @@ export default class JacksBetterCommand extends BaseCommand {
 
   get isEphemeral(): boolean {
     return !isCasinoChannel(this.channel)
+  }
+
+  get isComponentsV2(): boolean {
+    return true
   }
 
   #_creditsModel: CreditsModel
@@ -103,7 +102,7 @@ export default class JacksBetterCommand extends BaseCommand {
       isCasino: true,
     })
 
-    const response = await this.reply(this.#getReply(game))
+    const response = await this.reply(this.#getDealReply(game))
 
     this.#updateCache(true, response ?? null)
 
@@ -113,41 +112,28 @@ export default class JacksBetterCommand extends BaseCommand {
     }
 
     // Begin the rabbit hole...
-    await this.#handleAwaitResponse(response, game)
+    await this.#handleResponse(response, game)
   }
 
-  async #handleAwaitResponse(
-    response: InteractionResponse | Message,
-    game: JacksBetter,
-  ) {
+  async #handleResponse(response: Message, game: JacksBetter) {
     try {
       const interaction = await response.awaitMessageComponent({
-        componentType: ComponentType.Button,
-        idle: 5 * 60_000, // 5 minutes
+        time: 5 * 60_000, // 5 minutes
         filter: (i) => i.user.id === this.user.id,
       })
-
-      await interaction.deferUpdate()
-
-      const customId = this.#decodeCustomId(interaction.customId)
 
       // #############################################################################
       // Toggle card state
       // #############################################################################
-      if (customId.action === Action.Card) {
-        // Update card held state
-        const card = game.cards.find((card) => card.id === customId.cardId)
-        assert(!!card, "Card not found!")
+      if (interaction.isStringSelectMenu()) {
+        for (const card of game.cards) {
+          game.setCardHold(card.id, interaction.values.includes(card.id))
+        }
 
-        game.setCardHold(card.id, !card.isHeld)
-
-        // Update response
-        const nextResponse = await interaction.editReply(this.#getReply(game))
-
-        this.#updateCache(true, nextResponse)
+        await interaction.update(this.#getDealReply(game))
 
         // Continue the rabbit hole...
-        await this.#handleAwaitResponse(nextResponse, game)
+        await this.#handleResponse(response, game)
         return
       }
 
@@ -163,7 +149,7 @@ export default class JacksBetterCommand extends BaseCommand {
         isCasino: true,
       })
 
-      let outcome
+      let outcome: string
       if (state.handName) {
         outcome = `${state.handName}, you won`
       } else {
@@ -174,26 +160,30 @@ export default class JacksBetterCommand extends BaseCommand {
         withTimes: state.winMulti,
       })
 
-      await interaction.editReply({
-        embeds: [
-          {
-            color: this.member.displayColor,
-            description: joinAsLines(
-              `**${outcome} ${result}**`,
-              `You have ${formatCredits(wallet.credits)} now`,
-              "",
-              this.#formatCards(game.cards, true),
+      await interaction.update({
+        components: [
+          new ContainerBuilder()
+            .setAccentColor(this.member.displayColor)
+            .addTextDisplayComponents((textDisplay) =>
+              textDisplay.setContent(this.#formatCards(game.cards)),
+            )
+            .addSeparatorComponents((separator) => separator)
+            .addTextDisplayComponents((textDisplay) =>
+              textDisplay.setContent(
+                joinAsLines(
+                  `**${outcome} ${result}**`,
+                  `You have ${formatCredits(wallet.credits)} now`,
+                ),
+              ),
             ),
-          },
         ],
-        components: [],
       })
 
       this.#updateCache(false, null)
     } catch (error) {
       this.#updateCache(false, null)
 
-      if ((error as Error).name === "[InteractionCollectorError]") {
+      if ((error as Error).name.includes("InteractionCollectorError")) {
         const wallet = await this.#creditsModel.getWallet(this.member.id)
 
         await this.reply(this.#getTimedOutReply(game, wallet))
@@ -206,20 +196,22 @@ export default class JacksBetterCommand extends BaseCommand {
   #getTimedOutReply(
     game: JacksBetter,
     wallet: Wallet,
-  ): InteractionReplyOptions {
+  ): InteractionEditReplyOptions {
     return {
-      embeds: [
-        {
-          color: this.member.displayColor,
-          description: joinAsLines(
-            `**No action within 5 minutes, you lost ${formatCredits(
-              game.bet,
-            )}**`,
-            `You have ${formatCredits(wallet.credits)} now`,
+      components: [
+        new ContainerBuilder()
+          .setAccentColor(this.member.displayColor)
+          .addTextDisplayComponents((textDisplay) =>
+            textDisplay.setContent(
+              joinAsLines(
+                `**No action within 5 minutes, you lost ${formatCredits(
+                  game.bet,
+                )}**`,
+                `You have ${formatCredits(wallet.credits)} now`,
+              ),
+            ),
           ),
-        },
       ],
-      components: [],
     }
   }
 
@@ -227,92 +219,80 @@ export default class JacksBetterCommand extends BaseCommand {
     game: JacksBetter,
     wallet: Wallet,
     error?: Error,
-  ): InteractionReplyOptions {
+  ): InteractionEditReplyOptions {
     return {
-      embeds: [
-        {
-          color: this.member.displayColor,
-          description: joinAsLines(
-            `**An error has occurred, you get back ${formatCredits(game.bet)}**`,
-            `You have ${formatCredits(wallet.credits)} now`,
+      components: [
+        new ContainerBuilder()
+          .setAccentColor(this.member.displayColor)
+          .addTextDisplayComponents((textDisplay) =>
+            textDisplay.setContent(
+              joinAsLines(
+                `**An error has occurred, you get back ${formatCredits(game.bet)}**`,
+                `You have ${formatCredits(wallet.credits)} now`,
+                error ? `-# ${error.message}` : null,
+              ),
+            ),
           ),
-          footer: error
-            ? {
-                text: error.message,
-              }
-            : undefined,
-        },
       ],
-      components: [],
     }
   }
 
-  #getReply(game: JacksBetter): Omit<InteractionReplyOptions, "flags"> {
+  #getDealReply(game: JacksBetter): Omit<InteractionEditReplyOptions, "flags"> {
     return {
-      embeds: [
-        {
-          color: this.member.displayColor,
-          description: "Select cards to hold",
-          footer: this.isEphemeral
-            ? { text: "Dismissing message counts as a loss" }
-            : undefined,
-        },
+      components: [
+        new ContainerBuilder()
+          .setAccentColor(this.member.displayColor)
+          .addTextDisplayComponents((textDisplay) =>
+            textDisplay.setContent(this.#formatCards(game.cards)),
+          )
+          .addSeparatorComponents((separator) => separator)
+          .addActionRowComponents((actionRow) =>
+            actionRow.setComponents(
+              new StringSelectMenuBuilder()
+                .setCustomId("jb-held-cards")
+                .setPlaceholder("Choose cards to hold")
+                .setOptions(
+                  game.cards.map((card) => ({
+                    label: this.#formatCard(card),
+                    value: card.id,
+                    default: card.isHeld,
+                  })),
+                )
+                .setRequired(false)
+                .setMinValues(0)
+                .setMaxValues(5),
+            ),
+          )
+          .addActionRowComponents((actionRow) =>
+            actionRow.setComponents(
+              new ButtonBuilder()
+                .setCustomId("jb-draw")
+                .setLabel("Draw")
+                .setStyle(ButtonStyle.Primary),
+            ),
+          )
+          .addTextDisplayComponents(
+            this.isEphemeral
+              ? [
+                  new TextDisplayBuilder().setContent(
+                    "-# Dismissing message counts as a loss",
+                  ),
+                ]
+              : [],
+          ),
       ],
-      components: this.#getCardsComponents(game.cards),
     }
   }
 
-  #getCardsComponents(cards: JbCard[]) {
-    const cardsActionRow = new ActionRowBuilder<ButtonBuilder>()
-    cardsActionRow.addComponents(
-      ...cards.map((card) =>
-        new ButtonBuilder()
-          .setCustomId(this.#encodeCustomId(Action.Card, card.id))
-          .setLabel(this.#formatCards([card]))
-          .setStyle(!card.isHeld ? ButtonStyle.Secondary : ButtonStyle.Primary),
-      ),
-    )
+  #formatCard(card: JbCard, showHeld?: boolean): string {
+    const result = `${card.value}${Unicode[card.suit]}`
 
-    const drawActionRow = new ActionRowBuilder<ButtonBuilder>()
-    drawActionRow.addComponents(
-      new ButtonBuilder()
-        .setCustomId(this.#encodeCustomId(Action.Draw))
-        .setLabel("Draw")
-        .setStyle(ButtonStyle.Primary),
-    )
-
-    return [cardsActionRow, drawActionRow]
+    return showHeld && card.isHeld ? `__${result}__` : result
   }
 
-  #encodeCustomId(action: Action.Card, cardId: string): string
-  #encodeCustomId(action: Action.Draw, cardId?: undefined): string
-  #encodeCustomId(action: Action, cardId?: string): string {
-    return [action, cardId].filter(Boolean).join("::")
-  }
-
-  #decodeCustomId(customId: string):
-    | {
-        action: Action.Card
-        cardId: string
-      }
-    | {
-        action: Action.Draw
-      } {
-    const [action, cardId] = customId.split("::")
-
-    return {
-      action: action as Action,
-      cardId: cardId as string,
-    }
-  }
-
-  #formatCards(cards: JbCard[], showHeld?: boolean): string {
+  #formatCards(cards: JbCard[]): string {
     return cards
-      .map((card) => {
-        const result = `${card.value}${Unicode[card.suit]}`
-
-        return showHeld && card.isHeld ? `__${result}__` : result
-      })
+      .map((card) => this.#formatCard(card, true))
       .join(` ${Unicode.middot} `)
   }
 
@@ -323,13 +303,15 @@ export default class JacksBetterCommand extends BaseCommand {
       isCasino: true,
     })
 
-    const reply = this.#getErrorReply(game, wallet)
-    const embed = reply.embeds!.at(0)! as APIEmbed
-
     if (error) {
       await this.reply(this.#getErrorReply(game, wallet, error))
     } else {
-      throw new Error(embed.description ?? "Something went wrong!")
+      throw new Error(
+        joinAsLines(
+          `**An error has occurred, you get back ${formatCredits(game.bet)}**`,
+          `You have ${formatCredits(wallet.credits)} now`,
+        ),
+      )
     }
   }
 }

@@ -4,20 +4,22 @@ import {
   Guild,
   GuildMember,
   GuildTextBasedChannel,
-  InteractionReplyOptions,
+  InteractionEditReplyOptions,
+  MessageFlags,
   SlashCommandBuilder,
   SlashCommandOptionsOnlyBuilder,
   SlashCommandSubcommandsOnlyBuilder,
   User,
 } from "discord.js"
 
+import { assert } from "~/server/utils/error"
 import { Permission, permission } from "~/server/utils/permission"
 import { BaseContext } from "~/types"
 
 export class BaseCommand {
   constructor(
-    protected context: BaseContext,
-    protected interaction: Omit<ChatInputCommandInteraction, "deferReply">,
+    public context: BaseContext,
+    public interaction: Omit<ChatInputCommandInteraction, "deferReply">,
   ) {}
 
   /**
@@ -60,6 +62,13 @@ export class BaseCommand {
   }
 
   /**
+   * Sets the reply chain to be using V2 components.
+   */
+  get isComponentsV2(): boolean {
+    return false
+  }
+
+  /**
    * Execute the command
    */
   async execute(): Promise<void> {}
@@ -84,15 +93,21 @@ export class BaseCommand {
     return this.interaction.member as GuildMember
   }
 
-  async reply(options: string | Omit<InteractionReplyOptions, "flags">) {
-    try {
-      return await this.interaction[
-        this.interaction.deferred ? "editReply" : "reply"
-      ](options)
-    } catch (error) {
-      // Message is most likely deleted
-      console.error("Failed to reply!", error)
-    }
+  async reply(
+    contentOrOptions: string | Omit<InteractionEditReplyOptions, "flags">,
+  ) {
+    const options: InteractionEditReplyOptions =
+      typeof contentOrOptions === "string"
+        ? { content: contentOrOptions }
+        : contentOrOptions
+
+    // All interactions are deferred at the top-level, so assert it
+    assert(!!this.interaction.deferred, "Message was not deferred")
+
+    return await this.interaction.editReply({
+      ...options,
+      flags: this.isComponentsV2 ? MessageFlags.IsComponentsV2 : undefined,
+    })
   }
 
   /**

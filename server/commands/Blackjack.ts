@@ -250,7 +250,7 @@ export default class BlackjackCommand extends BaseCommand {
     } catch (error) {
       this.#updateCache(game, null)
 
-      if ((error as Error).name === "[InteractionCollectorError]") {
+      if ((error as Error).name.includes("InteractionCollectorError")) {
         const wallet = await this.#creditsModel.getWallet(this.member.id)
         const state = game.getState()
         const lostAmount = state.finalBet || state.initialBet

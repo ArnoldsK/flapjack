@@ -2,7 +2,13 @@ import "reflect-metadata"
 import http from "node:http"
 
 import { RequestContext } from "@mikro-orm/core"
-import { Client, Events, GatewayIntentBits } from "discord.js"
+import {
+  Client,
+  Events,
+  GatewayIntentBits,
+  MessageFlags,
+  TextDisplayBuilder,
+} from "discord.js"
 import express from "express"
 import next from "next"
 import OpenAI from "openai"
@@ -100,17 +106,23 @@ nextApp.prepare().then(async () => {
 
     if (interaction.isChatInputCommand()) {
       const command = commands.find((el) => el.name === interaction.commandName)
+      if (!command) return
+
+      const instance = command.getInstance(interaction)
 
       try {
-        await command?.handleExecute(interaction)
+        await command.handleExecute(instance)
       } catch (error) {
-        const options = {
-          content: (error as Error).message,
-        }
+        const content = (error as Error).message
+        const options = instance.isComponentsV2
+          ? {
+              components: [new TextDisplayBuilder().setContent(content)],
+            }
+          : { content }
 
         await (interaction.deferred
           ? interaction.editReply(options)
-          : interaction.reply({ flags: ["Ephemeral"], ...options }))
+          : interaction.reply({ flags: [MessageFlags.Ephemeral], ...options }))
       }
     }
   })

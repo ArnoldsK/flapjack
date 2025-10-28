@@ -22,7 +22,6 @@ export default class PingCommand extends BaseCommand {
   async execute() {
     const sent = await this.reply({
       content: "Pinging...",
-      fetchReply: true,
     })
 
     if (sent) {

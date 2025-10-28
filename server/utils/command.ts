@@ -3,6 +3,7 @@ import {
   ApplicationCommandType,
   ChatInputCommandInteraction,
   GuildMember,
+  MessageFlags,
   REST,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
   Routes,
@@ -23,9 +24,10 @@ import { BaseContext } from "~/types"
 
 export type SetupCommand = RESTPostAPIChatInputApplicationCommandsJSONBody & {
   dynamicVersion: boolean
-  handleExecute: (
+  getInstance: (
     interaction: Omit<ChatInputCommandInteraction, "deferReply">,
-  ) => Promise<void>
+  ) => BaseCommand
+  handleExecute: (instance: BaseCommand) => Promise<void>
 }
 
 const getCommandVersion = (command: {
@@ -75,8 +77,10 @@ export const getSetupCommands = async (
 
       dynamicVersion: Command.dynamicVersion,
 
-      handleExecute: async (interaction) => {
-        const command = new Command(context, interaction)
+      getInstance: (interaction) => new Command(context, interaction),
+
+      handleExecute: async (command) => {
+        const { interaction } = command
 
         // #############################################################################
         // Validate
@@ -107,7 +111,7 @@ export const getSetupCommands = async (
 
         // Always defer
         await interaction.deferReply({
-          flags: command.isEphemeral ? ["Ephemeral"] : undefined,
+          flags: command.isEphemeral ? MessageFlags.Ephemeral : undefined,
         })
 
         // Execute
@@ -158,7 +162,7 @@ export const handleApiCommands = async (commands: SetupCommand[]) => {
   // Update is an override so there's a single update body with all API commands
   const updateCommands: Omit<
     SetupCommand,
-    "handleExecute" | "dynamicVersion"
+    "getInstance" | "handleExecute" | "dynamicVersion"
   >[] = apiCommands.map(
     ({
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
