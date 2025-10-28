@@ -128,7 +128,10 @@ export const formatCredits = (
   }
 
   const emoji = getCreditsEmoji(BigInt(value) * BigInt(options?.withTimes ?? 1))
-  const times = options?.withTimes ? `${Unicode.times}${options.withTimes}` : ""
+  const times =
+    options?.withTimes && options.withTimes > 1
+      ? `${Unicode.times}${options.withTimes}`
+      : ""
 
   return [amount, suffix, times, emoji ? Unicode.thinSpace : "", emoji].join("")
 }
