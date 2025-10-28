@@ -3,12 +3,6 @@ import { createCanvas } from "@napi-rs/canvas"
 import { canvasFont } from "~/server/utils/canvas"
 import { JbCard } from "~/server/utils/jacksbetter"
 
-const HEADER_HEIGHT = 8
-const CARD_WIDTH = 45
-const CARD_HEIGHT = 60
-const CARD_RADII = CARD_HEIGHT * 0.1
-const CARD_PADDING = CARD_WIDTH * 0.1
-const CARDS_GAP = CARD_WIDTH * 0.2
 const CARD_SUIT = new Map<JbCard["suit"], string>([
   ["spades", "♠"],
   ["clubs", "♣"],
@@ -16,7 +10,21 @@ const CARD_SUIT = new Map<JbCard["suit"], string>([
   ["diamonds", "♦"],
 ])
 
-export const getJbCardsImage = ({ cards }: { cards: JbCard[] }): Buffer => {
+export const getJbCardsImage = ({
+  cards,
+  small,
+}: {
+  cards: JbCard[]
+  small?: boolean
+}): Buffer => {
+  const SIZE_MULTI = small ? 0.5 : 1
+  const HEADER_HEIGHT = 8 * SIZE_MULTI
+  const CARD_WIDTH = 45 * SIZE_MULTI
+  const CARD_HEIGHT = 60 * SIZE_MULTI
+  const CARD_RADII = CARD_HEIGHT * 0.1
+  const CARD_PADDING = CARD_WIDTH * 0.1
+  const CARDS_GAP = CARD_WIDTH * 0.2
+
   const width = CARD_WIDTH * cards.length + CARDS_GAP * (cards.length - 1)
   const height = HEADER_HEIGHT + CARD_HEIGHT
 

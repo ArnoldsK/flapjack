@@ -25,7 +25,7 @@ const run = async () => {
   console.log(game.cards.map((card) => card.id))
   console.log(draw.handName)
 
-  const image = getJbCardsImage({ cards: game.cards })
+  const image = getJbCardsImage({ cards: game.cards, small: true })
   await writeFile(path.join(__dirname, "jb.png"), image as unknown as string)
 }
 

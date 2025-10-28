@@ -183,9 +183,10 @@ export default class JacksBetterCommand extends BaseCommand {
 
     return {
       files: [
-        new AttachmentBuilder(getJbCardsImage({ cards: result.cards }), {
-          name: "cards.png",
-        }),
+        new AttachmentBuilder(
+          getJbCardsImage({ cards: result.cards, small: true }),
+          { name: "cards.png" },
+        ),
       ],
       components: [
         new ContainerBuilder()
