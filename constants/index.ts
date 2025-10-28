@@ -4,6 +4,7 @@ export enum Unicode {
   thinSpace = " ",
   enSpace = " ",
   longDash = "—",
+  times = "×",
   clubs = "♧",
   diamonds = "♢",
   hearts = "♡",
