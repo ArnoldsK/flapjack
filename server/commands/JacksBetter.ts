@@ -1,6 +1,5 @@
 import {
-  ButtonBuilder,
-  ButtonStyle,
+  ComponentType,
   ContainerBuilder,
   InteractionEditReplyOptions,
   InteractionResponse,
@@ -23,6 +22,8 @@ import { joinAsLines } from "~/server/utils/string"
 enum OptionName {
   Amount = "amount",
 }
+
+const VALUE_NONE = "none"
 
 export default class JacksBetterCommand extends BaseCommand {
   static version = 1
@@ -118,28 +119,17 @@ export default class JacksBetterCommand extends BaseCommand {
   async #handleResponse(response: Message, game: JacksBetter) {
     try {
       const interaction = await response.awaitMessageComponent({
+        componentType: ComponentType.StringSelect,
         time: 5 * 60_000, // 5 minutes
         filter: (i) => i.user.id === this.user.id,
       })
 
-      // #############################################################################
       // Toggle card state
-      // #############################################################################
-      if (interaction.isStringSelectMenu()) {
-        for (const card of game.cards) {
-          game.setCardHold(card.id, interaction.values.includes(card.id))
-        }
-
-        await interaction.update(this.#getDealReply(game))
-
-        // Continue the rabbit hole...
-        await this.#handleResponse(response, game)
-        return
+      for (const card of game.cards) {
+        game.setCardHold(card.id, interaction.values.includes(card.id))
       }
 
-      // #############################################################################
       // Draw new cards and end the game
-      // #############################################################################
       const state = game.draw()
 
       // Adjust credits
@@ -243,7 +233,12 @@ export default class JacksBetterCommand extends BaseCommand {
         new ContainerBuilder()
           .setAccentColor(this.member.displayColor)
           .addTextDisplayComponents((textDisplay) =>
-            textDisplay.setContent(this.#formatCards(game.cards)),
+            textDisplay.setContent(
+              joinAsLines(
+                this.#formatCards(game.cards),
+                game.cardsHandName ? `-# ${game.cardsHandName}` : null,
+              ),
+            ),
           )
           .addSeparatorComponents((separator) => separator)
           .addActionRowComponents((actionRow) =>
@@ -251,24 +246,19 @@ export default class JacksBetterCommand extends BaseCommand {
               new StringSelectMenuBuilder()
                 .setCustomId("jb-held-cards")
                 .setPlaceholder("Choose cards to hold")
-                .setOptions(
-                  game.cards.map((card) => ({
+                .setOptions([
+                  ...game.cards.map((card) => ({
                     label: this.#formatCard(card),
                     value: card.id,
                     default: card.isHeld,
                   })),
-                )
-                .setRequired(false)
-                .setMinValues(0)
+                  {
+                    label: "None",
+                    value: VALUE_NONE,
+                  },
+                ])
+                .setMinValues(1)
                 .setMaxValues(5),
-            ),
-          )
-          .addActionRowComponents((actionRow) =>
-            actionRow.setComponents(
-              new ButtonBuilder()
-                .setCustomId("jb-draw")
-                .setLabel("Draw")
-                .setStyle(ButtonStyle.Primary),
             ),
           )
           .addTextDisplayComponents(

@@ -102,6 +102,18 @@ export class JacksBetter {
     return [...this.#cards] // Clone to prevent mutating
   }
 
+  get cardsHandName(): HandName | null {
+    const cardIds = this.#cards.map((card) => card.id)
+    const hand = PokerSolver.Hand.solve(cardIds, "jacksbetter")
+
+    // Inject RoyalFlush as it's not there by default
+    hand.game.handValues.unshift(PokerSolver.RoyalFlush)
+
+    const [winner] = PokerSolver.Hand.winners([hand]) as PokerSolverWinner[]
+
+    return this.#getWinnerHandName(winner)
+  }
+
   deal({ bet }: { bet: number }) {
     this.#bet = bet
 
@@ -122,15 +134,17 @@ export class JacksBetter {
 
     this.#drawNewCards()
 
-    const cardIds = this.#cards.map((card) => card.id)
-    const hand = PokerSolver.Hand.solve(cardIds, "jacksbetter")
+    const handName = this.cardsHandName
+    const winMulti = handName ? PAY_TABLE.get(handName)! : 0
 
-    // Inject RoyalFlush as it's not there by default
-    hand.game.handValues.unshift(PokerSolver.RoyalFlush)
-
-    const [winner] = PokerSolver.Hand.winners([hand]) as PokerSolverWinner[]
-
-    return this.#parseWinner(winner)
+    return {
+      cards: this.#cards,
+      isWin: winMulti > 0,
+      winMulti,
+      betAmount: this.#bet,
+      winAmount: this.#bet * winMulti,
+      handName,
+    }
   }
 
   #resetDeck() {
@@ -171,20 +185,6 @@ export class JacksBetter {
     assert(!!card, "Could not take a card")
 
     return card
-  }
-
-  #parseWinner(winner: PokerSolverWinner) {
-    const handName = this.#getWinnerHandName(winner)
-    const winMulti = handName ? PAY_TABLE.get(handName)! : 0
-
-    return {
-      cards: this.#cards,
-      isWin: winMulti > 0,
-      winMulti,
-      betAmount: this.#bet,
-      winAmount: this.#bet * winMulti,
-      handName,
-    }
   }
 
   #getWinnerHandName(winner: PokerSolverWinner): HandName | null {
