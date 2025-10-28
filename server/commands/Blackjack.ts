@@ -317,8 +317,8 @@ export default class BlackjackCommand extends BaseCommand {
       }
     }
 
-    const result = formatCredits(receivedAmount > 0 ? receivedAmount : bet, {
-      withTimes: receivedAmount > 0 ? 2 : 0,
+    const result = formatCredits(wonAmount > 0 ? receivedAmount : bet, {
+      withTimes: wonAmount > 0 ? wonAmount / bet : 0,
     })
 
     return joinAsLines(
