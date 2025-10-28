@@ -177,13 +177,9 @@ export default class JacksBetterCommand extends BaseCommand {
             description: joinAsLines(
               `**${outcome} ${formatCredits(state.winAmount || game.bet)}**`,
               `You have ${formatCredits(wallet.credits)} now`,
+              "",
+              this.#formatCards(game.cards, true),
             ),
-            fields: [
-              {
-                name: "Your hand",
-                value: this.#formatCards(game.cards, true),
-              },
-            ],
           },
         ],
         components: [],
