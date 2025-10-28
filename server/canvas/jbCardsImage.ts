@@ -17,11 +17,11 @@ export const getJbCardsImage = ({
   cards: JbCard[]
   small?: boolean
 }): Buffer => {
-  const SIZE_MULTI = small ? 0.6 : 1
+  const SIZE_MULTI = small ? 0.66 : 1
   const HEADER_HEIGHT = 8 * SIZE_MULTI
   const CARD_WIDTH = 45 * SIZE_MULTI
   const CARD_HEIGHT = 60 * SIZE_MULTI
-  const CARD_RADII = CARD_HEIGHT * 0.1
+  const CARD_RADII = Math.max(8, CARD_HEIGHT * 0.1)
   const CARD_PADDING = CARD_WIDTH * 0.1
   const CARDS_GAP = CARD_WIDTH * 0.2
 
