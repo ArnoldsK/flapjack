@@ -3,9 +3,9 @@ import { createCanvas } from "@napi-rs/canvas"
 import { canvasFont } from "~/server/utils/canvas"
 import { JbCard } from "~/server/utils/jacksbetter"
 
-const HEADER_HEIGHT = 10
-const CARD_WIDTH = 60
-const CARD_HEIGHT = 80
+const HEADER_HEIGHT = 8
+const CARD_WIDTH = 45
+const CARD_HEIGHT = 60
 const CARD_RADII = CARD_HEIGHT * 0.1
 const CARD_PADDING = CARD_WIDTH * 0.1
 const CARDS_GAP = CARD_WIDTH * 0.2
