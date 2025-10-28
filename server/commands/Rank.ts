@@ -11,7 +11,6 @@ import { assert, checkUnreachable } from "~/server/utils/error"
 import { makeEqualLengths } from "~/server/utils/string"
 
 enum SubcommandName {
-  Me = "me",
   User = "user",
   Top = "top",
 }
@@ -21,23 +20,17 @@ enum OptionName {
 }
 
 export default class RankCommand extends BaseCommand {
-  static version = 1
+  static version = 2
 
   static command = new SlashCommandBuilder()
     .setName("rank")
     .setDescription("Get user's rank")
     .addSubcommand((subcommand) =>
-      subcommand.setName(SubcommandName.Me).setDescription("Get your rank"),
-    )
-    .addSubcommand((subcommand) =>
       subcommand
         .setName(SubcommandName.User)
-        .setDescription("Get other user rank")
+        .setDescription("Get your or other user rank")
         .addUserOption((option) =>
-          option
-            .setName(OptionName.User)
-            .setDescription("Choose a user")
-            .setRequired(true),
+          option.setName(OptionName.User).setDescription("Choose a user"),
         ),
     )
     .addSubcommand((subcommand) =>
@@ -52,11 +45,6 @@ export default class RankCommand extends BaseCommand {
     const subcommand = this.getSubcommand<SubcommandName>()
 
     switch (subcommand) {
-      case SubcommandName.Me: {
-        await this.#handleMe()
-        return
-      }
-
       case SubcommandName.User: {
         await this.#handleUser()
         return
@@ -73,14 +61,9 @@ export default class RankCommand extends BaseCommand {
     }
   }
 
-  async #handleMe() {
-    await this.#handleMember(this.member)
-  }
-
   async #handleUser() {
-    const user = this.interaction.options.getUser(OptionName.User, true)
-    const member = this.guild.members.cache.get(user.id)
-
+    const user = this.interaction.options.getUser(OptionName.User)
+    const member = user ? this.guild.members.cache.get(user.id) : this.member
     assert(!!member, "User not found")
 
     await this.#handleMember(member)
