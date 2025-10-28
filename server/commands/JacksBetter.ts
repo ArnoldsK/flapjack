@@ -140,16 +140,7 @@ export default class JacksBetterCommand extends BaseCommand {
         isCasino: true,
       })
 
-      // Convoluted reply fallback due to the interaction sometimes failing
-      try {
-        await interaction.update(this.#getDrawReply(result, wallet))
-      } catch (error) {
-        console.dir(
-          { name: "JacksBetter error", interaction, error },
-          { depth: null },
-        )
-        await this.reply(this.#getDrawReply(result, wallet, true))
-      }
+      await this.reply(this.#getDrawReply(result, wallet, true))
 
       this.#updateCache(false, null)
     } catch (error) {
