@@ -16,6 +16,15 @@ interface PokerSolverWinner {
   cards: PokerSolverCard[]
 }
 
+export interface JbDrawResult {
+  cards: JbCard[]
+  isWin: boolean
+  winMulti: number
+  betAmount: number
+  winAmount: number
+  handName: HandName | null
+}
+
 export interface JbCard {
   /** PokerSolver format, e.g., "Qh", "Td" */
   id: string
@@ -129,7 +138,7 @@ export class JacksBetter {
     this.#cards[cardIndex].isHeld = isHeld
   }
 
-  draw() {
+  draw(): JbDrawResult {
     assert(this.#cards.length === 5, "Not enough cards to draw")
 
     this.#drawNewCards()

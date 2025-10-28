@@ -18,7 +18,7 @@ import { CreditsModel, Wallet } from "~/server/db/model/Credits"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
 import { assert } from "~/server/utils/error"
-import { JacksBetter, JbCard } from "~/server/utils/jacksbetter"
+import { JacksBetter, JbCard, JbDrawResult } from "~/server/utils/jacksbetter"
 import { joinAsLines } from "~/server/utils/string"
 
 enum OptionName {
@@ -131,51 +131,25 @@ export default class JacksBetterCommand extends BaseCommand {
       }
 
       // Draw new cards and end the game
-      const state = game.draw()
-
-      let outcome: string
-      if (state.handName) {
-        outcome = `${state.handName}, you won`
-      } else {
-        outcome = state.isWin ? "You won" : "You lost"
-      }
-
-      const result = formatCredits(state.betAmount, {
-        withTimes: state.winMulti,
-      })
-
-      await interaction.update({
-        files: [
-          new AttachmentBuilder(getJbCardsImage({ cards: game.cards }), {
-            name: "cards.png",
-          }),
-        ],
-        components: [
-          new ContainerBuilder()
-            .setAccentColor(this.member.displayColor)
-            .addMediaGalleryComponents((mediaGallery) =>
-              mediaGallery.addItems((mediaItem) =>
-                mediaItem.setURL("attachment://cards.png"),
-              ),
-            )
-            .addSeparatorComponents((separator) => separator)
-            .addTextDisplayComponents((textDisplay) =>
-              textDisplay.setContent(
-                joinAsLines(
-                  `**${outcome} ${result}**`,
-                  `You have ${formatCredits(wallet.credits)} now`,
-                ),
-              ),
-            ),
-        ],
-      })
+      const result = game.draw()
 
       // Adjust credits
       const wallet = await this.#creditsModel.modifyCredits({
         userId: this.member.id,
-        byAmount: state.winAmount,
+        byAmount: result.winAmount,
         isCasino: true,
       })
+
+      // Convoluted reply fallback due to the interaction sometimes failing
+      try {
+        await interaction.update(this.#getDrawReply(result, wallet))
+      } catch (error) {
+        console.dir(
+          { name: "JacksBetter error", interaction, error },
+          { depth: null },
+        )
+        await this.reply(this.#getDrawReply(result, wallet, true))
+      }
 
       this.#updateCache(false, null)
     } catch (error) {
@@ -188,6 +162,52 @@ export default class JacksBetterCommand extends BaseCommand {
       } else {
         await this.#handleRefund(game, error as Error)
       }
+    }
+  }
+
+  #getDrawReply(
+    result: JbDrawResult,
+    wallet: Wallet,
+    hasInteractionError?: boolean,
+  ): InteractionEditReplyOptions {
+    let outcome: string
+    if (result.handName) {
+      outcome = `${result.handName}, you won`
+    } else {
+      outcome = result.isWin ? "You won" : "You lost"
+    }
+
+    const amount = formatCredits(result.betAmount, {
+      withTimes: result.winMulti,
+    })
+
+    return {
+      files: [
+        new AttachmentBuilder(getJbCardsImage({ cards: result.cards }), {
+          name: "cards.png",
+        }),
+      ],
+      components: [
+        new ContainerBuilder()
+          .setAccentColor(this.member.displayColor)
+          .addMediaGalleryComponents((mediaGallery) =>
+            mediaGallery.addItems((mediaItem) =>
+              mediaItem.setURL("attachment://cards.png"),
+            ),
+          )
+          .addSeparatorComponents((separator) => separator)
+          .addTextDisplayComponents((textDisplay) =>
+            textDisplay.setContent(
+              joinAsLines(
+                `**${outcome} ${amount}**`,
+                `You have ${formatCredits(wallet.credits)} now`,
+                hasInteractionError
+                  ? "-# There was an interaction error"
+                  : null,
+              ),
+            ),
+          ),
+      ],
     }
   }
 
