@@ -181,7 +181,7 @@ export default class JacksBetterCommand extends BaseCommand {
             fields: [
               {
                 name: "Your hand",
-                value: this.#formatCards(game.cards),
+                value: this.#formatCards(game.cards, true),
               },
             ],
           },
@@ -306,9 +306,13 @@ export default class JacksBetterCommand extends BaseCommand {
     }
   }
 
-  #formatCards(cards: JbCard[]): string {
+  #formatCards(cards: JbCard[], showHeld?: boolean): string {
     return cards
-      .map((card) => `${card.value}${Unicode[card.suit]}`)
+      .map((card) => {
+        const result = `${card.value}${Unicode[card.suit]}`
+
+        return showHeld && card.isHeld ? `__${result}__` : result
+      })
       .join(` ${Unicode.middot} `)
   }
 
