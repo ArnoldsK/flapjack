@@ -170,12 +170,16 @@ export default class JacksBetterCommand extends BaseCommand {
         outcome = state.isWin ? "You won" : "You lost"
       }
 
+      const result = formatCredits(state.betAmount, {
+        withTimes: state.winMulti,
+      })
+
       await interaction.editReply({
         embeds: [
           {
             color: this.member.displayColor,
             description: joinAsLines(
-              `**${outcome} ${formatCredits(state.winAmount || game.bet)}**`,
+              `**${outcome} ${result}**`,
               `You have ${formatCredits(wallet.credits)} now`,
               "",
               this.#formatCards(game.cards, true),
@@ -265,7 +269,7 @@ export default class JacksBetterCommand extends BaseCommand {
         new ButtonBuilder()
           .setCustomId(this.#encodeCustomId(Action.Card, card.id))
           .setLabel(this.#formatCards([card]))
-          .setStyle(card.isHeld ? ButtonStyle.Success : ButtonStyle.Secondary),
+          .setStyle(!card.isHeld ? ButtonStyle.Secondary : ButtonStyle.Primary),
       ),
     )
 

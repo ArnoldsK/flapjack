@@ -117,7 +117,10 @@ export const formatCreditsAmount = (
   }
 }
 
-export const formatCredits = (value: bigint | number): string => {
+export const formatCredits = (
+  value: bigint | number,
+  options?: { withTimes?: number },
+): string => {
   const { amount, suffix } = formatCreditsAmount(value)
 
   if (!amount) {
@@ -125,8 +128,9 @@ export const formatCredits = (value: bigint | number): string => {
   }
 
   const emoji = getCreditsEmoji(value)
+  const times = options?.withTimes ? `${Unicode.times}${options.withTimes}` : ""
 
-  return [amount, suffix, emoji ? Unicode.thinSpace : "", emoji].join("")
+  return [amount, suffix, times, emoji ? Unicode.thinSpace : "", emoji].join("")
 }
 
 export const parseCreditsAmount = (
