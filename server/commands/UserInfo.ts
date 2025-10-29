@@ -6,7 +6,6 @@ import { assert, checkUnreachable } from "~/server/utils/error"
 import { getMemberByJoinPosition } from "~/server/utils/member"
 
 enum SubcommandName {
-  Me = "me",
   User = "user",
   Position = "position",
 }
@@ -17,20 +16,15 @@ enum OptionName {
 }
 
 export default class UserInfoCommand extends BaseCommand {
-  static version = 1
+  static version = 2
 
   static command = new SlashCommandBuilder()
     .setName("userinfo")
     .setDescription("Get user's join information")
     .addSubcommand((subcommand) =>
       subcommand
-        .setName(SubcommandName.Me)
-        .setDescription("Get your information"),
-    )
-    .addSubcommand((subcommand) =>
-      subcommand
         .setName(SubcommandName.User)
-        .setDescription("Get other user information")
+        .setDescription("Get your or other user information")
         .addUserOption((option) =>
           option
             .setName(OptionName.User)
@@ -64,14 +58,10 @@ export default class UserInfoCommand extends BaseCommand {
     const subcommand = this.getSubcommand<SubcommandName>()
 
     switch (subcommand) {
-      case SubcommandName.Me: {
-        return this.member
-      }
-
       case SubcommandName.User: {
-        return this.guild.members.cache.get(
-          this.interaction.options.getUser(OptionName.User, true).id,
-        )
+        const user = this.interaction.options.getUser(OptionName.User)
+
+        return this.guild.members.cache.get(user ? user.id : this.member.id)
       }
 
       case SubcommandName.Position: {
