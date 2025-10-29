@@ -78,27 +78,13 @@ export default class BlackjackCommand extends BaseCommand {
     return this.#_creditsModel
   }
 
-  #getRunningGameUrl(): string | undefined {
-    const manager = this.context.cache.get(CacheKey.Blackjack)
-
-    return manager.get(this.user.id)
-  }
-
-  #updateCache(game: Game, response: InteractionResponse | Message | null) {
-    const manager = this.context.cache.get(CacheKey.Blackjack)
-
-    if (response && game.getState().stage !== "done") {
-      const url = new URL(this.channel.url)
-      url.pathname += `/${response.id}`
-      manager.set(this.user.id, url.toString())
-    } else {
-      manager.uns(this.user.id)
-    }
-  }
-
   async execute() {
-    const gameUrl = this.#getRunningGameUrl()
-    assert(!gameUrl, `You already have a running game at ${gameUrl}`)
+    const cache = this.context.cache.get(CacheKey.GamesRunning)
+    assert(!cache.get("blackjack"), "You already have a running Blackjack game")
+
+    cache.set("blackjack", true)
+
+    const game = this.#getNewGame()
 
     // #############################################################################
     // Prepare credits
@@ -114,7 +100,6 @@ export default class BlackjackCommand extends BaseCommand {
     // #############################################################################
     // Handle the game
     // #############################################################################
-    const game = this.#getNewGame()
 
     game.dispatch(actions.deal({ bet: amount }))
 
@@ -149,8 +134,6 @@ export default class BlackjackCommand extends BaseCommand {
       components,
     })
 
-    this.#updateCache(game, response ?? null)
-
     if (gameOver) return
 
     try {
@@ -159,8 +142,6 @@ export default class BlackjackCommand extends BaseCommand {
       // Begin the rabbit hole...
       await this.#handleAwaitResponse(response, game)
     } catch (error) {
-      this.#updateCache(game, null)
-
       if ((error as Error).name.includes("InteractionCollectorError")) {
         const wallet = await this.#creditsModel.getWallet(this.member.id)
 
@@ -168,6 +149,8 @@ export default class BlackjackCommand extends BaseCommand {
       } else {
         await this.#handleRefund(game, error as Error)
       }
+    } finally {
+      cache.uns("blackjack")
     }
   }
 
@@ -248,8 +231,6 @@ export default class BlackjackCommand extends BaseCommand {
       ],
       components,
     })
-
-    this.#updateCache(game, nextResponse)
 
     if (gameOver) return
 

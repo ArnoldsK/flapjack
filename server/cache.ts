@@ -5,39 +5,36 @@ import { RedGifsGif } from "~/types/redgifs"
 
 export enum CacheKey {
   NsfwPosts = "nsfwPosts",
-  Blackjack = "blackjack",
-  JacksBetter = "jacksBetter",
+  GamesRunning = "gamesRunning",
   McStatus = "mcStatus",
   Setting = "setting",
   Videos = "videos",
   Stats = "stats",
   DeleteUserMessagesRunning = "deleteUserMessagesRunning",
-  UserGearImage = "userGearImage",
 }
 
 interface AppCache {
   [CacheKey.NsfwPosts]: RedGifsGif[]
-  [CacheKey.Blackjack]: CacheObjectManager<string>
-  [CacheKey.JacksBetter]: CacheObjectManager<string>
+  [CacheKey.GamesRunning]: CacheObjectManager<
+    "blackjack" | "jacksbetter",
+    boolean
+  >
   [CacheKey.McStatus]: McStatus | null
   [CacheKey.Setting]: Settings | null
   [CacheKey.Videos]: ApiVideos | null
   [CacheKey.Stats]: ApiStats | null
   [CacheKey.DeleteUserMessagesRunning]: boolean
-  [CacheKey.UserGearImage]: CacheObjectManager<Buffer>
 }
 
 export default class CacheManager {
   #cache: AppCache = {
     [CacheKey.NsfwPosts]: [],
-    [CacheKey.Blackjack]: new CacheObjectManager(),
-    [CacheKey.JacksBetter]: new CacheObjectManager(),
+    [CacheKey.GamesRunning]: new CacheObjectManager(),
     [CacheKey.McStatus]: null,
     [CacheKey.Setting]: null,
     [CacheKey.Videos]: null,
     [CacheKey.Stats]: null,
     [CacheKey.DeleteUserMessagesRunning]: false,
-    [CacheKey.UserGearImage]: new CacheObjectManager(),
   }
 
   constructor() {}
@@ -51,10 +48,10 @@ export default class CacheManager {
   }
 }
 
-export class CacheObjectManager<T> {
-  #obj: Record<string, T> = {}
+export class CacheObjectManager<K extends string, T> {
+  #obj: Record<K, T> = {} as Record<K, T>
 
-  constructor(initial?: Record<string, T>) {
+  constructor(initial?: Record<K, T>) {
     if (initial) {
       this.#obj = initial
     }
@@ -64,19 +61,19 @@ export class CacheObjectManager<T> {
     return this.#obj
   }
 
-  get(key: string): T | undefined {
+  get(key: K): T | undefined {
     return this.#obj[key]
   }
 
-  has(key: string): boolean {
+  has(key: K): boolean {
     return this.get(key) === undefined
   }
 
-  set(key: string, value: T) {
+  set(key: K, value: T) {
     this.#obj[key] = value
   }
 
-  uns(key: string) {
+  uns(key: K) {
     delete this.#obj[key]
   }
 }

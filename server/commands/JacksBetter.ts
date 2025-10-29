@@ -3,7 +3,6 @@ import {
   ComponentType,
   ContainerBuilder,
   InteractionEditReplyOptions,
-  InteractionResponse,
   Message,
   SlashCommandBuilder,
   StringSelectMenuBuilder,
@@ -56,66 +55,47 @@ export default class JacksBetterCommand extends BaseCommand {
     return this.#_creditsModel
   }
 
-  #getRunningGameUrl(): string | undefined {
-    const manager = this.context.cache.get(CacheKey.JacksBetter)
-
-    return manager.get(this.user.id)
-  }
-
-  #updateCache(
-    active: boolean,
-    response: InteractionResponse | Message | null,
-  ) {
-    const manager = this.context.cache.get(CacheKey.JacksBetter)
-
-    if (response && active) {
-      const url = new URL(this.channel.url)
-      url.pathname += `/${response.id}`
-      manager.set(this.user.id, url.toString())
-    } else {
-      manager.uns(this.user.id)
-    }
-  }
-
   async execute() {
-    const gameUrl = this.#getRunningGameUrl()
-    assert(!gameUrl, `You already have a running game at ${gameUrl}`)
-
-    // #############################################################################
-    // Prepare credits
-    // #############################################################################
-    const wallet = await this.#creditsModel.getWallet(this.member.id)
-
-    const rawAmount = this.interaction.options.getString(
-      OptionName.Amount,
-      true,
+    const cache = this.context.cache.get(CacheKey.GamesRunning)
+    assert(
+      !cache.get("jacksbetter"),
+      "You already have a running Jacks or Better game",
     )
-    const amount = parseCreditsAmount(rawAmount, wallet.credits)
 
-    // #############################################################################
-    // Handle the game
-    // #############################################################################
+    cache.set("jacksbetter", true)
+
     const game = new JacksBetter()
 
-    game.deal({ bet: amount })
-
-    await this.#creditsModel.modifyCredits({
-      userId: this.member.id,
-      byAmount: -amount,
-      isCasino: true,
-    })
-
-    const response = await this.reply(this.#getDealReply(game))
-
-    this.#updateCache(true, response ?? null)
-
     try {
+      // #############################################################################
+      // Prepare credits
+      // #############################################################################
+      const wallet = await this.#creditsModel.getWallet(this.member.id)
+
+      const rawAmount = this.interaction.options.getString(
+        OptionName.Amount,
+        true,
+      )
+      const amount = parseCreditsAmount(rawAmount, wallet.credits)
+
+      // #############################################################################
+      // Handle the game
+      // #############################################################################
+
+      game.deal({ bet: amount })
+
+      await this.#creditsModel.modifyCredits({
+        userId: this.member.id,
+        byAmount: -amount,
+        isCasino: true,
+      })
+
+      const response = await this.reply(this.#getDealReply(game))
+
       assert(!!response, "No response")
 
       await this.#handleResponse(response, game)
     } catch (error) {
-      this.#updateCache(false, null)
-
       if ((error as Error).name.includes("InteractionCollectorError")) {
         const wallet = await this.#creditsModel.getWallet(this.member.id)
 
@@ -123,6 +103,9 @@ export default class JacksBetterCommand extends BaseCommand {
       } else {
         await this.#handleRefund(game, error as Error)
       }
+    } finally {
+      console.log("Game end fully!")
+      cache.uns("jacksbetter")
     }
   }
 
@@ -150,8 +133,6 @@ export default class JacksBetterCommand extends BaseCommand {
       byAmount: result.winAmount,
       isCasino: true,
     })
-
-    this.#updateCache(false, null)
 
     await this.reply(this.#getDrawReply(result, wallet))
   }
