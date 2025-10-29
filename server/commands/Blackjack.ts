@@ -20,7 +20,7 @@ import {
 import { OPTION_DESCRIPTION_AMOUNT, Unicode } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { CacheKey } from "~/server/cache"
-import { CreditsModel } from "~/server/db/model/Credits"
+import { CreditsModel, Wallet } from "~/server/db/model/Credits"
 import { isNonNullish } from "~/server/utils/boolean"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
@@ -151,14 +151,23 @@ export default class BlackjackCommand extends BaseCommand {
 
     this.#updateCache(game, response ?? null)
 
-    if (!response) {
-      await this.#handleRefund(game)
-      return
-    }
+    if (gameOver) return
 
-    if (!gameOver) {
+    try {
+      assert(!!response, "No response")
+
       // Begin the rabbit hole...
       await this.#handleAwaitResponse(response, game)
+    } catch (error) {
+      this.#updateCache(game, null)
+
+      if ((error as Error).name.includes("InteractionCollectorError")) {
+        const wallet = await this.#creditsModel.getWallet(this.member.id)
+
+        await this.reply(this.#getGameOverReply(game, wallet))
+      } else {
+        await this.#handleRefund(game, error as Error)
+      }
     }
   }
 
@@ -166,112 +175,105 @@ export default class BlackjackCommand extends BaseCommand {
     response: InteractionResponse | Message,
     game: Game,
   ) {
-    try {
-      const interaction = await response.awaitMessageComponent({
-        componentType: ComponentType.Button,
-        time: 5 * 60_000, // 5 minutes
-        filter: (i) => i.user.id === this.user.id,
+    const interaction = await response.awaitMessageComponent({
+      componentType: ComponentType.Button,
+      time: 5 * 60_000, // 5 minutes
+      filter: (i) => i.user.id === this.user.id,
+    })
+
+    await interaction.deferUpdate()
+
+    // #############################################################################
+    // Handle actions
+    // #############################################################################
+    const { action, handSide } = this.#decodeCustomId(interaction.customId)
+
+    switch (action) {
+      case "stand": {
+        game.dispatch(actions.stand({ position: handSide }))
+        break
+      }
+      case "hit": {
+        game.dispatch(actions.hit({ position: handSide }))
+        break
+      }
+      case "surrender": {
+        game.dispatch(actions.surrender())
+        break
+      }
+      case "double": {
+        game.dispatch(actions.double({ position: handSide }))
+        break
+      }
+      case "split": {
+        game.dispatch(actions.split())
+        break
+      }
+      default: {
+        console.log("ACTION NOT IMPLEMENTED", action)
+        break
+      }
+    }
+
+    const state = game.getState()
+
+    // #############################################################################
+    // Modify credits
+    // #############################################################################
+    if (["double", "split"].includes(action)) {
+      await this.#creditsModel.modifyCredits({
+        userId: this.member.id,
+        byAmount: -state.initialBet,
+        isCasino: true,
       })
+    }
 
-      await interaction.deferUpdate()
+    // #############################################################################
+    // Update the message and repeat
+    // #############################################################################
+    const { embed, components, gameOver, wonAmount } = this.#parseGame(game, {
+      canDouble: false,
+    })
 
-      // #############################################################################
-      // Handle actions
-      // #############################################################################
-      const { action, handSide } = this.#decodeCustomId(interaction.customId)
+    const description = gameOver
+      ? await this.#handleGameOver(game, wonAmount)
+      : undefined
 
-      switch (action) {
-        case "stand": {
-          game.dispatch(actions.stand({ position: handSide }))
-          break
-        }
-        case "hit": {
-          game.dispatch(actions.hit({ position: handSide }))
-          break
-        }
-        case "surrender": {
-          game.dispatch(actions.surrender())
-          break
-        }
-        case "double": {
-          game.dispatch(actions.double({ position: handSide }))
-          break
-        }
-        case "split": {
-          game.dispatch(actions.split())
-          break
-        }
-        default: {
-          console.log("ACTION NOT IMPLEMENTED", action)
-          break
-        }
-      }
+    const nextResponse = await interaction.editReply({
+      embeds: [
+        {
+          ...embed,
+          description,
+        },
+      ],
+      components,
+    })
 
-      const state = game.getState()
+    this.#updateCache(game, nextResponse)
 
-      // #############################################################################
-      // Modify credits
-      // #############################################################################
-      if (["double", "split"].includes(action)) {
-        await this.#creditsModel.modifyCredits({
-          userId: this.member.id,
-          byAmount: -state.initialBet,
-          isCasino: true,
-        })
-      }
+    if (gameOver) return
 
-      // #############################################################################
-      // Update the message and repeat
-      // #############################################################################
-      const { embed, components, gameOver, wonAmount } = this.#parseGame(game, {
-        canDouble: false,
-      })
+    // Continue the rabbit hole...
+    await this.#handleAwaitResponse(nextResponse, game)
+  }
 
-      const description = gameOver
-        ? await this.#handleGameOver(game, wonAmount)
-        : undefined
+  #getGameOverReply(game: Game, wallet: Wallet) {
+    const state = game.getState()
+    const lostAmount = state.finalBet || state.initialBet
 
-      const nextResponse = await interaction.editReply({
-        embeds: [
-          {
-            ...embed,
-            description,
-          },
-        ],
-        components,
-      })
-
-      this.#updateCache(game, nextResponse)
-
-      if (!gameOver) {
-        // Continue the rabbit hole...
-        await this.#handleAwaitResponse(nextResponse, game)
-      }
-    } catch (error) {
-      this.#updateCache(game, null)
-
-      if ((error as Error).name.includes("InteractionCollectorError")) {
-        const wallet = await this.#creditsModel.getWallet(this.member.id)
-        const state = game.getState()
-        const lostAmount = state.finalBet || state.initialBet
-
-        await this.reply({
-          embeds: [
-            {
-              color: this.member.displayColor,
-              description: joinAsLines(
-                `**No action within 5 minutes, you lost ${formatCredits(
-                  lostAmount,
-                )}**`,
-                `You have ${formatCredits(wallet.credits)} now`,
-              ),
-            },
-          ],
-          components: [],
-        })
-      } else {
-        await this.#handleRefund(game, error as Error)
-      }
+    return {
+      embeds: [
+        {
+          color: this.member.displayColor,
+          description: joinAsLines(
+            `**No action within 5 minutes, you lost ${formatCredits(
+              lostAmount,
+            )}**`,
+            `You have ${formatCredits(wallet.credits)} now`,
+          ),
+        },
+      ],
+      components: [],
     }
   }
 
@@ -317,7 +319,7 @@ export default class BlackjackCommand extends BaseCommand {
       }
     }
 
-    const result = formatCredits(wonAmount > 0 ? receivedAmount : bet, {
+    const result = formatCredits(receivedAmount > 0 ? receivedAmount : bet, {
       withTimes: wonAmount > 0 ? wonAmount / bet : 0,
     })
 

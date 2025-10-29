@@ -109,40 +109,10 @@ export default class JacksBetterCommand extends BaseCommand {
 
     this.#updateCache(true, response ?? null)
 
-    if (!response) {
-      await this.#handleRefund(game)
-      return
-    }
-
-    await this.#handleResponse(response, game)
-  }
-
-  async #handleResponse(response: Message, game: JacksBetter) {
     try {
-      const interaction = await response.awaitMessageComponent({
-        componentType: ComponentType.StringSelect,
-        time: 5 * 60_000, // 5 minutes
-        filter: (i) => i.user.id === this.user.id,
-      })
+      assert(!!response, "No response")
 
-      // Toggle card state
-      for (const card of game.cards) {
-        game.setCardHold(card.id, interaction.values.includes(card.id))
-      }
-
-      // Draw new cards and end the game
-      const result = game.draw()
-
-      // Adjust credits
-      const wallet = await this.#creditsModel.modifyCredits({
-        userId: this.member.id,
-        byAmount: result.winAmount,
-        isCasino: true,
-      })
-
-      await this.reply(this.#getDrawReply(result, wallet))
-
-      this.#updateCache(false, null)
+      await this.#handleResponse(response, game)
     } catch (error) {
       this.#updateCache(false, null)
 
@@ -154,6 +124,36 @@ export default class JacksBetterCommand extends BaseCommand {
         await this.#handleRefund(game, error as Error)
       }
     }
+  }
+
+  async #handleResponse(response: Message, game: JacksBetter) {
+    const stringSelectMenuInteraction = await response.awaitMessageComponent({
+      componentType: ComponentType.StringSelect,
+      time: 5 * 60_000, // 5 minutes
+      filter: (i) => i.user.id === this.user.id,
+    })
+
+    // Toggle card state
+    for (const card of game.cards) {
+      game.setCardHold(
+        card.id,
+        stringSelectMenuInteraction.values.includes(card.id),
+      )
+    }
+
+    // Draw new cards and end the game
+    const result = game.draw()
+
+    // Adjust credits
+    const wallet = await this.#creditsModel.modifyCredits({
+      userId: this.member.id,
+      byAmount: result.winAmount,
+      isCasino: true,
+    })
+
+    this.#updateCache(false, null)
+
+    await this.reply(this.#getDrawReply(result, wallet))
   }
 
   #getDrawReply(
