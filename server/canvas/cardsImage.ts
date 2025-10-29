@@ -10,61 +10,63 @@ const CARD_SUIT = new Map<JbCard["suit"], string>([
   ["diamonds", "♦"],
 ])
 
-export const getJbCardsImage = ({
+export const getCardsImage = ({
   cards,
   small,
 }: {
-  cards: JbCard[]
+  cards: Pick<JbCard, "suit" | "value" | "isHeld">[]
   small?: boolean
 }): Buffer => {
-  const SIZE_MULTI = small ? 0.66 : 1
-  const HEADER_HEIGHT = 8 * SIZE_MULTI
-  const CARD_WIDTH = 45 * SIZE_MULTI
-  const CARD_HEIGHT = 60 * SIZE_MULTI
-  const CARD_RADII = Math.max(8, CARD_HEIGHT * 0.1)
-  const CARD_PADDING = CARD_WIDTH * 0.1
-  const CARDS_GAP = CARD_WIDTH * 0.2
+  const hasHeld = cards.some((card) => card.isHeld)
 
-  const width = CARD_WIDTH * cards.length + CARDS_GAP * (cards.length - 1)
-  const height = HEADER_HEIGHT + CARD_HEIGHT + 1
+  const sizeMulti = small ? 0.66 : 1
+  const headerHeight = hasHeld ? 8 * sizeMulti : 0
+  const cardWidth = 45 * sizeMulti
+  const cardHeight = 60 * sizeMulti
+  const cardRadii = Math.max(8, cardHeight * 0.1)
+  const cardPadding = cardWidth * 0.1
+  const cardsGap = cardWidth * 0.2
+
+  const width = cardWidth * cards.length + cardsGap * (cards.length - 1)
+  const height = headerHeight + cardHeight + 1
 
   const canvas = createCanvas(width, height)
   const ctx = canvas.getContext("2d")
 
   let x = 0
-  const y = HEADER_HEIGHT
+  const y = headerHeight
   for (const card of cards) {
     // Value
     ctx.fillStyle = "#fff"
 
     ctx.arc(0, 0, 20, 0, Math.PI * 2)
     ctx.beginPath()
-    ctx.roundRect(x, y, CARD_WIDTH, CARD_HEIGHT, CARD_RADII)
+    ctx.roundRect(x, y, cardWidth, cardHeight, cardRadii)
     ctx.fill()
 
     // Suit
     ctx.textBaseline = "top"
     ctx.fillStyle = ["hearts", "diamonds"].includes(card.suit) ? "#F00" : "#000"
 
-    const valueSize = CARD_HEIGHT * 0.5
+    const valueSize = cardHeight * 0.5
     ctx.font = canvasFont(valueSize, { bold: true })
     ctx.letterSpacing = `${-valueSize * 0.2}px`
-    ctx.fillText(card.value, x + CARD_PADDING, y + CARD_PADDING)
+    ctx.fillText(card.value, x + cardPadding, y + cardPadding)
 
-    const suitSize = CARD_HEIGHT * 0.5
+    const suitSize = cardHeight * 0.5
     ctx.font = canvasFont(suitSize, { family: "" })
     const suit = CARD_SUIT.get(card.suit)!
     const suitMetrics = ctx.measureText(suit)
 
     ctx.fillText(
       suit,
-      x + CARD_WIDTH - CARD_PADDING - suitMetrics.actualBoundingBoxRight,
-      y + CARD_HEIGHT - CARD_PADDING - suitMetrics.actualBoundingBoxDescent,
+      x + cardWidth - cardPadding - suitMetrics.actualBoundingBoxRight,
+      y + cardHeight - cardPadding - suitMetrics.actualBoundingBoxDescent,
     )
 
     // Hold label
-    if (card.isHeld) {
-      const labelSize = HEADER_HEIGHT
+    if (hasHeld && card.isHeld) {
+      const labelSize = headerHeight
       ctx.fillStyle = "#fff"
       ctx.letterSpacing = `${labelSize * 0.2}px`
       ctx.font = canvasFont(labelSize, { bold: true })
@@ -72,13 +74,13 @@ export const getJbCardsImage = ({
       const labelMetrics = ctx.measureText(label)
       ctx.fillText(
         label,
-        x + CARD_WIDTH / 2 - labelMetrics.actualBoundingBoxRight / 2,
+        x + cardWidth / 2 - labelMetrics.actualBoundingBoxRight / 2,
         0,
       )
     }
 
     // Prepare next
-    x += CARD_WIDTH + CARDS_GAP
+    x += cardWidth + cardsGap
   }
 
   return canvas.toBuffer("image/png")

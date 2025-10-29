@@ -12,7 +12,7 @@ import {
 import { OPTION_DESCRIPTION_AMOUNT, Unicode } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { CacheKey } from "~/server/cache"
-import { getJbCardsImage } from "~/server/canvas/jbCardsImage"
+import { getCardsImage } from "~/server/canvas/cardsImage"
 import { CreditsModel, Wallet } from "~/server/db/model/Credits"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
@@ -155,9 +155,8 @@ export default class JacksBetterCommand extends BaseCommand {
     return {
       files: [
         new AttachmentBuilder(
-          getJbCardsImage({ cards: result.cards, small: true }),
-          { name: "cards.png" },
-        ),
+          getCardsImage({ cards: result.cards, small: true }),
+        ).setName("cards.png"),
       ],
       components: [
         new ContainerBuilder()
@@ -227,7 +226,7 @@ export default class JacksBetterCommand extends BaseCommand {
   #getDealReply(game: JacksBetter): InteractionEditReplyOptions {
     return {
       files: [
-        new AttachmentBuilder(getJbCardsImage({ cards: game.cards }), {
+        new AttachmentBuilder(getCardsImage({ cards: game.cards }), {
           name: "cards.png",
         }),
       ],

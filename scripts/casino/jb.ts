@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises"
 import path from "node:path"
 
-import { getJbCardsImage } from "~/server/canvas/jbCardsImage"
+import { getCardsImage } from "~/server/canvas/cardsImage"
 import { JacksBetter } from "~/server/utils/jacksbetter"
 
 const run = async () => {
@@ -25,7 +25,7 @@ const run = async () => {
   console.log(game.cards.map((card) => card.id))
   console.log(draw.handName)
 
-  const image = getJbCardsImage({ cards: game.cards, small: true })
+  const image = getCardsImage({ cards: game.cards, small: true })
   await writeFile(path.join(__dirname, "jb.png"), image as unknown as string)
 }
 
