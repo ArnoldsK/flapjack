@@ -26,7 +26,7 @@ export const getJbCardsImage = ({
   const CARDS_GAP = CARD_WIDTH * 0.2
 
   const width = CARD_WIDTH * cards.length + CARDS_GAP * (cards.length - 1)
-  const height = HEADER_HEIGHT + CARD_HEIGHT
+  const height = HEADER_HEIGHT + CARD_HEIGHT + 1
 
   const canvas = createCanvas(width, height)
   const ctx = canvas.getContext("2d")
