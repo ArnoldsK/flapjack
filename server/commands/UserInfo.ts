@@ -16,7 +16,7 @@ enum OptionName {
 }
 
 export default class UserInfoCommand extends BaseCommand {
-  static version = 2
+  static version = 3
 
   static command = new SlashCommandBuilder()
     .setName("userinfo")
@@ -26,10 +26,7 @@ export default class UserInfoCommand extends BaseCommand {
         .setName(SubcommandName.User)
         .setDescription("Get your or other user information")
         .addUserOption((option) =>
-          option
-            .setName(OptionName.User)
-            .setDescription("Choose a user")
-            .setRequired(true),
+          option.setName(OptionName.User).setDescription("Choose a user"),
         ),
     )
     .addSubcommand((subcommand) =>
