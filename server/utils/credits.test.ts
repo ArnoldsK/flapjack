@@ -1,3 +1,4 @@
+import { Unicode } from "~/constants"
 import {
   formatCredits,
   formatCreditsAmount,
@@ -84,8 +85,16 @@ test("formatCreditsAmount", () => {
     amount: 12.1,
     suffix: "K",
   })
+  expect(formatCreditsAmount(99_999)).toStrictEqual({
+    amount: 99.9,
+    suffix: "K",
+  })
   expect(formatCreditsAmount(123_123)).toStrictEqual({
     amount: 123.1,
+    suffix: "K",
+  })
+  expect(formatCreditsAmount(999_999)).toStrictEqual({
+    amount: 999.9,
     suffix: "K",
   })
   expect(formatCreditsAmount(1_123_123)).toStrictEqual({
@@ -132,4 +141,7 @@ test("formatCredits", () => {
   )
   expect(formatCredits(-100_133_287_524)).toBe("-100B")
   expect(formatCredits(-100_133_287_524n)).toBe("-100B")
+  expect(formatCredits(1000, { withTimes: 2.5 })).toBe(
+    `1000${Unicode.times}2.5 <:Coins250:1204533921652412487>`,
+  )
 })

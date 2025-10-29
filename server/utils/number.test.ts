@@ -1,4 +1,4 @@
-import { getPercentageChangeString, scaleToHeight, scaleToMax } from "./number"
+import { getPercentageChangeString, toFixedDecimals } from "./number"
 
 test("getPercentageChangeString()", () => {
   expect(
@@ -9,14 +9,7 @@ test("getPercentageChangeString()", () => {
   ).toBe("+20%")
 })
 
-test("scaleToMax()", () => {
-  const s = scaleToMax(300, 100, 10)
-
-  expect([s.width, s.height]).toEqual([10, 3])
-})
-
-test("scaleToHeight()", () => {
-  const s = scaleToHeight(300, 100, 10)
-
-  expect([s.width, s.height]).toEqual([30, 10])
+test("toFixedDecimals()", () => {
+  expect(toFixedDecimals(99.999, 1)).toBe(99.9)
+  expect(toFixedDecimals(0, 1)).toBe(0)
 })

@@ -1,5 +1,6 @@
 import { Unicode } from "~/constants"
 import { assert } from "~/server/utils/error"
+import { multiplyBigInt, toFixedDecimals } from "~/server/utils/number"
 
 export const getCreditsEmoji = (value: bigint | number): string => {
   const minValueMap = {
@@ -32,83 +33,77 @@ export const formatCreditsAmount = (
 } => {
   const isNegative = value < 0
 
-  if (typeof value === "number") {
-    value = Math.abs(Math.floor(value))
-  } else if (isNegative) {
-    value = value * -1n // abs the bigint
+  if (typeof value !== "number") {
+    value = Number(value)
   }
 
+  value = Math.abs(Math.floor(value))
+
   const items: Array<{
-    from: bigint
-    to: bigint | number
+    from: number
+    to: number
     suffix: AmountSuffix | null
-    multiplier: bigint
+    multiplier: number
     decimals: number
   }> = [
     {
-      from: BigInt("0"),
-      to: BigInt("9999"),
+      from: 0,
+      to: 9999,
       suffix: null,
-      multiplier: BigInt("1"),
+      multiplier: 1,
       decimals: 0,
     },
     {
-      from: BigInt("10000"),
-      to: BigInt("999999"),
+      from: 10_000,
+      to: 999_999,
       suffix: "K",
-      multiplier: BigInt("1000"),
+      multiplier: 1000,
       decimals: 1,
     },
     {
-      from: BigInt("1000000"),
-      to: BigInt("9999999"),
+      from: 1_000_000,
+      to: 9_999_999,
       suffix: "M",
-      multiplier: BigInt("1000000"),
+      multiplier: 1_000_000,
       decimals: 2,
     },
     {
-      from: BigInt("10000000"),
-      to: BigInt("99999999"),
+      from: 10_000_000,
+      to: 99_999_999,
       suffix: "M",
-      multiplier: BigInt("1000000"),
+      multiplier: 1_000_000,
       decimals: 1,
     },
     {
-      from: BigInt("100000000"),
-      to: BigInt("999999999"),
+      from: 100_000_000,
+      to: 999_999_999,
       suffix: "M",
-      multiplier: BigInt("1000000"),
+      multiplier: 1_000_000,
       decimals: 0, // By this point we don't care about decimals
     },
     {
-      from: BigInt("1000000000"),
-      to: BigInt("999999999999"),
+      from: 1_000_000_000,
+      to: 999_999_999_999,
       suffix: "B",
-      multiplier: BigInt("1000000000"),
+      multiplier: 1_000_000_000,
       decimals: 0,
     },
     {
-      from: BigInt("1000000000000"),
+      from: 1_000_000_000_000,
       to: Infinity,
       suffix: "T",
-      multiplier: BigInt("1000000000000"),
+      multiplier: 1_000_000_000_000,
       decimals: 0,
     },
   ]
 
   const item = items.find(({ from, to }) => {
-    return value >= from && value < to
+    return value >= from && value <= to
   })
 
-  const maxDecimals = items
-    .map((i) => i.decimals)
-    .reduce((a, b) => Math.max(a, b), 0)
-  const decimalsMultiplier = BigInt(10 ** maxDecimals)
-  const divider = item?.multiplier ?? BigInt(1)
-  const amountWithMaxDecimals =
-    Number((BigInt(value) * decimalsMultiplier) / divider) / 100
+  const divider = item?.multiplier ?? 1
   const amount =
-    Number.parseFloat(amountWithMaxDecimals.toFixed(item?.decimals ?? 0)) *
+    toFixedDecimals(value / divider, item?.decimals ?? 0) *
     (isNegative ? -1 : 1)
 
   return {
@@ -127,7 +122,7 @@ export const formatCredits = (
     return "no credits"
   }
 
-  const emoji = getCreditsEmoji(BigInt(value) * BigInt(options?.withTimes ?? 1))
+  const emoji = getCreditsEmoji(multiplyBigInt(value, options?.withTimes ?? 1))
   const times =
     options?.withTimes && options.withTimes > 1
       ? `${Unicode.times}${options.withTimes}`

@@ -1,3 +1,5 @@
+import { assert } from "~/server/utils/error"
+
 export const clamp = (value: number, min: number, max: number): number => {
   return Math.max(Math.min(value, Math.max(min, max)), Math.min(min, max))
 }
@@ -32,47 +34,25 @@ export const getPercentageChangeString = ({
   return `${sign}${percentageChange}%`
 }
 
-/**
- * Scales width and height to at most one max dimension.
- *
- * @example
- * scaleToMax(300, 100, 10) // { width: 10, height: 3 }
- */
-export const scaleToMax = (
-  width: number,
-  height: number,
-  maxDimension: number,
-): {
-  width: number
-  height: number
-  scaleFactor: number
-} => {
-  const scaleFactor = maxDimension / Math.max(width, height)
-
-  return {
-    width: Math.round(width * scaleFactor),
-    height: Math.round(height * scaleFactor),
-    scaleFactor,
+export const multiplyBigInt = (
+  value: number | bigint,
+  multi: number,
+): bigint => {
+  if (typeof value !== "number") {
+    value = Number(value)
   }
+
+  return BigInt(Math.round(value * multi))
 }
 
 /**
- * Scales width and height to match given height exactly.
+ * The native Number.toFixed() returns a rounded number, which is not always wanted!
  */
-export const scaleToHeight = (
-  width: number,
-  height: number,
-  targetHeight: number,
-): {
-  width: number
-  height: number
-  scaleFactor: number
-} => {
-  const scaleFactor = targetHeight / height
+export const toFixedDecimals = (value: number, decimals: number): number => {
+  assert(decimals >= 0, "Decimals must be non-negative")
 
-  return {
-    width: Math.round(width * scaleFactor),
-    height: Math.round(height * scaleFactor),
-    scaleFactor,
-  }
+  const [whole, fraction] = String(value).split(".")
+  const result = `${whole}.${(fraction ?? "").slice(0, decimals)}`
+
+  return Number.parseFloat(result)
 }
