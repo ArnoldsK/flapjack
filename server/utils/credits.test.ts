@@ -137,11 +137,11 @@ test("formatCreditsAmount", () => {
 
 test("formatCredits", () => {
   expect(formatCredits(100_133_287_524)).toBe(
-    "100B <:Coins10000:1204533924559065099>",
+    `100B${Unicode.thinSpace}<:Coins10000:1204533924559065099>`,
   )
   expect(formatCredits(-100_133_287_524)).toBe("-100B")
   expect(formatCredits(-100_133_287_524n)).toBe("-100B")
   expect(formatCredits(1000, { withTimes: 2.5 })).toBe(
-    `1000${Unicode.times}2.5 <:Coins250:1204533921652412487>`,
+    `1000${Unicode.times}2.5${Unicode.thinSpace}<:Coins250:1204533921652412487>`,
   )
 })
