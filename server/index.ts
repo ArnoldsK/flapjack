@@ -114,15 +114,19 @@ nextApp.prepare().then(async () => {
         await command.handleExecute(instance)
       } catch (error) {
         const content = (error as Error).message
-        const options = instance.isComponentsV2
-          ? {
-              components: [new TextDisplayBuilder().setContent(content)],
-            }
-          : { content }
 
-        await (interaction.deferred
-          ? interaction.editReply(options)
-          : interaction.reply({ flags: [MessageFlags.Ephemeral], ...options }))
+        if (interaction.deferred) {
+          await interaction.editReply(
+            instance.isComponentsV2
+              ? {
+                  flags: [MessageFlags.IsComponentsV2],
+                  components: [new TextDisplayBuilder().setContent(content)],
+                }
+              : content,
+          )
+        } else {
+          await interaction.reply({ flags: [MessageFlags.Ephemeral], content })
+        }
       }
     }
   })
@@ -138,9 +142,7 @@ nextApp.prepare().then(async () => {
     client.on(event.name, async (...args) => {
       try {
         await Promise.all(
-          event.callbacks.map((callback) => {
-            return Reflect.apply(callback, null, [context, ...args])
-          }),
+          event.callbacks.map((callback) => callback(context, ...args)),
         )
       } catch (error) {
         console.error(error)
