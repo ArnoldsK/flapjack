@@ -86,57 +86,56 @@ export default class BlackjackCommand extends BaseCommand {
 
     const game = this.#getNewGame()
 
-    // #############################################################################
-    // Prepare credits
-    // #############################################################################
-    const wallet = await this.#creditsModel.getWallet(this.member.id)
-
-    const rawAmount = this.interaction.options.getString(
-      OptionName.Amount,
-      true,
-    )
-    const amount = parseCreditsAmount(rawAmount, wallet.credits)
-
-    // #############################################################################
-    // Handle the game
-    // #############################################################################
-
-    game.dispatch(actions.deal({ bet: amount }))
-
-    const newWallet = await this.#creditsModel.modifyCredits({
-      userId: this.member.id,
-      byAmount: -amount,
-      isCasino: true,
-    })
-    const canDouble = newWallet.credits >= amount
-
-    const { embed, components, gameOver, wonAmount } = this.#parseGame(game, {
-      canDouble,
-    })
-
-    const description = gameOver
-      ? await this.#handleGameOver(game, wonAmount)
-      : undefined
-
-    const response = await this.reply({
-      embeds: [
-        {
-          ...embed,
-          description,
-          footer:
-            this.isEphemeral && !gameOver
-              ? {
-                  text: "Dismissing message counts as a loss",
-                }
-              : undefined,
-        },
-      ],
-      components,
-    })
-
-    if (gameOver) return
-
     try {
+      // #############################################################################
+      // Prepare credits
+      // #############################################################################
+      const wallet = await this.#creditsModel.getWallet(this.member.id)
+
+      const rawAmount = this.interaction.options.getString(
+        OptionName.Amount,
+        true,
+      )
+      const amount = parseCreditsAmount(rawAmount, wallet.credits)
+
+      // #############################################################################
+      // Handle the game
+      // #############################################################################
+      game.dispatch(actions.deal({ bet: amount }))
+
+      const newWallet = await this.#creditsModel.modifyCredits({
+        userId: this.member.id,
+        byAmount: -amount,
+        isCasino: true,
+      })
+      const canDouble = newWallet.credits >= amount
+
+      const { embed, components, gameOver, wonAmount } = this.#parseGame(game, {
+        canDouble,
+      })
+
+      const description = gameOver
+        ? await this.#handleGameOver(game, wonAmount)
+        : undefined
+
+      const response = await this.reply({
+        embeds: [
+          {
+            ...embed,
+            description,
+            footer:
+              this.isEphemeral && !gameOver
+                ? {
+                    text: "Dismissing message counts as a loss",
+                  }
+                : undefined,
+          },
+        ],
+        components,
+      })
+
+      if (gameOver) return
+
       assert(!!response, "No response")
 
       // Begin the rabbit hole...
