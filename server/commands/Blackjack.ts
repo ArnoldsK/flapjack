@@ -24,7 +24,7 @@ import { CreditsModel, Wallet } from "~/server/db/model/Credits"
 import { isNonNullish } from "~/server/utils/boolean"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
-import { assert } from "~/server/utils/error"
+import { assert, isInteractionCollectorError } from "~/server/utils/error"
 import { joinAsLines, ucFirst } from "~/server/utils/string"
 
 type Action = keyof typeof actions
@@ -141,7 +141,7 @@ export default class BlackjackCommand extends BaseCommand {
       // Begin the rabbit hole...
       await this.#handleAwaitResponse(response, game)
     } catch (error) {
-      if ((error as Error).name.includes("InteractionCollectorError")) {
+      if (isInteractionCollectorError(error)) {
         const wallet = await this.#creditsModel.getWallet(this.member.id)
 
         await this.reply(this.#getGameOverReply(game, wallet))

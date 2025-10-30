@@ -15,7 +15,7 @@ import { getCardsAttachment } from "~/server/canvas/cardsAttachment"
 import { CreditsModel, Wallet } from "~/server/db/model/Credits"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
-import { assert } from "~/server/utils/error"
+import { assert, isInteractionCollectorError } from "~/server/utils/error"
 import { JacksBetter, JbCard, JbDrawResult } from "~/server/utils/jacksbetter"
 import { joinAsLines } from "~/server/utils/string"
 
@@ -95,7 +95,7 @@ export default class JacksBetterCommand extends BaseCommand {
 
       await this.#handleResponse(response, game)
     } catch (error) {
-      if ((error as Error).name.includes("InteractionCollectorError")) {
+      if (isInteractionCollectorError(error)) {
         const wallet = await this.#creditsModel.getWallet(this.member.id)
 
         await this.reply(this.#getTimedOutReply(game, wallet))
