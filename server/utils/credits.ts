@@ -44,56 +44,48 @@ export const formatCreditsAmount = (
     to: number
     suffix: AmountSuffix | null
     multiplier: number
-    decimals: number
   }> = [
     {
       from: 0,
       to: 9999,
       suffix: null,
       multiplier: 1,
-      decimals: 0,
     },
     {
       from: 10_000,
       to: 999_999,
       suffix: "K",
       multiplier: 1000,
-      decimals: 1,
     },
     {
       from: 1_000_000,
       to: 9_999_999,
       suffix: "M",
       multiplier: 1_000_000,
-      decimals: 2,
     },
     {
       from: 10_000_000,
       to: 99_999_999,
       suffix: "M",
       multiplier: 1_000_000,
-      decimals: 1,
     },
     {
       from: 100_000_000,
       to: 999_999_999,
       suffix: "M",
       multiplier: 1_000_000,
-      decimals: 0, // By this point we don't care about decimals
     },
     {
       from: 1_000_000_000,
       to: 999_999_999_999,
       suffix: "B",
       multiplier: 1_000_000_000,
-      decimals: 0,
     },
     {
       from: 1_000_000_000_000,
       to: Infinity,
       suffix: "T",
       multiplier: 1_000_000_000_000,
-      decimals: 0,
     },
   ]
 
@@ -102,9 +94,27 @@ export const formatCreditsAmount = (
   })
 
   const divider = item?.multiplier ?? 1
-  const amount =
-    toFixedDecimals(value / divider, item?.decimals ?? 0) *
-    (isNegative ? -1 : 1)
+  const dividedValue = value / divider
+
+  const integerLength = String(Math.floor(dividedValue)).length
+
+  let decimals = 0
+  if (integerLength === 1) {
+    // e.g., 1.23K, 123,000 / 1000 = 123.0. integerLength is 3.
+    // e.g., 1.12M, 1,123,123 / 1,000,000 = 1.123123. integerLength is 1.
+    // Max 3 significant digits: 3 - 1 = 2 decimal places (e.g., 1.12)
+    decimals = 2
+  } else if (integerLength === 2) {
+    // e.g., 12.1K, 12,123 / 1000 = 12.123. integerLength is 2.
+    // Max 3 significant digits: 3 - 2 = 1 decimal place (e.g., 12.1)
+    decimals = 1
+  } else if (integerLength >= 3) {
+    // e.g., 123K, 123,123 / 1000 = 123.123. integerLength is 3.
+    // Max 3 significant digits: 3 - 3 = 0 decimal places (e.g., 123)
+    decimals = 0
+  }
+
+  const amount = toFixedDecimals(dividedValue, decimals) * (isNegative ? -1 : 1)
 
   return {
     amount,

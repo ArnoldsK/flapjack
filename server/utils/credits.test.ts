@@ -54,7 +54,7 @@ test("formatCreditsAmount", () => {
     suffix: "B",
   })
   expect(formatCreditsAmount(-123_123)).toStrictEqual({
-    amount: -123.1,
+    amount: -123,
     suffix: "K",
   })
   expect(formatCreditsAmount(0)).toStrictEqual({
@@ -90,11 +90,11 @@ test("formatCreditsAmount", () => {
     suffix: "K",
   })
   expect(formatCreditsAmount(123_123)).toStrictEqual({
-    amount: 123.1,
+    amount: 123,
     suffix: "K",
   })
   expect(formatCreditsAmount(999_999)).toStrictEqual({
-    amount: 999.9,
+    amount: 999,
     suffix: "K",
   })
   expect(formatCreditsAmount(1_123_123)).toStrictEqual({
@@ -114,11 +114,11 @@ test("formatCreditsAmount", () => {
     suffix: "M",
   })
   expect(formatCreditsAmount(1_123_123_123)).toStrictEqual({
-    amount: 1,
+    amount: 1.12,
     suffix: "B",
   })
   expect(formatCreditsAmount(12_123_123_123)).toStrictEqual({
-    amount: 12,
+    amount: 12.1,
     suffix: "B",
   })
   expect(formatCreditsAmount(123_123_123_123)).toStrictEqual({
@@ -126,11 +126,11 @@ test("formatCreditsAmount", () => {
     suffix: "B",
   })
   expect(formatCreditsAmount(1_123_123_123_123)).toStrictEqual({
-    amount: 1,
+    amount: 1.12,
     suffix: "T",
   })
   expect(formatCreditsAmount(12_123_123_123_123)).toStrictEqual({
-    amount: 12,
+    amount: 12.1,
     suffix: "T",
   })
 })
@@ -139,8 +139,8 @@ test("formatCredits", () => {
   expect(formatCredits(100_133_287_524)).toBe(
     `100B${Unicode.thinSpace}<:Coins10000:1204533924559065099>`,
   )
-  expect(formatCredits(-100_133_287_524)).toBe("-100B")
-  expect(formatCredits(-100_133_287_524n)).toBe("-100B")
+  expect(formatCredits(-100_133_287_524)).toBe("-100.1B")
+  expect(formatCredits(-100_133_287_524n)).toBe("-100.1B")
   expect(formatCredits(1000, { withTimes: 2.5 })).toBe(
     `1000${Unicode.times}2.5${Unicode.thinSpace}<:Coins250:1204533921652412487>`,
   )
