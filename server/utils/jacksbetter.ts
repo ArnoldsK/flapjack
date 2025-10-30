@@ -118,9 +118,7 @@ export class JacksBetter {
     // Inject RoyalFlush as it's not there by default
     hand.game.handValues.unshift(PokerSolver.RoyalFlush)
 
-    const [winner] = PokerSolver.Hand.winners([hand]) as PokerSolverWinner[]
-
-    return this.#getWinnerHandName(winner)
+    return this.#getWinnerHandName(hand)
   }
 
   deal({ bet }: { bet: number }) {
