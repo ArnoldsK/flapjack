@@ -23,8 +23,6 @@ enum OptionName {
   Amount = "amount",
 }
 
-const VALUE_NONE = "none"
-
 export default class JacksBetterCommand extends BaseCommand {
   static version = 1
 
@@ -255,11 +253,18 @@ export default class JacksBetterCommand extends BaseCommand {
                   })),
                   {
                     label: "None",
-                    value: VALUE_NONE,
+                    value: "none",
+                  },
+                  // This is a hack to remedy the annoying Discord UI/UX
+                  {
+                    label: "Hold",
+                    value: "placeholder",
+                    // Set as always selected so the select doesn't jump on value change
+                    default: true,
                   },
                 ])
                 .setMinValues(1)
-                .setMaxValues(5),
+                .setMaxValues(game.cards.length + 1),
             ),
           )
           .addTextDisplayComponents(
