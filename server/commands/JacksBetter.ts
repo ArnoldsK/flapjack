@@ -1,5 +1,4 @@
 import {
-  AttachmentBuilder,
   ComponentType,
   ContainerBuilder,
   InteractionEditReplyOptions,
@@ -12,7 +11,7 @@ import {
 import { OPTION_DESCRIPTION_AMOUNT, Unicode } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { CacheKey } from "~/server/cache"
-import { getCardsImage } from "~/server/canvas/cardsImage"
+import { getCardsAttachment } from "~/server/canvas/cardsAttachment"
 import { CreditsModel, Wallet } from "~/server/db/model/Credits"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
@@ -104,7 +103,6 @@ export default class JacksBetterCommand extends BaseCommand {
         await this.#handleRefund(game, error as Error)
       }
     } finally {
-      console.log("Game end fully!")
       cache.uns("jacksbetter")
     }
   }
@@ -141,6 +139,8 @@ export default class JacksBetterCommand extends BaseCommand {
     result: JbDrawResult,
     wallet: Wallet,
   ): InteractionEditReplyOptions {
+    const attachment = getCardsAttachment({ cards: result.cards, small: true })
+
     let outcome: string
     if (result.handName) {
       outcome = `${result.handName}, you won`
@@ -153,17 +153,13 @@ export default class JacksBetterCommand extends BaseCommand {
     })
 
     return {
-      files: [
-        new AttachmentBuilder(
-          getCardsImage({ cards: result.cards, small: true }),
-        ).setName("cards.png"),
-      ],
+      files: [attachment],
       components: [
         new ContainerBuilder()
           .setAccentColor(this.member.displayColor)
           .addMediaGalleryComponents((mediaGallery) =>
             mediaGallery.addItems((mediaItem) =>
-              mediaItem.setURL("attachment://cards.png"),
+              mediaItem.setURL(`attachment://${attachment.name}`),
             ),
           )
           .addSeparatorComponents((separator) => separator)
@@ -224,18 +220,16 @@ export default class JacksBetterCommand extends BaseCommand {
   }
 
   #getDealReply(game: JacksBetter): InteractionEditReplyOptions {
+    const attachment = getCardsAttachment({ cards: game.cards })
+
     return {
-      files: [
-        new AttachmentBuilder(getCardsImage({ cards: game.cards }), {
-          name: "cards.png",
-        }),
-      ],
+      files: [attachment],
       components: [
         new ContainerBuilder()
           .setAccentColor(this.member.displayColor)
           .addMediaGalleryComponents((mediaGallery) =>
             mediaGallery.addItems((mediaItem) =>
-              mediaItem.setURL("attachment://cards.png"),
+              mediaItem.setURL(`attachment://${attachment.name}`),
             ),
           )
           .addTextDisplayComponents(

@@ -30,6 +30,7 @@
     "engine-blackjack-ts": "^0.9.11",
     "express": "^4.18.2",
     "get-image-colors": "^4.0.1",
+    "gif-encoder-2": "^1.0.5",
     "js-tiktoken": "^1.0.14",
     "mysql2": "^3.3.5",
     "next": "13.4.5",
