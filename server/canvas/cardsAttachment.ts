@@ -77,7 +77,7 @@ export const getCardsAttachment = ({
       )
 
       // Fake shadow
-      if (frame < frameCount / 1.5) {
+      if (frameCount > 1 && frame < frameCount / 1.5) {
         ctx.fillStyle = "rgba(0, 0, 0, 0.3)"
         ctx.beginPath()
         ctx.roundRect(cardX * 1.2, cardY, cardWidth, cardHeight, cardRadii)
