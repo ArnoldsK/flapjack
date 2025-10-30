@@ -115,9 +115,6 @@ export class JacksBetter {
     const cardIds = this.#cards.map((card) => card.id)
     const hand = PokerSolver.Hand.solve(cardIds, "jacksbetter")
 
-    // Inject RoyalFlush as it's not there by default
-    hand.game.handValues.unshift(PokerSolver.RoyalFlush)
-
     return this.#getWinnerHandName(hand)
   }
 
