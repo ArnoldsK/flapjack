@@ -115,7 +115,7 @@ export class JacksBetter {
     const cardIds = this.#cards.map((card) => card.id)
     const hand = PokerSolver.Hand.solve(cardIds, "jacksbetter")
 
-    return this.#getWinnerHandName(hand)
+    return this.#getHandName(hand)
   }
 
   deal({ bet }: { bet: number }) {
@@ -191,7 +191,7 @@ export class JacksBetter {
     return card
   }
 
-  #getWinnerHandName(winner: PokerSolverWinner): HandName | null {
+  #getHandName(winner: PokerSolverWinner): HandName | null {
     switch (winner.name) {
       case "Straight Flush": {
         if (winner.descr === "Royal Flush") {
