@@ -137,7 +137,7 @@ export const getCardsAttachment = ({
 
   encoder.finish()
 
-  return new AttachmentBuilder(encoder.out.getData()).setName(
-    frameCount > 1 ? "cards.gif" : "cards.png",
-  )
+  return new AttachmentBuilder(
+    frameCount > 1 ? encoder.out.getData() : canvas.toBuffer("image/png"),
+  ).setName(frameCount > 1 ? "cards.gif" : "cards.png")
 }
