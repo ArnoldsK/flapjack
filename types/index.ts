@@ -1,12 +1,10 @@
 import { EntityManager } from "@mikro-orm/core"
 import { Client, Guild } from "discord.js"
-import OpenAI from "openai"
 
 import CacheManager from "~/server/cache"
 
 export interface BaseContext {
   client: Client
-  openAI: OpenAI
   guild: () => Guild
   cache: CacheManager
   /**

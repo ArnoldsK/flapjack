@@ -18,11 +18,8 @@ const env = z
     LOCAL_COMMANDS: z.string().default("false"),
     WEB_ONLY: z.string().default("false"),
     GIPHY_API_KEY: z.string(),
-    OPENAI_API_KEY: z.string(),
     HOSTING_AUTH_NAME: z.string(),
     HOSTING_AUTH_TOKEN: z.string(),
-    GOOGLE_API_KEY: z.string(),
-    GOOGLE_CSE_ID: z.string(),
   })
   .parse(process.env)
 
@@ -63,14 +60,5 @@ export const appConfig = {
     url: "https://hosting.pepsidog.lv",
     authName: env.HOSTING_AUTH_NAME,
     authToken: env.HOSTING_AUTH_TOKEN,
-  },
-
-  openAI: {
-    apiKey: env.OPENAI_API_KEY,
-  },
-
-  google: {
-    apiKey: env.GOOGLE_API_KEY,
-    cseId: env.GOOGLE_CSE_ID,
   },
 }
