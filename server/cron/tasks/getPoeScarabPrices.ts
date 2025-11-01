@@ -13,7 +13,7 @@ export const getPoeScarabPrices: Task<PoeScarabData> = async (context) => {
   // #############################################################################
   let league = ""
   try {
-    const res = await fetch("https://poe.ninja/api/data/index-state")
+    const res = await fetch("https://poe.ninja/poe1/api/data/index-state")
     const data = await res.json()
     // yolo
     league = data.economyLeagues[0].name as string
