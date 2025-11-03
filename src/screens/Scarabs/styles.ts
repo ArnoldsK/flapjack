@@ -10,7 +10,8 @@ export const Wrap = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 32px;
+  gap: 20px;
+  margin-bottom: -80px;
 `
 
 export const Title = styled.h1`
@@ -41,7 +42,7 @@ export const Column = styled.div<ColumnProps>`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 14px;
+  gap: 4px;
 
   align-items: ${({ $align }) => {
     switch ($align) {
@@ -56,6 +57,17 @@ export const Column = styled.div<ColumnProps>`
       }
     }
   }};
+`
+
+export const GroupWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`
+
+export const GroupName = styled.div`
+  font-size: 12px;
+  color: #555;
 `
 
 export const Group = styled.div`

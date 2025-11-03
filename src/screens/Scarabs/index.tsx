@@ -40,17 +40,20 @@ export const ScarabsScreen = ({ data }: ScarabsScreenProps) => {
               {row.columns.map((column, columnIndex) => (
                 <S.Column key={columnIndex} $align={column.align}>
                   {column.groups.map((group, groupIndex) => (
-                    <S.Group key={groupIndex}>
-                      {group.map((name) => {
-                        const scarab = scarabByName.get(name)
+                    <S.GroupWrap key={groupIndex}>
+                      {!!group.name && <S.GroupName>{group.name}</S.GroupName>}
+                      <S.Group>
+                        {group.scarabs.map((name) => {
+                          const scarab = scarabByName.get(name)
 
-                        return scarab ? (
-                          <Scarab key={name} scarab={scarab} />
-                        ) : (
-                          <S.BlankScarab key={name} />
-                        )
-                      })}
-                    </S.Group>
+                          return scarab ? (
+                            <Scarab key={name} scarab={scarab} />
+                          ) : (
+                            <S.BlankScarab key={name} />
+                          )
+                        })}
+                      </S.Group>
+                    </S.GroupWrap>
                   ))}
                 </S.Column>
               ))}
