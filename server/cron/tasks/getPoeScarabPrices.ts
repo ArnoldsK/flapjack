@@ -1,65 +1,108 @@
-import { NinjaAPI } from "poe-api-manager"
 import { z } from "zod"
 
 import { StaticDataModel } from "~/server/db/model/StaticData"
-import { assert } from "~/server/utils/error"
+import { isNonNullish } from "~/server/utils/boolean"
 import { StaticDataType } from "~/types/entity"
 import { PoeScarab, PoeScarabData } from "~/types/poe"
 import { Task } from "~/types/tasks"
 
+const API_BASE_URL = "https://poe.ninja"
+const CDN_BASE_URL = "https://web.poecdn.com"
+
+const fetchJson = async <T extends z.ZodType>(
+  url: URL,
+  schema: T,
+): Promise<Awaited<z.TypeOf<T>>> => {
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "Scarab price data for a Discord server",
+    },
+  })
+  const json = await res.json()
+
+  return schema.parse(json)
+}
+
+const getLeagueName = async (): Promise<string> => {
+  const url = new URL("/poe1/api/data/index-state", API_BASE_URL)
+  url.searchParams.set("league", "Keepers")
+  url.searchParams.set("type", "Scarab")
+
+  const data = await fetchJson(
+    url,
+    z.object({
+      economyLeagues: z.array(
+        z.object({
+          name: z.string(),
+        }),
+      ),
+    }),
+  )
+
+  return data.economyLeagues[0].name
+}
+
+const getScarabData = async (league: string): Promise<PoeScarab[]> => {
+  const url = new URL(
+    "/poe1/api/economy/exchange/current/overview",
+    API_BASE_URL,
+  )
+  url.searchParams.set("league", league)
+  url.searchParams.set("type", "Scarab")
+
+  const data = await fetchJson(
+    url,
+    z.object({
+      lines: z.array(
+        z.object({
+          id: z.string(),
+          primaryValue: z.number(),
+        }),
+      ),
+      items: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          image: z.string(),
+        }),
+      ),
+    }),
+  )
+
+  return data.lines
+    .map((line) => {
+      const item = data.items.find((el) => el.id === line.id)
+      if (!item) {
+        return null
+      }
+
+      return {
+        name: item.name,
+        chaosValue: line.primaryValue,
+        icon: new URL(item.image, CDN_BASE_URL).toString(),
+      } satisfies PoeScarab
+    })
+    .filter(isNonNullish)
+}
+
 export const getPoeScarabPrices: Task<PoeScarabData> = async (context) => {
-  // #############################################################################
-  // Get active league
-  // #############################################################################
-  let league = ""
-  try {
-    const res = await fetch("https://poe.ninja/poe1/api/data/index-state")
-    const data = await res.json()
-    // yolo
-    league = data.economyLeagues[0].name as string
-  } catch {
-    // Shrug
+  const league = await getLeagueName()
+  const scarabs = await getScarabData(league)
+
+  const scarabData: PoeScarabData = {
+    league,
+    scarabs,
+    updatedAt: new Date(),
   }
-  assert(!!league, "Could not determine the active PoE league")
-
-  // #############################################################################
-  // Get scarab data
-  // #############################################################################
-  const api = new NinjaAPI(league)
-
-  const scarabDataRaw = await api.itemView.scarab.getData()
-  const scarabData = z
-    .array(
-      z.object({
-        name: z.string(),
-        chaosValue: z.number(),
-        icon: z.string().url(),
-      }),
-    )
-    .parse(scarabDataRaw)
 
   // #############################################################################
   // Save as static data
   // #############################################################################
   const model = new StaticDataModel(context)
-
-  const staticData: PoeScarabData = {
-    league,
-    scarabs: scarabData.map(
-      (scarab) =>
-        ({
-          name: scarab.name,
-          chaosValue: scarab.chaosValue,
-          icon: scarab.icon,
-        }) satisfies PoeScarab,
-    ),
-    updatedAt: new Date(),
-  }
-
-  await model.set(StaticDataType.PoeScarabs, staticData)
+  await model.set(StaticDataType.PoeScarabs, scarabData)
 
   // #############################################################################
   // Return data for manual updates
   // #############################################################################
-  return staticData
+  return scarabData
 }
