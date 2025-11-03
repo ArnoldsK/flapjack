@@ -26,7 +26,7 @@ export const Note = styled.div`
 export const Rows = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 4px;
 `
 
 export const Row = styled.div`
