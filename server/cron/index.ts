@@ -77,7 +77,7 @@ export const cronTasks: CronTask[] = [
   },
   {
     description: "Get PoE scarab prices",
-    expression: "every hour",
+    expression: "every 20 minutes",
     isRawExpression: false,
     productionOnly: true,
     task: getPoeScarabPrices,

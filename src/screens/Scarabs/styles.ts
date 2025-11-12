@@ -1,7 +1,5 @@
 import styled from "styled-components"
 
-import { checkUnreachable } from "~/server/utils/error"
-
 const SCARAB_SIZE = 40
 const SCARAB_PADDING = 4
 
@@ -35,28 +33,13 @@ export const Row = styled.div`
   gap: 28px;
 `
 
-interface ColumnProps {
-  $align: "left" | "center"
-}
-export const Column = styled.div<ColumnProps>`
+export const Column = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 4px;
 
-  align-items: ${({ $align }) => {
-    switch ($align) {
-      case "left": {
-        return "flex-start"
-      }
-      case "center": {
-        return "center"
-      }
-      default: {
-        checkUnreachable($align)
-      }
-    }
-  }};
+  align-items: center;
 `
 
 export const GroupWrap = styled.div`

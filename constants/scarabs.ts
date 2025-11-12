@@ -1,27 +1,36 @@
-interface Group {
-  name: string
-  scarabs: string[]
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace ScarabMapping {
+  export interface Group {
+    name: string
+    wide?: boolean
+    scarabs: string[]
+  }
+
+  export interface Column {
+    groups: Group[]
+  }
+
+  export interface Row {
+    gap: number
+    /**
+     * In the game, the last row is scuffed.
+     * Horned scarabs are shifted by 0.66 of scarab width to the right.
+     */
+    scuffed?: boolean
+    columns: Column[]
+  }
+
+  export interface Root {
+    rows: Row[]
+  }
 }
 
-interface Column {
-  align: "left" | "center"
-  groups: Group[]
-}
-
-interface Row {
-  columns: Column[]
-}
-
-interface ScarabMapping {
-  rows: Row[]
-}
-
-export const mapping: ScarabMapping = {
+export const mapping: ScarabMapping.Root = {
   rows: [
     {
+      gap: 30,
       columns: [
         {
-          align: "left",
           groups: [
             {
               name: "Titanic",
@@ -34,7 +43,6 @@ export const mapping: ScarabMapping = {
           ],
         },
         {
-          align: "left",
           groups: [
             {
               name: "Sulphite",
@@ -47,7 +55,6 @@ export const mapping: ScarabMapping = {
           ],
         },
         {
-          align: "left",
           groups: [
             {
               name: "Divination",
@@ -62,9 +69,9 @@ export const mapping: ScarabMapping = {
       ],
     },
     {
+      gap: 30,
       columns: [
         {
-          align: "left",
           groups: [
             {
               name: "Anarchy",
@@ -77,7 +84,6 @@ export const mapping: ScarabMapping = {
           ],
         },
         {
-          align: "left",
           groups: [
             {
               name: "Ritual",
@@ -90,7 +96,6 @@ export const mapping: ScarabMapping = {
           ],
         },
         {
-          align: "left",
           groups: [
             {
               name: "Harvest",
@@ -103,7 +108,6 @@ export const mapping: ScarabMapping = {
           ],
         },
         {
-          align: "left",
           groups: [
             {
               name: "Kalguuran",
@@ -118,9 +122,9 @@ export const mapping: ScarabMapping = {
       ],
     },
     {
+      gap: 40,
       columns: [
         {
-          align: "left",
           groups: [
             {
               name: "Bestiary",
@@ -143,7 +147,6 @@ export const mapping: ScarabMapping = {
           ],
         },
         {
-          align: "left",
           groups: [
             {
               name: "Influencing",
@@ -175,7 +178,6 @@ export const mapping: ScarabMapping = {
           ],
         },
         {
-          align: "left",
           groups: [
             {
               name: "Harbinger",
@@ -200,9 +202,9 @@ export const mapping: ScarabMapping = {
       ],
     },
     {
+      gap: 54,
       columns: [
         {
-          align: "left",
           groups: [
             {
               name: "Cartography",
@@ -257,7 +259,6 @@ export const mapping: ScarabMapping = {
           ],
         },
         {
-          align: "left",
           groups: [
             {
               name: "Beyond",
@@ -314,9 +315,9 @@ export const mapping: ScarabMapping = {
       ],
     },
     {
+      gap: 30,
       columns: [
         {
-          align: "left",
           groups: [
             {
               name: "Breach",
@@ -334,12 +335,14 @@ export const mapping: ScarabMapping = {
       ],
     },
     {
+      gap: 40,
+      scuffed: true,
       columns: [
         {
-          align: "left",
           groups: [
             {
               name: "Miscellaneous",
+              wide: true,
               scarabs: [
                 "Scarab of Monstrous Lineage",
                 "Scarab of Adversaries",
@@ -349,6 +352,7 @@ export const mapping: ScarabMapping = {
             },
             {
               name: "",
+              wide: true,
               scarabs: [
                 "Scarab of Stability",
                 "Scarab of Wisps",
@@ -359,10 +363,10 @@ export const mapping: ScarabMapping = {
           ],
         },
         {
-          align: "center",
           groups: [
             {
               name: "Horned",
+              wide: true,
               scarabs: [
                 "Horned Scarab of Bloodlines",
                 "Horned Scarab of Nemeses",
@@ -373,6 +377,7 @@ export const mapping: ScarabMapping = {
             },
             {
               name: "",
+              wide: true,
               scarabs: [
                 "Horned Scarab of Glittering",
                 "Horned Scarab of Pandemonium",

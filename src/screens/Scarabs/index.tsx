@@ -4,9 +4,9 @@ import absoluteUrl from "next-absolute-url"
 import { useMemo } from "react"
 import { useCopyToClipboard } from "react-use"
 
-import { mapping } from "./mapping"
 import * as S from "./styles"
 
+import { mapping } from "~/constants/scarabs"
 import { d } from "~/server/utils/date"
 import { Page } from "~/src/components/Page"
 import { PoeScarab, PoeScarabData } from "~/types/poe"
@@ -38,7 +38,7 @@ export const ScarabsScreen = ({ data }: ScarabsScreenProps) => {
           {mapping.rows.map((row, rowIndex) => (
             <S.Row key={rowIndex}>
               {row.columns.map((column, columnIndex) => (
-                <S.Column key={columnIndex} $align={column.align}>
+                <S.Column key={columnIndex}>
                   {column.groups.map((group, groupIndex) => (
                     <S.GroupWrap key={groupIndex}>
                       {!!group.name && <S.GroupName>{group.name}</S.GroupName>}
