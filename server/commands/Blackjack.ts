@@ -84,31 +84,40 @@ export default class BlackjackCommand extends BaseCommand {
 
     cache.set("blackjack", true)
 
-    const game = this.#getNewGame()
-
+    // #############################################################################
+    // Prepare credits
+    // #############################################################################
+    let amount
+    let canDouble
     try {
-      // #############################################################################
-      // Prepare credits
-      // #############################################################################
       const wallet = await this.#creditsModel.getWallet(this.member.id)
 
       const rawAmount = this.interaction.options.getString(
         OptionName.Amount,
         true,
       )
-      const amount = parseCreditsAmount(rawAmount, wallet.credits)
 
-      // #############################################################################
-      // Handle the game
-      // #############################################################################
-      game.dispatch(actions.deal({ bet: amount }))
+      amount = parseCreditsAmount(rawAmount, wallet.credits)
 
       const newWallet = await this.#creditsModel.modifyCredits({
         userId: this.member.id,
         byAmount: -amount,
         isCasino: true,
       })
-      const canDouble = newWallet.credits >= amount
+
+      canDouble = newWallet.credits >= amount
+    } catch (error) {
+      cache.uns("blackjack")
+      throw error
+    }
+
+    // #############################################################################
+    // Handle the game
+    // #############################################################################
+    const game = this.#getNewGame()
+
+    try {
+      game.dispatch(actions.deal({ bet: amount }))
 
       const { embed, components, gameOver, wonAmount } = this.#parseGame(game, {
         canDouble,

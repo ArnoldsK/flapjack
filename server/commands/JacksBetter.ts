@@ -61,24 +61,36 @@ export default class JacksBetterCommand extends BaseCommand {
 
     cache.set("jacksbetter", true)
 
-    const game = new JacksBetter()
-
+    // #############################################################################
+    // Prepare credits
+    // #############################################################################
+    let amount
     try {
-      // #############################################################################
-      // Prepare credits
-      // #############################################################################
       const wallet = await this.#creditsModel.getWallet(this.member.id)
 
       const rawAmount = this.interaction.options.getString(
         OptionName.Amount,
         true,
       )
-      const amount = parseCreditsAmount(rawAmount, wallet.credits)
 
-      // #############################################################################
-      // Handle the game
-      // #############################################################################
+      amount = parseCreditsAmount(rawAmount, wallet.credits)
 
+      await this.#creditsModel.modifyCredits({
+        userId: this.member.id,
+        byAmount: -amount,
+        isCasino: true,
+      })
+    } catch (error) {
+      cache.uns("jacksbetter")
+      throw error
+    }
+
+    // #############################################################################
+    // Handle the game
+    // #############################################################################
+    const game = new JacksBetter()
+
+    try {
       game.deal({ bet: amount })
 
       await this.#creditsModel.modifyCredits({
