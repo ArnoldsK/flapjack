@@ -116,5 +116,5 @@ export const formatScarabPrice = (chaosValue: number): string => {
   const simpleDenominator = denominator / commonDivisor
 
   // d. Return the simplified fraction string
-  return `${simpleNumerator}c/${simpleDenominator}`
+  return `${simpleNumerator}c/${simpleDenominator}`.replace("1c/1", "1c")
 }
