@@ -12,7 +12,7 @@ import {
   formatScarabPrice,
   isBadScarabPrice,
   isGoodScarabPrice,
-} from "~/server/utils/member"
+} from "~/server/utils/number"
 import { Page } from "~/src/components/Page"
 import { PoeScarab, PoeScarabData } from "~/types/poe"
 

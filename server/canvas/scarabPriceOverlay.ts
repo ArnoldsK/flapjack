@@ -7,7 +7,7 @@ import {
   formatScarabPrice,
   isBadScarabPrice,
   isGoodScarabPrice,
-} from "~/server/utils/member"
+} from "~/server/utils/number"
 import { PoeScarab } from "~/types/poe"
 
 const ROW_GAP = 10

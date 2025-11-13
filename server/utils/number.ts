@@ -56,3 +56,44 @@ export const toFixedDecimals = (value: number, decimals: number): number => {
 
   return Number.parseFloat(result)
 }
+
+export const isGoodScarabPrice = (chaosValue: number): boolean => {
+  const roundedPrecisionValue = Math.round(chaosValue * 10) / 10
+
+  return roundedPrecisionValue >= 1
+}
+
+export const isBadScarabPrice = (chaosValue: number): boolean => {
+  const roundedPrecisionValue = Math.round(chaosValue * 10) / 10
+
+  return roundedPrecisionValue < 0.5
+}
+
+export const formatScarabPrice = (chaosValue: number): string => {
+  // 1. Handle values >= 1 (Return the integer part)
+  if (chaosValue >= 1) {
+    return `${Math.floor(chaosValue)}c`
+  }
+
+  // 2. Handle values < 1 (Convert to a simplified fraction)
+
+  // a. GCD helper function (Euclidean Algorithm)
+  const gcd = (a: number, b: number): number => {
+    return b ? gcd(b, a % b) : a
+  }
+
+  // b. Find a suitable denominator and numerator
+  // We multiply by a power of 10 until the value is an integer (e.g., for 0.75, we multiply by 100 to get 75).
+  // The max power of 10 (e.g., 1,000,000) limits the precision.
+  const precision = 10
+  const numerator = Math.round(chaosValue * precision)
+  const denominator = precision
+
+  // c. Simplify the fraction using GCD
+  const commonDivisor = gcd(numerator, denominator)
+  const simpleNumerator = numerator / commonDivisor
+  const simpleDenominator = denominator / commonDivisor
+
+  // d. Return the simplified fraction string
+  return `${simpleNumerator}c/${simpleDenominator}`.replace(/^1c\/1$/, "1c")
+}
