@@ -2,6 +2,7 @@ import { createCanvas } from "@napi-rs/canvas"
 
 import { mapping, ScarabMapping } from "~/constants/scarabs"
 import { canvasFont } from "~/server/utils/canvas"
+import { d } from "~/server/utils/date"
 import { PoeScarab } from "~/types/poe"
 
 const ROW_GAP = 10
@@ -36,6 +37,12 @@ export const getScarabPriceOverlay = ({
     ctx.drawImage(rowCanvas, x, y)
     y += rowCanvas.height + ROW_GAP
   }
+
+  ctx.textAlign = "left"
+  ctx.textBaseline = "top"
+  ctx.font = canvasFont(10)
+  ctx.fillStyle = "#fff"
+  ctx.fillText(d().tz("Europe/Riga").format("DD/MM/YYYY HH:mm"), 0, 0)
 
   return canvas.toBuffer("image/png")
 }
@@ -113,8 +120,8 @@ const getGroupCanvas = (group: ScarabMapping.Group, options: Options) => {
       const good = value > GOOD_VALUE_MIN
       const color = bad ? "#4b1a1a" : good ? "#1a4b1a" : "#4b4b4b"
 
-      ctx.textBaseline = "bottom"
       ctx.textAlign = "left"
+      ctx.textBaseline = "bottom"
       ctx.font = canvasFont(12)
 
       const text = `${value}c`
