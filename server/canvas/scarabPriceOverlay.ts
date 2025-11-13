@@ -3,6 +3,7 @@ import { createCanvas } from "@napi-rs/canvas"
 import { mapping, ScarabMapping } from "~/constants/scarabs"
 import { canvasFont } from "~/server/utils/canvas"
 import { d } from "~/server/utils/date"
+import { formatScarabPrice } from "~/server/utils/member"
 import { PoeScarab } from "~/types/poe"
 
 const ROW_GAP = 10
@@ -117,16 +118,16 @@ const getGroupCanvas = (group: ScarabMapping.Group, options: Options) => {
     const scarab = options.scarabByName.get(name)
 
     if (scarab) {
-      const value = Math.floor(scarab?.chaosValue ?? 0)
-      const bad = value < BAD_VALUE_MAX
-      const good = value > GOOD_VALUE_MIN
+      const chaosValue = scarab?.chaosValue ?? 0
+      const bad = chaosValue < BAD_VALUE_MAX
+      const good = chaosValue > GOOD_VALUE_MIN
       const color = bad ? "#4b1a1a" : good ? "#1a4b1a" : "#4b4b4b"
 
       ctx.textAlign = "left"
       ctx.textBaseline = "bottom"
       ctx.font = canvasFont(12)
 
-      const text = `${value}c`
+      const text = formatScarabPrice(chaosValue)
       const metrics = ctx.measureText(text)
       const padding = 4
 
