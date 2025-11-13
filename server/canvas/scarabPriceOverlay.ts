@@ -18,8 +18,10 @@ interface Options {
 
 export const getScarabPriceOverlay = ({
   scarabs,
+  updatedAt,
 }: {
   scarabs: PoeScarab[]
+  updatedAt: Date
 }): Buffer => {
   const canvas = createCanvas(820, 780)
   const ctx = canvas.getContext("2d")
@@ -42,7 +44,7 @@ export const getScarabPriceOverlay = ({
   ctx.textBaseline = "top"
   ctx.font = canvasFont(10)
   ctx.fillStyle = "#fff"
-  ctx.fillText(d().tz("Europe/Riga").format("DD/MM/YYYY HH:mm"), 0, 0)
+  ctx.fillText(d(updatedAt).tz("Europe/Riga").format("DD/MM/YYYY HH:mm"), 0, 0)
 
   return canvas.toBuffer("image/png")
 }

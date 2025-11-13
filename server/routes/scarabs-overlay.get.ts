@@ -14,7 +14,10 @@ export default createRoute({
       data = await getPoeScarabPrices(context)
     }
 
-    const image = getScarabPriceOverlay({ scarabs: data.scarabs })
+    const image = getScarabPriceOverlay({
+      scarabs: data.scarabs,
+      updatedAt: data.updatedAt,
+    })
 
     res.contentType("image/png")
     res.send(image)
