@@ -8,12 +8,13 @@ import * as S from "./styles"
 
 import { mapping } from "~/constants/scarabs"
 import { d } from "~/server/utils/date"
-import { formatScarabPrice } from "~/server/utils/member"
+import {
+  formatScarabPrice,
+  isBadScarabPrice,
+  isGoodScarabPrice,
+} from "~/server/utils/member"
 import { Page } from "~/src/components/Page"
 import { PoeScarab, PoeScarabData } from "~/types/poe"
-
-const BAD_VALUE_MAX = 1
-const GOOD_VALUE_MIN = 2
 
 interface ScarabsScreenProps {
   data: PoeScarabData
@@ -69,8 +70,8 @@ export const ScarabsScreen = ({ data }: ScarabsScreenProps) => {
 
 const Scarab = ({ scarab }: { scarab: PoeScarab }) => {
   const chaosValue = scarab?.chaosValue ?? 0
-  const bad = chaosValue < BAD_VALUE_MAX
-  const good = chaosValue > GOOD_VALUE_MIN
+  const bad = isBadScarabPrice(chaosValue)
+  const good = isGoodScarabPrice(chaosValue)
 
   const [, copyToClipboard] = useCopyToClipboard()
 

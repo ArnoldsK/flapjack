@@ -82,6 +82,14 @@ export const embedAuthor = (member: GuildMember): APIEmbedAuthor => {
   }
 }
 
+export const isGoodScarabPrice = (chaosValue: number): boolean => {
+  return chaosValue >= 2
+}
+
+export const isBadScarabPrice = (chaosValue: number): boolean => {
+  return chaosValue < 0.5
+}
+
 export const formatScarabPrice = (chaosValue: number): string => {
   // 1. Handle values >= 1 (Return the integer part)
   if (chaosValue >= 1) {
