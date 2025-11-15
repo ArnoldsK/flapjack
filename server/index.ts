@@ -107,16 +107,20 @@ nextApp.prepare().then(async () => {
         const content = (error as Error).message
 
         if (interaction.deferred) {
-          await interaction.editReply(
-            instance.isComponentsV2
-              ? {
-                  flags: [MessageFlags.IsComponentsV2],
-                  components: [new TextDisplayBuilder().setContent(content)],
-                }
-              : content,
-          )
+          await interaction
+            .editReply(
+              instance.isComponentsV2
+                ? {
+                    flags: [MessageFlags.IsComponentsV2],
+                    components: [new TextDisplayBuilder().setContent(content)],
+                  }
+                : content,
+            )
+            .catch(() => null)
         } else {
-          await interaction.reply({ flags: [MessageFlags.Ephemeral], content })
+          await interaction
+            .reply({ flags: [MessageFlags.Ephemeral], content })
+            .catch(() => null)
         }
       }
     }
