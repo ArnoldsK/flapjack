@@ -73,7 +73,7 @@ export default createEvent(
     channel.send({
       embeds: [
         {
-          color: Color.black,
+          color: Color.red,
           author: embedAuthor(member),
           title,
           description: joinAsLines(
