@@ -93,12 +93,6 @@ export default class JacksBetterCommand extends BaseCommand {
     try {
       game.deal({ bet: amount })
 
-      await this.#creditsModel.modifyCredits({
-        userId: this.member.id,
-        byAmount: -amount,
-        isCasino: true,
-      })
-
       const response = await this.reply(this.#getDealReply(game))
 
       assert(!!response, "No response")
