@@ -189,6 +189,13 @@ export default class CreditsCommand extends BaseCommand {
     const creditsModel = new CreditsModel(this.context)
     const wallets = await creditsModel.getAllWallets()
 
+    if (wallets.length === 0) {
+      this.reply({
+        content: "No one has any credits yet.",
+      })
+      return
+    }
+
     this.reply({
       embeds: [
         {
