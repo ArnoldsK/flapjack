@@ -1,6 +1,6 @@
 import { Events } from "discord.js"
 
-import { MIN_CREDITS_PER_MESSAGE, RANK_ACTIVE_ROLE_LEVEL } from "~/constants"
+import { RANK_ACTIVE_ROLE_LEVEL } from "~/constants"
 import { DISCORD_IDS } from "~/constants"
 import { appConfig } from "~/server/config"
 import { CreditsModel } from "~/server/db/model/Credits"
@@ -64,17 +64,9 @@ export default createEvent(
     // Credits
     // #############################################################################
     const creditsModel = new CreditsModel(context)
-    const wallet = await creditsModel.getWallet(message.member.id)
 
-    const secondsSinceUpdate = wallet.lastMessageAt
-      ? (Date.now() - wallet.lastMessageAt.getTime()) / 1000
-      : 0
-    const timeBasedAmount = Math.floor(secondsSinceUpdate * 0.2)
-
-    await creditsModel.modifyCredits({
+    await creditsModel.addMessageCredits({
       userId: message.member.id,
-      byAmount: Math.max(MIN_CREDITS_PER_MESSAGE, timeBasedAmount),
-      isCasino: false,
       messageAt: message.createdAt,
     })
   },

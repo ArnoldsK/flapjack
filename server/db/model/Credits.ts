@@ -1,7 +1,11 @@
 import { RequiredEntityData } from "@mikro-orm/core"
 import { GuildMember } from "discord.js"
 
-import { DISCORD_IDS, UPPER_CLASS_MESSAGE_CREDITS } from "~/constants"
+import {
+  DISCORD_IDS,
+  MIN_CREDITS_PER_MESSAGE,
+  UPPER_CLASS_MESSAGE_CREDITS,
+} from "~/constants"
 import { BaseModel } from "~/server/base/Model"
 import { appConfig } from "~/server/config"
 import { CreditsEntity } from "~/server/db/entity/Credits"
@@ -145,5 +149,31 @@ export class CreditsModel extends BaseModel {
 
   async removeAll() {
     await this.em.nativeDelete(this.Entity, {})
+  }
+
+  async addMessageCredits({
+    userId,
+    messageAt,
+  }: {
+    userId: string
+    messageAt: Date
+  }): Promise<Wallet> {
+    const wallet = await this.getWallet(userId)
+
+    if (wallet.member.user.bot) {
+      return wallet
+    }
+
+    const secondsSinceUpdate = wallet.lastMessageAt
+      ? (messageAt.getTime() - wallet.lastMessageAt.getTime()) / 1000
+      : 0
+    const timeBasedAmount = Math.floor(secondsSinceUpdate * 0.2)
+
+    return await this.modifyCredits({
+      userId,
+      byAmount: Math.max(MIN_CREDITS_PER_MESSAGE, timeBasedAmount),
+      isCasino: false,
+      messageAt,
+    })
   }
 }

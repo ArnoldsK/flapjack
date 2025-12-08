@@ -3,7 +3,7 @@ import { SlashCommandBuilder } from "discord.js"
 import { OPTION_DESCRIPTION_AMOUNT } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { appConfig } from "~/server/config"
-import { CreditsModel } from "~/server/db/model/Credits"
+import { CreditsModel, Wallet } from "~/server/db/model/Credits"
 import { sortBigInt } from "~/server/utils/array"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
@@ -130,7 +130,16 @@ export default class CreditsCommand extends BaseCommand {
     const intro = isSelf ? "You have" : `${member.displayName} has`
 
     const creditsModel = new CreditsModel(this.context)
-    const wallet = await creditsModel.getWallet(member.id)
+
+    let wallet: Wallet
+    if (isSelf && isCasinoChannel(this.channel)) {
+      wallet = await creditsModel.addMessageCredits({
+        userId: this.user.id,
+        messageAt: this.interaction.createdAt,
+      })
+    } else {
+      wallet = await creditsModel.getWallet(member.id)
+    }
 
     this.reply({
       embeds: [
