@@ -94,7 +94,7 @@ export class CreditsModel extends BaseModel {
 
     const entity = await this.em.upsert(
       this.Entity,
-      getUpsertData(userId, newCredits, messageAt),
+      getUpsertData(userId, newCredits, messageAt ?? wallet.lastMessageAt),
     )
 
     // Modify bot credits with the opposite amount
@@ -110,7 +110,7 @@ export class CreditsModel extends BaseModel {
     const newWallet: Wallet = {
       member: wallet.member,
       credits: parseEntityCredits(entity),
-      lastMessageAt: messageAt ?? entity.lastMessageAt,
+      lastMessageAt: entity.lastMessageAt,
       updatedAt: entity.updatedAt,
     }
 
