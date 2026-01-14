@@ -66,6 +66,10 @@ export default class BoosterIconCommand extends BaseCommand {
     permissions: [PermissionFlags.NitroBooster],
   })
 
+  get isEphemeral(): boolean {
+    return true
+  }
+
   async execute() {
     const subcommand = this.getSubcommand<SubcommandName>()
 
