@@ -2,9 +2,9 @@ import { z } from "zod"
 
 import { StaticDataModel } from "~/server/db/model/StaticData"
 import { isNonNullish } from "~/server/utils/boolean"
+import { BaseContext } from "~/types"
 import { StaticDataType } from "~/types/entity"
-import { PoeScarab, PoeScarabData } from "~/types/poe"
-import { Task } from "~/types/tasks"
+import { PoeScarab } from "~/types/poe"
 
 const API_BASE_URL = "https://poe.ninja"
 const CDN_BASE_URL = "https://web.poecdn.com"
@@ -85,24 +85,28 @@ const getScarabData = async (league: string): Promise<PoeScarab[]> => {
     .filter(isNonNullish)
 }
 
-export const getPoeScarabPrices: Task<PoeScarabData> = async (context) => {
+export const getPoeScarabPrices = async (context: BaseContext) => {
+  // Use cached if possible
+  const model = new StaticDataModel(context)
+  let scarabData = await model.get(StaticDataType.PoeScarabs)
+
+  if (scarabData) {
+    return scarabData
+  }
+
+  // Otherwise get new data
   const league = await getLeagueName()
   const scarabs = await getScarabData(league)
 
-  const scarabData: PoeScarabData = {
+  scarabData = {
     league,
     scarabs,
     updatedAt: new Date(),
   }
 
-  // #############################################################################
-  // Save as static data
-  // #############################################################################
-  const model = new StaticDataModel(context)
+  // Update static data
   await model.set(StaticDataType.PoeScarabs, scarabData)
 
-  // #############################################################################
-  // Return data for manual updates
-  // #############################################################################
+  // Return final data
   return scarabData
 }

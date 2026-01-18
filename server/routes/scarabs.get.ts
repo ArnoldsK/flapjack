@@ -1,5 +1,5 @@
-import { getPoeScarabPrices } from "~/server/cron/tasks/getPoeScarabPrices"
 import { StaticDataModel } from "~/server/db/model/StaticData"
+import { getPoeScarabPrices } from "~/server/utils/poe"
 import { createRoute } from "~/server/utils/routes"
 import { StaticDataType } from "~/types/entity"
 

@@ -24,4 +24,10 @@ export class StaticDataModel extends BaseModel {
       value,
     })
   }
+
+  async delete<Type extends StaticDataType>(dataType: Type) {
+    await this.em.nativeDelete(this.Entity, {
+      type: dataType,
+    })
+  }
 }

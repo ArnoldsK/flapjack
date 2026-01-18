@@ -1,12 +1,12 @@
 import { createDailyStats } from "~/server/cron/tasks/createDailyStats"
 import { createWeekRecap } from "~/server/cron/tasks/createWeekRecap"
 import { endReminders } from "~/server/cron/tasks/endReminders"
-import { getPoeScarabPrices } from "~/server/cron/tasks/getPoeScarabPrices"
 // import { handleCreditsLotteries } from "~/server/cron/tasks/handleCreditsLotteries"
 // import { mcStatus } from "~/server/cron/tasks/mcStatus"
 import { removeNonBoosterIcons } from "~/server/cron/tasks/removeNonBoosterIcons"
 import { removeOldStats } from "~/server/cron/tasks/removeOldStats"
 import { resetCredits } from "~/server/cron/tasks/resetCredits"
+import { resetPoeScarabsStaticData } from "~/server/cron/tasks/resetPoeScarabsStaticData"
 import { updateBannerToGif } from "~/server/cron/tasks/updateBannerToGif"
 import { CronTask } from "~/server/utils/cron"
 
@@ -76,10 +76,10 @@ export const cronTasks: CronTask[] = [
     task: createDailyStats,
   },
   {
-    description: "Get PoE scarab prices",
+    description: "Reset PoE scarabs static data",
     expression: "every 20 minutes",
     isRawExpression: false,
     productionOnly: true,
-    task: getPoeScarabPrices,
+    task: resetPoeScarabsStaticData,
   },
 ]
