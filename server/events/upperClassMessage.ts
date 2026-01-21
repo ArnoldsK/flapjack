@@ -10,10 +10,17 @@ export default createEvent(
   { productionOnly: true },
   async (context, message) => {
     if (message.channel.id !== DISCORD_IDS.channels.upperClass) return
-    if (message.author.bot) return
-    if (!message.member) return
+    if (message.author.bot) {
+      console.log("UPPER CLASS > user is a bot")
+      return
+    }
+    if (!message.member) {
+      console.log("UPPER CLASS > not a member")
+      return
+    }
 
     if (!message.member.roles.cache.has(DISCORD_IDS.roles.upperClass)) {
+      console.log("UPPER CLASS > no role")
       await message.delete()
       return
     }
@@ -23,10 +30,12 @@ export default createEvent(
 
     // Role should account for this but just in case...
     if (wallet.credits < UPPER_CLASS_MESSAGE_CREDITS) {
+      console.log("UPPER CLASS > no credits")
       await message.delete()
       return
     }
 
+    console.log("UPPER CLASS > remove credits")
     await creditsModel.modifyCredits({
       userId: message.member.id,
       byAmount: -UPPER_CLASS_MESSAGE_CREDITS,
