@@ -66,7 +66,7 @@ export class CreditsModel extends BaseModel {
     userId,
     byAmount,
     isCasino,
-    messageAt,
+    timeBasedMessageAt,
   }: {
     userId: string
     byAmount: bigint | number
@@ -78,7 +78,7 @@ export class CreditsModel extends BaseModel {
     /**
      * When updating time-based message credits
      */
-    messageAt?: Date
+    timeBasedMessageAt?: Date
   }): Promise<Wallet> {
     const wallet = await this.getWallet(userId)
 
@@ -94,7 +94,11 @@ export class CreditsModel extends BaseModel {
 
     const entity = await this.em.upsert(
       this.Entity,
-      getUpsertData(userId, newCredits, messageAt ?? wallet.lastMessageAt),
+      getUpsertData(
+        userId,
+        newCredits,
+        timeBasedMessageAt ?? wallet.lastMessageAt,
+      ),
     )
 
     // Modify bot credits with the opposite amount
@@ -173,7 +177,7 @@ export class CreditsModel extends BaseModel {
       userId,
       byAmount: Math.max(MIN_CREDITS_PER_MESSAGE, timeBasedAmount),
       isCasino: false,
-      messageAt,
+      timeBasedMessageAt: messageAt,
     })
   }
 }
