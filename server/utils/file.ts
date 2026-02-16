@@ -8,7 +8,9 @@ const getImportableDirectoryFiles = (dir: string) => {
     .filter(
       (file) =>
         (file.endsWith(".ts") || file.endsWith(".js")) &&
-        !file.startsWith("index"),
+        !file.startsWith("index") &&
+        !file.endsWith(".test.ts") &&
+        !file.endsWith(".test.js"),
     )
     .map((file) => path.join(dir, file.replace(/\.(t|s)s$/, "")))
 }
@@ -16,7 +18,7 @@ const getImportableDirectoryFiles = (dir: string) => {
 /**
  * Import and return all directory file `default` exports.
  *
- * For use in index files. Index files are excluded from the import.
+ * For use in index files. Index and test files are excluded from the import.
  *
  * @example
  * ```ts

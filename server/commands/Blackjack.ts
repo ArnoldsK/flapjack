@@ -21,6 +21,7 @@ import { OPTION_DESCRIPTION_AMOUNT, Unicode } from "~/constants"
 import { BaseCommand } from "~/server/base/Command"
 import { CacheKey } from "~/server/cache"
 import { CreditsModel, Wallet } from "~/server/db/model/Credits"
+import { getGameOutcomeText } from "~/server/utils/blackjack"
 import { isNonNullish } from "~/server/utils/boolean"
 import { isCasinoChannel } from "~/server/utils/channel"
 import { formatCredits, parseCreditsAmount } from "~/server/utils/credits"
@@ -277,39 +278,16 @@ export default class BlackjackCommand extends BaseCommand {
     const rightHand = state.handInfo.right
     const leftHand = state.handInfo.left as Hand | undefined
 
-    const bust: boolean =
-      rightHand.playerHasBusted || !!leftHand?.playerHasBusted
-    const hasDoubleBj: boolean =
-      rightHand.playerHasBlackjack && !!leftHand?.playerHasBlackjack
-    const hasBj: boolean =
-      rightHand.playerHasBlackjack || !!leftHand?.playerHasBlackjack
-
     const bet = state.finalBet || state.initialBet
     const receivedAmount = wonAmount - bet
 
-    let outcome: string
-    if (bust) {
-      outcome = "Bust, you lost"
-    } else if (state.dealerHasBusted) {
-      outcome = "Dealer bust, you won"
-    } else if (hasDoubleBj) {
-      outcome = "Double blackjack, you won"
-    } else if (hasBj && state.dealerHasBlackjack) {
-      outcome = "Draw, both have blackjack"
-    } else if (state.dealerHasBlackjack) {
-      outcome = "Dealer blackjack, you lost"
-    } else if (hasBj) {
-      outcome = "Blackjack, you won"
-    } else {
-      if (receivedAmount > 0) {
-        outcome = "You won"
-      } else if (receivedAmount === 0) {
-        outcome = "Draw, you get back"
-      } else {
-        outcome = "You lost"
-      }
-    }
-
+    const outcome = getGameOutcomeText({
+      playerMainHand: rightHand,
+      playerSplitHand: leftHand,
+      dealerHasBusted: state.dealerHasBusted,
+      dealerHasBlackjack: state.dealerHasBlackjack,
+      receivedAmount,
+    })
     const result = formatCredits(receivedAmount > 0 ? receivedAmount : bet, {
       withTimes: wonAmount > 0 ? wonAmount / bet : 0,
     })
