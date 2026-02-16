@@ -292,10 +292,12 @@ export default class BlackjackCommand extends BaseCommand {
       outcome = "Bust, you lost"
     } else if (state.dealerHasBusted) {
       outcome = "Dealer bust, you won"
-    } else if (state.dealerHasBlackjack) {
-      outcome = "Dealer blackjack, you lost"
     } else if (hasDoubleBj) {
       outcome = "Double blackjack, you won"
+    } else if (hasBj && state.dealerHasBlackjack) {
+      outcome = "Draw, both have blackjack"
+    } else if (state.dealerHasBlackjack) {
+      outcome = "Dealer blackjack, you lost"
     } else if (hasBj) {
       outcome = "Blackjack, you won"
     } else {
